@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "domains": [
+    {
+      "id": "quickwins",
+      "title": "Quick Wins",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "auto_updates",
+              "type": "YN",
+              "weight": 8,
+              "quickWin": true,
+              "timeEstimate": "2 minutes",
+              "text": "Do you have automatic updates enabled on your devices?",
+              "explanation": "Keeps you protected from known vulnerabilities",
+              "actionHint": "Go to Settings > Update & Security > Turn on automatic updates"
+            },
+            {
+              "id": "lock_screen",
+              "type": "YN", 
+              "weight": 6,
+              "quickWin": true,
+              "timeEstimate": "1 minute",
+              "text": "Does your phone/computer lock automatically?",
+              "explanation": "Prevents unauthorized access if you walk away",
+              "actionHint": "Set auto-lock to 5 minutes or less"
+            },
+            {
+              "id": "browser_passwords",
+              "type": "YN",
+              "weight": 10,
+              "quickWin": true,
+              "timeEstimate": "3 minutes",
+              "text": "Do you let your browser save and generate passwords?",
+              "explanation": "Instant unique passwords for every account",
+              "actionHint": "Chrome/Edge/Safari all have built-in password managers"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "account",
+      "title": "Account Security",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "email_mfa",
+              "type": "YN",
+              "weight": 10,
+              "quickWin": true,
+              "timeEstimate": "5 minutes",
+              "text": "Is two-factor authentication (2FA) enabled on your main email?",
+              "explanation": "Your email is the key to everything - protect it first!",
+              "actionHint": "Gmail: Settings > Security > 2-Step Verification"
+            },
+            {
+              "id": "banking_mfa", 
+              "type": "YN",
+              "weight": 9,
+              "quickWin": true,
+              "timeEstimate": "5 minutes", 
+              "text": "Is 2FA enabled on your banking/financial accounts?",
+              "explanation": "Protects your money - highest priority",
+              "actionHint": "Log into your bank > Security Settings > Enable 2FA"
+            }
+          ]
+        },
+        {
+          "level": 1,
+          "questions": [
+            {
+              "id": "password_reuse",
+              "type": "SCALE",
+              "weight": 7,
+              "text": "How often do you reuse the same password? (1=Always, 5=Never)",
+              "explanation": "One breach shouldn't compromise all accounts",
+              "actionHint": "Use your browser's password generator for new accounts"
+            },
+            {
+              "id": "social_media_mfa",
+              "type": "YN",
+              "weight": 6,
+              "text": "Is 2FA enabled on your social media accounts?",
+              "explanation": "Prevents account hijacking and impersonation",
+              "actionHint": "Check security settings on Facebook, Instagram, Twitter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "device",
+      "title": "Device Security", 
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "antivirus",
+              "type": "YN",
+              "weight": 7,
+              "quickWin": true,
+              "timeEstimate": "10 minutes",
+              "text": "Do you have antivirus software running?",
+              "explanation": "Basic malware protection",
+              "actionHint": "Windows Defender is free and built-in, or try Malwarebytes"
+            },
+            {
+              "id": "firewall",
+              "type": "YN", 
+              "weight": 6,
+              "quickWin": true,
+              "timeEstimate": "1 minute",
+              "text": "Is your firewall turned on?",
+              "explanation": "Blocks unauthorized network connections",
+              "actionHint": "Windows: Settings > Network > Windows Defender Firewall"
+            }
+          ]
+        },
+        {
+          "level": 1,
+          "questions": [
+            {
+              "id": "disk_encryption",
+              "type": "YN",
+              "weight": 8,
+              "text": "Is your hard drive encrypted?",
+              "explanation": "Protects data if device is stolen",
+              "actionHint": "Windows: BitLocker, Mac: FileVault, built into most phones"
+            },
+            {
+              "id": "usb_autorun",
+              "type": "YN",
+              "weight": 4,
+              "text": "Have you disabled USB autorun?",
+              "explanation": "Prevents malware from USB drives auto-executing",
+              "actionHint": "Windows: gpedit.msc > Computer Config > Admin Templates > Windows Components > Autoplay Policies"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "browsing",
+      "title": "Safe Browsing",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "ad_blocker",
+              "type": "YN",
+              "weight": 6,
+              "quickWin": true,
+              "timeEstimate": "3 minutes",
+              "text": "Do you use an ad blocker?",
+              "explanation": "Blocks malicious ads and trackers",
+              "actionHint": "Install uBlock Origin from your browser's extension store"
+            },
+            {
+              "id": "https_everywhere",
+              "type": "YN",
+              "weight": 5,
+              "quickWin": true,
+              "timeEstimate": "2 minutes",
+              "text": "Do you check for HTTPS (lock icon) on websites?",
+              "explanation": "Ensures your data is encrypted in transit",
+              "actionHint": "Look for the lock icon in the address bar, avoid sites without it"
+            }
+          ]
+        },
+        {
+          "level": 1,
+          "questions": [
+            {
+              "id": "download_sources",
+              "type": "SCALE",
+              "weight": 7,
+              "text": "How often do you download software from official sources? (1=Never, 5=Always)",
+              "explanation": "Official sources are less likely to contain malware",
+              "actionHint": "Use app stores, official websites, or trusted repositories"
+            },
+            {
+              "id": "email_attachments",
+              "type": "SCALE", 
+              "weight": 6,
+              "text": "How careful are you with email attachments? (1=Open everything, 5=Very cautious)",
+              "explanation": "Email attachments are a common malware vector",
+              "actionHint": "Scan attachments, verify sender, be suspicious of unexpected files"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backup",
+      "title": "Data Protection",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "phone_backup",
+              "type": "YN",
+              "weight": 8,
+              "quickWin": true,
+              "timeEstimate": "5 minutes",
+              "text": "Do you backup your phone to the cloud?",
+              "explanation": "Don't lose your photos and contacts!",
+              "actionHint": "iPhone: iCloud Backup, Android: Google Backup - usually automatic"
+            },
+            {
+              "id": "important_files",
+              "type": "YN",
+              "weight": 7,
+              "quickWin": true,
+              "timeEstimate": "10 minutes",
+              "text": "Do you backup important files (photos, documents)?",
+              "explanation": "Protects against ransomware and hardware failure",
+              "actionHint": "Google Drive, OneDrive, or Dropbox - 15GB+ free"
+            }
+          ]
+        },
+        {
+          "level": 1,
+          "questions": [
+            {
+              "id": "backup_frequency",
+              "type": "SCALE",
+              "weight": 6,
+              "text": "How often do you backup important data? (1=Never, 5=Daily/Automatic)",
+              "explanation": "Regular backups minimize data loss",
+              "actionHint": "Set up automatic daily backups to cloud storage"
+            },
+            {
+              "id": "backup_testing",
+              "type": "YN",
+              "weight": 4,
+              "text": "Have you ever tested restoring from your backup?",
+              "explanation": "Untested backups may not work when you need them",
+              "actionHint": "Try restoring a single file to verify backup works"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "network",
+      "title": "Network Security",
+      "levels": [
+        {
+          "level": 1,
+          "questions": [
+            {
+              "id": "home_wifi_password",
+              "type": "YN",
+              "weight": 6,
+              "text": "Does your home WiFi use WPA2/WPA3 security?",
+              "explanation": "Prevents neighbors from using your internet and snooping",
+              "actionHint": "Check router settings - avoid WEP or open networks"
+            },
+            {
+              "id": "public_wifi_caution",
+              "type": "SCALE",
+              "weight": 5,
+              "text": "How careful are you on public WiFi? (1=Use normally, 5=Very cautious)",
+              "explanation": "Public WiFi can be monitored by attackers",
+              "actionHint": "Avoid sensitive activities, use your phone's hotspot instead"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "questions": [
+            {
+              "id": "router_default_password",
+              "type": "YN",
+              "weight": 7,
+              "text": "Have you changed your router's default admin password?",
+              "explanation": "Default passwords are publicly known",
+              "actionHint": "Access router settings (usually 192.168.1.1) and change admin password"
+            },
+            {
+              "id": "vpn_usage",
+              "type": "YN",
+              "weight": 4,
+              "text": "Do you use a VPN when needed?",
+              "explanation": "Encrypts traffic and hides location",
+              "actionHint": "Many routers have built-in VPN, or use services like ProtonVPN"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

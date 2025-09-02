@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --score-width: 0%;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .score-bar-fill {
+    width: var(--score-width);
+  }
+  
+  .level-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+  
+  .level-badge-novice {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .level-badge-competent {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .level-badge-advanced {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .level-badge-expert {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .level-badge-master {
+    @apply bg-purple-100 text-purple-800;
+  }
+  
+  .question-card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow;
+  }
+  
+  .domain-section {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+  }
+}
