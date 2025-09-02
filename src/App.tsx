@@ -63,14 +63,29 @@ function App() {
     reader.onload = (e) => {
       try {
         const data = JSON.parse(e.target?.result as string);
-        if (data.answers) {
+        
+        // Validate structure
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid file structure');
+        }
+        
+        if (data.answers && typeof data.answers === 'object') {
           // Import answers one by one to trigger score recalculation
-          Object.entries(data.answers as typeof answers).forEach(([questionId, answer]) => {
-            answerQuestion(questionId, (answer as any).value);
+          Object.entries(data.answers as Record<string, { questionId: string; value: boolean | number }>).forEach(([questionId, answer]) => {
+            if (answer && typeof answer === 'object' && 'value' in answer) {
+              const value = answer.value;
+              if (typeof value === 'boolean' || (typeof value === 'number' && value >= 1 && value <= 5)) {
+                answerQuestion(questionId, value);
+              }
+            }
           });
+          alert('Assessment data imported successfully!');
+        } else {
+          throw new Error('No valid answers found in file');
         }
       } catch (error) {
-        alert('Invalid file format');
+        console.error('Import error:', error);
+        alert(error instanceof Error ? error.message : 'Invalid file format');
       }
     };
     reader.readAsText(file);

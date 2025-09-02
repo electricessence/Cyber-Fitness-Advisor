@@ -22,6 +22,9 @@ interface AssessmentState {
     progress: number;
   };
   
+  // Cached recommendations
+  recommendations: ReturnType<typeof getTopRecommendations>;
+  
   // UI state
   showCelebration: boolean;
   lastScoreIncrease: number;
@@ -48,6 +51,7 @@ const initialState = {
     pointsNeeded: 15,
     progress: 0
   },
+  recommendations: [] as ReturnType<typeof getTopRecommendations>,
   showCelebration: false,
   lastScoreIncrease: 0,
   earnedBadges: [],
@@ -86,6 +90,9 @@ export const useAssessmentStore = create<AssessmentState>()(
           newBadges.push('halfway-hero');
         }
         
+        // Recalculate recommendations
+        const newRecommendations = getTopRecommendations(state.questionBank, newAnswers);
+        
         set({
           answers: newAnswers,
           overallScore: scoreResult.overallScore,
@@ -94,6 +101,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           quickWinsCompleted: scoreResult.quickWinsCompleted,
           totalQuickWins: scoreResult.totalQuickWins,
           nextLevelProgress,
+          recommendations: newRecommendations,
           showCelebration: shouldCelebrate,
           lastScoreIncrease: scoreIncrease,
           earnedBadges: newBadges,
@@ -108,8 +116,7 @@ export const useAssessmentStore = create<AssessmentState>()(
       },
       
       getRecommendations: () => {
-        const state = get();
-        return getTopRecommendations(state.questionBank, state.answers);
+        return get().recommendations;
       },
       
       dismissCelebration: () => {

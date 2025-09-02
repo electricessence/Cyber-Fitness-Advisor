@@ -26,11 +26,15 @@ export function QuestionCard({ question, answer, onAnswer, domainTitle }: Questi
     : typeof answer === 'number' && answer >= 4;
 
   return (
-    <div className={`
-      bg-white rounded-lg shadow-md p-5 border-l-4 transition-all duration-200 hover:shadow-lg
-      ${question.quickWin ? 'border-l-yellow-400 bg-gradient-to-r from-yellow-50 to-white' : 'border-l-gray-300'}
-      ${isAnswered ? (isPositiveAnswer ? 'ring-2 ring-green-200' : 'ring-2 ring-orange-200') : ''}
-    `}>
+    <div 
+      className={`
+        bg-white rounded-lg shadow-md p-5 border-l-4 transition-all duration-200 hover:shadow-lg
+        ${question.quickWin ? 'border-l-yellow-400 bg-gradient-to-r from-yellow-50 to-white' : 'border-l-gray-300'}
+        ${isAnswered ? (isPositiveAnswer ? 'ring-2 ring-green-200' : 'ring-2 ring-orange-200') : ''}
+      `}
+      role="region"
+      aria-labelledby={`question-title-${question.id}`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -58,7 +62,10 @@ export function QuestionCard({ question, answer, onAnswer, domainTitle }: Questi
 
       {/* Question */}
       <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-800 mb-2">
+        <h3 
+          id={`question-title-${question.id}`}
+          className="text-lg font-medium text-gray-800 mb-2"
+        >
           {question.text}
         </h3>
         
