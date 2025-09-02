@@ -9,16 +9,6 @@
           "level": 0,
           "questions": [
             {
-              "id": "auto_updates",
-              "type": "YN",
-              "weight": 8,
-              "quickWin": true,
-              "timeEstimate": "2 minutes",
-              "text": "Do you have automatic updates enabled on your devices?",
-              "explanation": "Keeps you protected from known vulnerabilities",
-              "actionHint": "Go to Settings > Update & Security > Turn on automatic updates"
-            },
-            {
               "id": "lock_screen",
               "type": "YN", 
               "weight": 6,

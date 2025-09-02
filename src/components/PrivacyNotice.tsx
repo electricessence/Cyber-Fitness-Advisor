@@ -12,7 +12,7 @@ export function PrivacyNotice({ onDismiss, isMinimized = false }: PrivacyNoticeP
 
   if (!isExpanded && isMinimized) {
     return (
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-4 right-4 z-[60]">
         <button
           onClick={() => setIsExpanded(true)}
           className="bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition-colors"
@@ -25,7 +25,7 @@ export function PrivacyNotice({ onDismiss, isMinimized = false }: PrivacyNoticeP
   }
 
   return (
-    <div className="fixed top-4 right-4 max-w-sm z-50 animate-slide-in">
+    <div className="fixed top-4 right-4 max-w-sm z-[60] animate-slide-in">
       <div className="bg-white rounded-lg shadow-lg border border-green-200 overflow-hidden">
         {/* Header */}
         <div className="bg-green-50 px-4 py-3 border-b border-green-200">

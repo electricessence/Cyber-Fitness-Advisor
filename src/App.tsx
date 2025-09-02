@@ -8,6 +8,7 @@ import { ActionRecommendations } from './components/ActionRecommendations';
 import { Celebration } from './components/Celebration';
 import { GameifiedOnboarding } from './components/GameifiedOnboarding';
 import { PrivacyNotice } from './components/PrivacyNotice';
+import { AnswerHistory } from './components/AnswerHistory';
 
 function App() {
   const [currentDomain, setCurrentDomain] = useState<string>('quickwins');
@@ -205,12 +206,14 @@ function App() {
             localStorage.setItem('cyber-fitness-detected-platform', result.detectedInfo.platform);
             localStorage.setItem('cyber-fitness-detected-browser', result.detectedInfo.browser);
             
-            // Apply the score from onboarding to their actual assessment
-            // (you might want to add some of these as actual answered questions)
-            
             setShowOnboarding(false);
             // Show privacy notice after gamified onboarding
             setPrivacyNoticeMinimized(false);
+            
+            // Force reinitialize the store to pick up onboarding data
+            setTimeout(() => {
+              initializeStore();
+            }, 100);
           }}
         />
       )}
@@ -364,6 +367,13 @@ function App() {
                     console.log('Action completed:', actionId);
                   }}
                 />
+              </div>
+            )}
+
+            {/* Answer History */}
+            {!showOnboarding && answeredQuestions > 0 && (
+              <div className="mt-6">
+                <AnswerHistory />
               </div>
             )}
 

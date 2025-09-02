@@ -30,6 +30,9 @@ export interface QuestionBank {
 export interface Answer {
   questionId: string;
   value: boolean | number;
+  timestamp?: Date;
+  pointsEarned?: number;
+  questionText?: string; // Store for historic reference
 }
 
 export interface UserProgress {

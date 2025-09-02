@@ -1,8 +1,53 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { QuestionBank, Answer } from '../engine/schema';
-import { calculateOverallScore, getTopRecommendations, getNextLevelProgress } from '../engine/scoring';
+import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints } from '../engine/scoring';
 import questionsData from '../data/questions.json';
+
+// Smart pre-population from onboarding data
+function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
+  const onboardingAnswers = JSON.parse(localStorage.getItem('cyber-fitness-onboarding-answers') || '{}');
+  const updatedAnswers = { ...existingAnswers };
+
+  // Map password practices from onboarding to browser_passwords question
+  if (onboardingAnswers.password_strength && !updatedAnswers.browser_passwords) {
+    const passwordBehavior = onboardingAnswers.password_strength.value;
+    // If they use all_unique or mostly_unique, they likely use browser passwords or password manager
+    const usesBrowserPasswords = passwordBehavior === 'all_unique' || passwordBehavior === 'mostly_unique';
+    
+    updatedAnswers.browser_passwords = {
+      questionId: 'browser_passwords',
+      value: usesBrowserPasswords,
+      timestamp: new Date(),
+      pointsEarned: usesBrowserPasswords ? 10 : 0,
+      questionText: 'Browser password manager usage (inferred from onboarding)'
+    };
+  }
+
+  // Map password practices to password_reuse question (SCALE 1-5)
+  if (onboardingAnswers.password_strength && !updatedAnswers.password_reuse) {
+    const passwordBehavior = onboardingAnswers.password_strength.value;
+    let reuseScore = 1; // Default to worst case
+    
+    switch(passwordBehavior) {
+      case 'all_unique': reuseScore = 5; break; // Never reuse
+      case 'mostly_unique': reuseScore = 4; break; // Rarely reuse  
+      case 'some_same': reuseScore = 3; break; // Sometimes reuse
+      case 'mostly_same': reuseScore = 2; break; // Often reuse
+      default: reuseScore = 1; // Always reuse
+    }
+    
+    updatedAnswers.password_reuse = {
+      questionId: 'password_reuse',
+      value: reuseScore,
+      timestamp: new Date(),
+      pointsEarned: reuseScore > 1 ? (reuseScore - 1) * 2.5 : 0, // Rough estimate
+      questionText: 'Password reuse habits (inferred from onboarding)'
+    };
+  }
+
+  return updatedAnswers;
+}
 
 interface AssessmentState {
   // Data
@@ -34,6 +79,7 @@ interface AssessmentState {
   answerQuestion: (questionId: string, value: boolean | number) => void;
   resetAssessment: () => void;
   getRecommendations: () => ReturnType<typeof getTopRecommendations>;
+  getHistoricAnswers: () => Array<Answer & { domain: string; level: number }>;
   dismissCelebration: () => void;
 }
 
@@ -66,12 +112,22 @@ export const useAssessmentStore = create<AssessmentState>()(
         const state = get();
         const previousScore = state.overallScore;
         
+        // Find the question to get its details
+        const question = state.questionBank.domains
+          .flatMap(d => d.levels.flatMap(l => l.questions))
+          .find(q => q.id === questionId);
+        
+        const pointsEarned = question ? calculateQuestionPoints(question, value) : 0;
+        
         const newAnswers = {
           ...state.answers,
           [questionId]: {
             questionId,
             value,
-          },
+            timestamp: new Date(),
+            pointsEarned,
+            questionText: question?.text
+          } as Answer,
         };
         
         const scoreResult = calculateOverallScore(state.questionBank, newAnswers);
@@ -119,6 +175,39 @@ export const useAssessmentStore = create<AssessmentState>()(
         return get().recommendations;
       },
       
+      getHistoricAnswers: () => {
+        const state = get();
+        return Object.values(state.answers).map(answer => {
+          // Find which domain and level this question belongs to
+          let domain = '';
+          let level = 0;
+          
+          for (const d of state.questionBank.domains) {
+            for (let l = 0; l < d.levels.length; l++) {
+              const question = d.levels[l].questions.find(q => q.id === answer.questionId);
+              if (question) {
+                domain = d.title;
+                level = l + 1;
+                break;
+              }
+            }
+            if (domain) break;
+          }
+          
+          return {
+            ...answer,
+            domain,
+            level
+          };
+        }).sort((a, b) => {
+          // Sort by timestamp if available, otherwise by question ID
+          if (a.timestamp && b.timestamp) {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+          }
+          return a.questionId.localeCompare(b.questionId);
+        });
+      },
+      
       dismissCelebration: () => {
         set({ showCelebration: false });
       },
@@ -137,11 +226,17 @@ export const useAssessmentStore = create<AssessmentState>()(
 // Recompute scores when store loads (in case questions/scoring changed)
 export const initializeStore = () => {
   const store = useAssessmentStore.getState();
-  if (Object.keys(store.answers).length > 0) {
-    const scoreResult = calculateOverallScore(store.questionBank, store.answers);
+  
+  // Pre-populate answers from onboarding (always run this, not just when we have existing answers)
+  const prePopulatedAnswers = prePopulateFromOnboarding(store.answers);
+  
+  // If we have any answers (existing or pre-populated), recalculate scores
+  if (Object.keys(prePopulatedAnswers).length > 0) {
+    const scoreResult = calculateOverallScore(store.questionBank, prePopulatedAnswers);
     const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
     
     useAssessmentStore.setState({
+      answers: prePopulatedAnswers,
       overallScore: scoreResult.overallScore,
       domainScores: scoreResult.domainScores,
       currentLevel: scoreResult.level,
