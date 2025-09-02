@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Shield, RotateCcw, FileDown, FileUp, Menu, X } from 'lucide-react';
+import { Shield, RotateCcw, FileDown, FileUp, Menu, X, Github } from 'lucide-react';
 import { useAssessmentStore, initializeStore } from './features/assessment/state/store';
 import { ScoreBar } from './components/ScoreBar';
 import { QuestionCard } from './components/QuestionCard';
@@ -271,6 +271,16 @@ function App() {
                 <RotateCcw className="w-4 h-4" />
                 Reset
               </button>
+              <a
+                href="https://github.com/electricessence/Cyber-Fitness-Advisor"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                title="View source code, report issues, or suggest improvements on GitHub"
+              >
+                <Github className="w-4 h-4" />
+                GitHub
+              </a>
             </div>
 
             <button
@@ -432,6 +442,35 @@ function App() {
                     We provide search terms and instructions instead, so you can verify sources yourself 
                     and avoid tracking, malicious redirects, or compromised links. This builds good security habits!
                   </p>
+                </div>
+              </div>
+            </div>
+
+            {/* GitHub Community Section */}
+            <div className="max-w-2xl mx-auto p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+              <div className="flex items-start gap-3 text-left">
+                <Github className="w-5 h-5 text-gray-700 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-gray-700">
+                  <p className="font-medium text-gray-900 mb-2">Help Improve Cyber Fitness Advisor</p>
+                  <p className="mb-3">
+                    This is an open-source project! Your feedback and contributions make it better for everyone.
+                  </p>
+                  <div className="space-y-1 text-xs">
+                    <p>🐛 <span className="font-medium">Found a bug?</span> Submit an issue on GitHub</p>
+                    <p>💡 <span className="font-medium">Have suggestions?</span> Request features or improvements</p>
+                    <p>🔧 <span className="font-medium">Want to contribute?</span> Check out the source code</p>
+                  </div>
+                  <div className="mt-3">
+                    <a
+                      href="https://github.com/electricessence/Cyber-Fitness-Advisor"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-md hover:bg-gray-700 transition-colors"
+                    >
+                      <Github className="w-3 h-3" />
+                      View on GitHub
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

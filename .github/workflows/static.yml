@@ -5,6 +5,10 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
+  
+  # Run on pull requests for testing
+  pull_request:
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -72,4 +76,5 @@ jobs:
           
       - name: Deploy to GitHub Pages
         id: deployment
+        if: github.ref == 'refs/heads/main'
         uses: actions/deploy-pages@v4
