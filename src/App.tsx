@@ -4,12 +4,27 @@ import { useAssessmentStore, initializeStore } from './features/assessment/state
 import { ScoreBar } from './components/ScoreBar';
 import { QuestionCard } from './components/QuestionCard';
 import { Recommendations } from './components/Recommendations';
+import { ActionRecommendations } from './components/ActionRecommendations';
 import { Celebration } from './components/Celebration';
+import { GameifiedOnboarding } from './components/GameifiedOnboarding';
+import { PrivacyNotice } from './components/PrivacyNotice';
 
 function App() {
   const [currentDomain, setCurrentDomain] = useState<string>('quickwins');
   const [currentLevel, setCurrentLevel] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
+    // Show onboarding if it's a new user (no answers in localStorage)
+    const hasAnswers = localStorage.getItem('cyber-fitness-answers');
+    const hasSeenOnboarding = localStorage.getItem('cyber-fitness-onboarding-completed');
+    return !hasAnswers && !hasSeenOnboarding;
+  });
+  const [showPrivacyNotice, setShowPrivacyNotice] = useState<boolean>(() => {
+    // Show privacy notice if user hasn't dismissed it permanently
+    return !localStorage.getItem('cyber-fitness-privacy-dismissed');
+  });
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [privacyNoticeMinimized, setPrivacyNoticeMinimized] = useState<boolean>(false);
 
   const {
     questionBank,
@@ -23,7 +38,6 @@ function App() {
     showCelebration,
     lastScoreIncrease,
     answerQuestion,
-    resetAssessment,
     getRecommendations,
     dismissCelebration,
   } = useAssessmentStore();
@@ -43,6 +57,32 @@ function App() {
     ), 0
   );
   const answeredQuestions = Object.keys(answers).length;
+
+  // Simple browser/platform detection for action recommendations
+  const getBrowserInfo = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    
+    let browser = 'unknown';
+    if (userAgent.includes('chrome') && !userAgent.includes('edg')) browser = 'chrome';
+    else if (userAgent.includes('firefox')) browser = 'firefox';
+    else if (userAgent.includes('safari') && !userAgent.includes('chrome')) browser = 'safari';
+    else if (userAgent.includes('edg')) browser = 'edge';
+    
+    let platform = 'unknown';
+    if (userAgent.includes('win')) platform = 'windows';
+    else if (userAgent.includes('mac')) platform = 'mac';
+    else if (userAgent.includes('linux')) platform = 'linux';
+    else if (userAgent.includes('android')) platform = 'android';
+    else if (userAgent.includes('iphone') || userAgent.includes('ipad')) platform = 'ios';
+    
+    return { browser, platform };
+  };
+
+  const getUserProfile = () => {
+    const techComfort = localStorage.getItem('cyber-fitness-tech-comfort') as 'beginner' | 'comfortable' | 'advanced' || 'beginner';
+    const mainConcerns = JSON.parse(localStorage.getItem('cyber-fitness-main-concerns') || '["general"]');
+    return { techComfort, mainConcerns };
+  };
 
   const exportData = () => {
     const data = JSON.stringify({ answers, timestamp: new Date().toISOString() }, null, 2);
@@ -99,20 +139,93 @@ function App() {
         if (level.questions.some(q => q.id === questionId)) {
           setCurrentDomain(domain.id);
           setCurrentLevel(level.level);
-          setMobileMenuOpen(false);
-          // Scroll to question after navigation
+          // Scroll to question
           setTimeout(() => {
             const element = document.getElementById(`question-${questionId}`);
-            element?.scrollIntoView({ behavior: 'smooth' });
+            element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }, 100);
-          return;
+          break;
         }
       }
     }
   };
 
+  const resetOnboardingForTesting = () => {
+    console.log('Reset button clicked - clearing localStorage...');
+    
+    // Clear all onboarding-related data
+    localStorage.removeItem('cyber-fitness-onboarding-completed');
+    localStorage.removeItem('cyber-fitness-privacy-dismissed');
+    localStorage.removeItem('cyber-fitness-onboarding-score');
+    localStorage.removeItem('cyber-fitness-onboarding-answers');
+    localStorage.removeItem('cyber-fitness-detected-platform');
+    localStorage.removeItem('cyber-fitness-detected-browser');
+    
+    // Legacy onboarding data
+    localStorage.removeItem('cyber-fitness-primary-device');
+    localStorage.removeItem('cyber-fitness-tech-comfort');
+    localStorage.removeItem('cyber-fitness-main-concerns');
+    localStorage.removeItem('cyber-fitness-confidence-goal');
+    
+    // Clear assessment data too for complete reset
+    localStorage.removeItem('cyber-fitness-answers');
+    localStorage.removeItem('cyber-fitness-completed-actions');
+    
+    console.log('LocalStorage cleared, refreshing page...');
+    
+    // Force page refresh to reset all state
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+  };
+
+  const handleResetToBeginning = () => {
+    // Clear everything - both onboarding and assessment data
+    resetOnboardingForTesting();
+    setShowResetModal(false);
+  };
+
+  const handleResetCurrentLevel = () => {
+    // Only reset assessment answers, keep onboarding completion
+    const store = useAssessmentStore.getState();
+    store.resetAssessment();
+    setShowResetModal(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Onboarding Flow */}
+      {showOnboarding && (
+        <GameifiedOnboarding 
+          onComplete={(result) => {
+            localStorage.setItem('cyber-fitness-onboarding-completed', 'true');
+            // Store the results from gamified onboarding
+            localStorage.setItem('cyber-fitness-onboarding-score', result.totalScore.toString());
+            localStorage.setItem('cyber-fitness-onboarding-answers', JSON.stringify(result.answeredQuestions));
+            localStorage.setItem('cyber-fitness-detected-platform', result.detectedInfo.platform);
+            localStorage.setItem('cyber-fitness-detected-browser', result.detectedInfo.browser);
+            
+            // Apply the score from onboarding to their actual assessment
+            // (you might want to add some of these as actual answered questions)
+            
+            setShowOnboarding(false);
+            // Show privacy notice after gamified onboarding
+            setPrivacyNoticeMinimized(false);
+          }}
+        />
+      )}
+
+      {/* Privacy Notice */}
+      {showPrivacyNotice && !showOnboarding && (
+        <PrivacyNotice 
+          onDismiss={() => {
+            localStorage.setItem('cyber-fitness-privacy-dismissed', 'true');
+            setShowPrivacyNotice(false);
+          }}
+          isMinimized={privacyNoticeMinimized}
+        />
+      )}
+
       <Celebration 
         show={showCelebration}
         scoreIncrease={lastScoreIncrease}
@@ -149,7 +262,7 @@ function App() {
                 <input type="file" accept=".json" onChange={importData} className="hidden" />
               </label>
               <button
-                onClick={resetAssessment}
+                onClick={() => setShowResetModal(true)}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:text-red-700 transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -240,6 +353,20 @@ function App() {
               </div>
             )}
 
+            {/* Action Recommendations - High-Impact Security Actions */}
+            {!showOnboarding && answeredQuestions > 0 && (
+              <div className="mt-6">
+                <ActionRecommendations
+                  browserInfo={getBrowserInfo()}
+                  userProfile={getUserProfile()}
+                  onActionComplete={(actionId) => {
+                    // You could potentially award bonus points for completing actions
+                    console.log('Action completed:', actionId);
+                  }}
+                />
+              </div>
+            )}
+
             {/* Current Level Questions */}
             {currentLevelData && (
               <div className="mt-6">
@@ -279,13 +406,86 @@ function App() {
             <p className="mb-2">
               🛡️ Cyber Fitness Advisor - Your personal cybersecurity coach
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mb-3">
               Start with quick wins, build momentum, stay secure. 
               No data leaves your browser.
             </p>
+            
+            {/* Security Policy Statement */}
+            <div className="max-w-2xl mx-auto p-3 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+              <div className="flex items-start gap-2 text-left">
+                <Shield className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-blue-800">
+                  <p className="font-medium mb-1">🔒 Secure App Policy: No External Links</p>
+                  <p>
+                    This app follows security best practices by never redirecting you to external sites. 
+                    We provide search terms and instructions instead, so you can verify sources yourself 
+                    and avoid tracking, malicious redirects, or compromised links. This builds good security habits!
+                  </p>
+                </div>
+              </div>
+            </div>
+            {/* Developer testing option */}
+            {window.location.hostname === 'localhost' && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    console.log('Reset button clicked!');
+                    resetOnboardingForTesting();
+                  }}
+                  className="bg-red-100 text-red-600 px-3 py-2 rounded text-sm font-medium hover:bg-red-200 transition-colors"
+                >
+                  🔄 [Dev] Reset Onboarding & Start Over
+                </button>
+                <p className="text-xs text-gray-400 mt-1">
+                  This will clear all data and restart the onboarding flow
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </footer>
+
+      {/* Reset Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <RotateCcw className="w-6 h-6 text-red-500" />
+              <h3 className="text-lg font-semibold text-gray-900">Reset Options</h3>
+            </div>
+            
+            <p className="text-gray-600 mb-6">
+              What would you like to reset?
+            </p>
+            
+            <div className="space-y-3">
+              <button
+                onClick={handleResetToBeginning}
+                className="w-full bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors text-left"
+              >
+                <div className="font-medium">Reset to Very Beginning</div>
+                <div className="text-red-100 text-sm">Clear everything and start fresh with onboarding</div>
+              </button>
+              
+              <button
+                onClick={handleResetCurrentLevel}
+                className="w-full bg-orange-500 text-white px-4 py-3 rounded-lg hover:bg-orange-600 transition-colors text-left"
+              >
+                <div className="font-medium">Reset Current Assessment</div>
+                <div className="text-orange-100 text-sm">Keep onboarding progress, reset only security questions</div>
+              </button>
+              
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="w-full bg-gray-200 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

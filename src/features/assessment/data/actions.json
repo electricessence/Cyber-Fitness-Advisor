@@ -1,0 +1,134 @@
+{
+  "quickActions": [
+    {
+      "id": "ublock_origin",
+      "title": "Install uBlock Origin Ad Blocker",
+      "description": "Blocks ads, trackers, and malicious scripts automatically",
+      "impact": "high",
+      "effort": "low",
+      "category": "browser_protection",
+      "timeEstimate": "2 minutes",
+      "platforms": ["chrome", "firefox", "edge"],
+      "links": {
+        "chrome": "https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm",
+        "firefox": "https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/",
+        "edge": "https://microsoftedge.microsoft.com/addons/detail/ublock-origin/odfafepnkmbhccpbejgmiehpchacaeak"
+      },
+      "benefits": [
+        "Blocks malicious ads and trackers",
+        "Reduces data usage by 30-50%",
+        "Faster page loading",
+        "Privacy protection"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "enable_2fa",
+      "title": "Enable Two-Factor Authentication",
+      "description": "Add an extra layer of security to your most important accounts",
+      "impact": "high",
+      "effort": "medium",
+      "category": "account_security",
+      "timeEstimate": "10 minutes per account",
+      "platforms": ["all"],
+      "priorityAccounts": ["email", "banking", "social_media", "cloud_storage"],
+      "benefits": [
+        "Prevents 99.9% of account takeovers",
+        "Protects even if password is compromised",
+        "Easy with authenticator apps"
+      ],
+      "difficulty": "comfortable"
+    },
+    {
+      "id": "update_browser",
+      "title": "Update Your Browser",
+      "description": "Keep your browser updated for the latest security patches",
+      "impact": "high",
+      "effort": "low",
+      "category": "software_updates",
+      "timeEstimate": "5 minutes",
+      "platforms": ["all"],
+      "benefits": [
+        "Latest security patches",
+        "Better performance",
+        "New privacy features"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "password_manager",
+      "title": "Set Up a Password Manager",
+      "description": "Generate and store unique passwords for every account",
+      "impact": "very_high",
+      "effort": "medium",
+      "category": "password_security",
+      "timeEstimate": "20 minutes setup",
+      "platforms": ["all"],
+      "recommendations": ["Bitwarden", "1Password", "Keeper"],
+      "benefits": [
+        "Unique passwords for every account",
+        "No more password reuse",
+        "Automatic form filling",
+        "Secure password sharing"
+      ],
+      "difficulty": "comfortable"
+    },
+    {
+      "id": "secure_dns",
+      "title": "Use Secure DNS",
+      "description": "Switch to a privacy-focused DNS provider",
+      "impact": "medium",
+      "effort": "low",
+      "category": "network_security",
+      "timeEstimate": "3 minutes",
+      "platforms": ["all"],
+      "providers": {
+        "cloudflare": "1.1.1.1",
+        "quad9": "9.9.9.9",
+        "opendns": "208.67.222.222"
+      },
+      "benefits": [
+        "Blocks malicious websites",
+        "Better privacy",
+        "Faster browsing"
+      ],
+      "difficulty": "comfortable"
+    },
+    {
+      "id": "backup_important_data",
+      "title": "Back Up Your Important Data",
+      "description": "Protect your files with the 3-2-1 backup rule",
+      "impact": "very_high",
+      "effort": "medium",
+      "category": "data_protection",
+      "timeEstimate": "30 minutes setup",
+      "platforms": ["all"],
+      "rule": "3 copies, 2 different media, 1 offsite",
+      "benefits": [
+        "Protection against ransomware",
+        "Hardware failure recovery",
+        "Peace of mind"
+      ],
+      "difficulty": "comfortable"
+    }
+  ],
+  "smartRecommendations": {
+    "browserSpecific": {
+      "chrome": ["ublock_origin", "update_browser"],
+      "firefox": ["ublock_origin", "update_browser"],
+      "safari": ["update_browser", "secure_dns"],
+      "edge": ["ublock_origin", "update_browser"]
+    },
+    "skillBased": {
+      "beginner": ["ublock_origin", "update_browser", "enable_2fa"],
+      "comfortable": ["password_manager", "secure_dns", "enable_2fa"],
+      "advanced": ["backup_important_data", "secure_dns", "password_manager"]
+    },
+    "concernBased": {
+      "privacy": ["ublock_origin", "secure_dns", "password_manager"],
+      "malware": ["ublock_origin", "update_browser", "backup_important_data"],
+      "account_security": ["enable_2fa", "password_manager"],
+      "data_loss": ["backup_important_data", "password_manager"]
+    }
+  }
+}
