@@ -9,6 +9,7 @@ import { Celebration } from './components/Celebration';
 import { GameifiedOnboarding } from './components/GameifiedOnboarding';
 import { PrivacyNotice } from './components/PrivacyNotice';
 import { AnswerHistory } from './components/AnswerHistory';
+import { VersionBadge } from './components/VersionBadge';
 
 function App() {
   const [currentDomain, setCurrentDomain] = useState<string>('quickwins');
@@ -430,6 +431,11 @@ function App() {
               Start with quick wins, build momentum, stay secure. 
               No data leaves your browser.
             </p>
+            
+            {/* Version Badge */}
+            <div className="mb-4">
+              <VersionBadge />
+            </div>
             
             {/* Security Policy Statement */}
             <div className="max-w-2xl mx-auto p-3 bg-blue-50 rounded-lg border border-blue-200 mb-4">
