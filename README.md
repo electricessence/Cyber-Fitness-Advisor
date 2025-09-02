@@ -2,7 +2,7 @@
 
 **Your personal cybersecurity coach that makes security simple, engaging, and rewarding.**
 
-[![Deploy to GitHub Pages](https://github.com/electricessence/Cyber-Fitness-Advisor/actions/workflows/static.yml/badge.svg)](https://github.com/electricessence/Cyber-Fitness-Advisor/actions/workflows/deploy.yml)
+[![Deploy to GitHub Pages](https://github.com/electricessence/Cyber-Fitness-Advisor/actions/workflows/static.yml/badge.svg)](https://github.com/electricessence/Cyber-Fitness-Advisor/actions/workflows/static.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🚀 Live Demo
