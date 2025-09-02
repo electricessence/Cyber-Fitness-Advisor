@@ -2,16 +2,17 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs after version bump completes
+  # Runs after version bump completes on main branch
   workflow_run:
     workflows: ["Auto Version Bump"]
     types:
       - completed
     branches: [main]
   
-  # Run on pull requests for testing (but don't deploy)
+  # Test build on pull requests to main (no deployment)
   pull_request:
     branches: ["main"]
+    types: [opened, synchronize, reopened]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -79,5 +80,6 @@ jobs:
           
       - name: Deploy to GitHub Pages
         id: deployment
+        # Only deploy when triggered by successful version bump workflow
         if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
         uses: actions/deploy-pages@v4
