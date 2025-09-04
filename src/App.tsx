@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { Shield, RotateCcw, FileDown, FileUp, Menu, X, Github } from 'lucide-react';
 import { useAssessmentStore, initializeStore } from './features/assessment/state/store';
 import { ScoreBar } from './components/ScoreBar';
-import { QuestionCard } from './components/QuestionCard';
-import { Recommendations } from './components/Recommendations';
-import { ActionRecommendations } from './components/ActionRecommendations';
+import { UniversalCard } from './components/UniversalCard';
 import { Celebration } from './components/Celebration';
+import { getRecommendedActions } from './data/secureActions';
 import { GameifiedOnboarding } from './components/GameifiedOnboarding';
 import { PrivacyNotice } from './components/PrivacyNotice';
-import { AnswerHistory } from './components/AnswerHistory';
 import { VersionBadge } from './components/VersionBadge';
+import { ResponseCatalog } from './components/ResponseCatalog';
 
 function App() {
   const [currentDomain, setCurrentDomain] = useState<string>('quickwins');
@@ -296,7 +295,7 @@ function App() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar Navigation */}
+          {/* Left Sidebar Navigation */}
           <div className={`lg:col-span-1 ${mobileMenuOpen ? 'block' : 'hidden lg:block'}`}>
             <div className="bg-white rounded-lg shadow-md p-4 sticky top-24">
               <h3 className="font-bold text-gray-800 mb-4">Assessment Sections</h3>
@@ -305,7 +304,7 @@ function App() {
                 <div key={domain.id} className="mb-4">
                   <h4 className="font-medium text-gray-700 mb-2">
                     {domain.title}
-                    {domainScores[domain.id] && (
+                    {domainScores[domain.id] !== undefined && domainScores[domain.id] > 0 && (
                       <span className="ml-2 text-sm text-blue-600 font-bold">
                         {Math.round(domainScores[domain.id])}%
                       </span>
@@ -346,9 +345,9 @@ function App() {
             </div>
           </div>
 
-          {/* Main Content */}
+          {/* Right Content Area - Main Content + Security Status */}
           <div className="lg:col-span-3">
-            {/* Score Bar */}
+            {/* Score Bar - spans full width */}
             <ScoreBar
               score={overallScore}
               level={userLevel}
@@ -357,70 +356,176 @@ function App() {
               totalQuickWins={totalQuickWins}
             />
 
-            {/* Recommendations */}
-            {recommendations.length > 0 && (
-              <div className="mt-6">
-                <Recommendations
-                  recommendations={recommendations}
-                  onQuestionClick={navigateToQuestion}
-                />
-              </div>
-            )}
-
-            {/* Action Recommendations - High-Impact Security Actions */}
-            {!showOnboarding && answeredQuestions > 0 && (
-              <div className="mt-6">
-                <ActionRecommendations
-                  browserInfo={getBrowserInfo()}
-                  userProfile={getUserProfile()}
-                  onActionComplete={(actionId) => {
-                    // You could potentially award bonus points for completing actions
-                    console.log('Action completed:', actionId);
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Answer History */}
-            {!showOnboarding && answeredQuestions > 0 && (
-              <div className="mt-6">
-                <AnswerHistory />
-              </div>
-            )}
-
-            {/* Current Level Questions */}
-            {currentLevelData && (
-              <div className="mt-6">
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                    {currentDomainData?.title} - Level {currentLevel}
-                  </h2>
-                  <p className="text-gray-600">
-                    {currentLevel === 0 ? 'Start with these essential security basics!' :
-                     currentLevel === 1 ? 'Build on your foundation with these improvements!' :
-                     'Advanced security measures for comprehensive protection!'}
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  {currentLevelData.questions.map((question) => (
-                    <div key={question.id} id={`question-${question.id}`}>
-                      <QuestionCard
-                        question={question}
-                        answer={answers[question.id]?.value}
-                        onAnswer={(value) => answerQuestion(question.id, value)}
-                        domainTitle={currentDomainData?.title || ''}
-                      />
+            {/* Content Grid - Main Content + Security Status side by side */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
+              {/* Main Content */}
+              <div className="lg:col-span-3">{/* Recommendations */}
+                {recommendations.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Recommended Actions</h2>
+                    <div className="space-y-4">
+                      {recommendations.slice(0, 3).map((rec) => (
+                        <UniversalCard
+                          key={rec.question.id}
+                          mode="preview"
+                          id={rec.question.id}
+                          title={rec.question.text}
+                          category={rec.domain}
+                          priority={rec.question.weight}
+                          isQuickWin={rec.question.quickWin}
+                          timeEstimate={rec.question.timeEstimate}
+                          impact={rec.impact}
+                          actionHint={rec.question.actionHint}
+                          options={[]} // Preview mode doesn't need options
+                          onClick={() => navigateToQuestion(rec.question.id)}
+                        />
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
+
+                {/* Action Recommendations - High-Impact Security Actions */}
+                {!showOnboarding && answeredQuestions > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">High-Impact Security Actions</h2>
+                    <div className="space-y-4">
+                      {getRecommendedActions(getBrowserInfo(), getUserProfile(), 3).map((action) => (
+                        <UniversalCard
+                          key={action.id}
+                          mode="question"
+                          id={action.id}
+                          title={`Do you have ${action.title}?`}
+                          category="Security Actions"
+                          priority={action.impact === 'high' ? 9 : action.impact === 'medium' ? 6 : 3}
+                          isQuickWin={action.difficulty === 'easy'}
+                          timeEstimate={action.timeEstimate}
+                          impact={action.impact}
+                          detailedGuidance={action.description}
+                          actionHint={`Search for: ${action.searchTerm}`}
+                          options={[
+                            {
+                              id: 'yes',
+                              text: '✅ Yes, I have this',
+                              displayText: `${action.title} - Enabled`,
+                              points: action.impact === 'high' ? 10 : action.impact === 'medium' ? 6 : 3,
+                              target: 'shields-up',
+                              impact: 'Great security practice!'
+                            },
+                            {
+                              id: 'no',
+                              text: '❌ No, I need to set this up',
+                              displayText: `${action.title} - To Do`,
+                              points: 0,
+                              target: 'todo',
+                              advice: `${action.description}\n\nSearch for: ${action.searchTerm}`,
+                              followUp: action.installSteps ? {
+                                modifyQuestions: {
+                                  [`${action.id}_setup`]: {
+                                    text: `Follow these steps to set up ${action.title}`,
+                                    explanation: action.installSteps?.join('\n')
+                                  }
+                                }
+                              } : undefined
+                            }
+                          ]}
+                          onAnswer={(answer) => {
+                            console.log(`Action ${action.id} answered:`, answer);
+                            // Store this action answer if needed
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Current Level Questions */}
+                {currentLevelData && (
+                  <div>
+                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                      <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                        {currentDomainData?.title} - Level {currentLevel}
+                      </h2>
+                      <p className="text-gray-600">
+                        {currentLevel === 0 ? 'Start with these essential security basics!' :
+                         currentLevel === 1 ? 'Build on your foundation with these improvements!' :
+                         'Advanced security measures for comprehensive protection!'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-6">
+                      {currentLevelData.questions
+                        .filter(question => !answers[question.id]) // Only show unanswered questions
+                        .map((question) => (
+                        <div key={question.id} id={`question-${question.id}`}>
+                          <UniversalCard
+                            mode="question"
+                            id={question.id}
+                            title={question.text}
+                            category={currentDomainData?.title || ''}
+                            priority={question.weight}
+                            isQuickWin={question.quickWin}
+                            timeEstimate={question.timeEstimate}
+                            impact={question.weight >= 8 ? 'high' : question.weight >= 5 ? 'medium' : 'low'}
+                            currentAnswer={answers[question.id]?.value as string}
+                            detailedGuidance={question.explanation}
+                            actionHint={question.actionHint}
+                            options={(() => {
+                              const opts = question.options || [
+                                // Fallback for old-style questions - convert Y/N to options format
+                                {
+                                  id: 'yes',
+                                  text: '✅ Yes',
+                                  displayText: 'Yes',
+                                  points: question.weight,
+                                  target: 'shields-up' as const,
+                                  impact: 'Good security practice!'
+                                },
+                                {
+                                  id: 'unsure',
+                                  text: '🤔 Not sure',
+                                  displayText: 'Check this setting',
+                                  points: Math.floor(question.weight * 0.3),
+                                  target: 'todo' as const,
+                                  advice: question.actionHint || 'Please verify this setting'
+                                },
+                                {
+                                  id: 'no',
+                                  text: '❌ No',
+                                  displayText: 'No',
+                                  points: 0,
+                                  target: 'needs-improvement' as const,
+                                  impact: 'This could be a security risk',
+                                  advice: question.actionHint || 'Consider implementing this security measure'
+                                }
+                              ];
+                              console.log('App.tsx passing options for question:', question.id, opts);
+                              return opts;
+                            })()}
+                            defaultLayout={question.defaultLayout || 'buttons'}
+                            onAnswer={(optionId) => {
+                              console.log('App.tsx onAnswer called with:', optionId, 'for question:', question.id);
+                              answerQuestion(question.id, optionId);
+                            }}
+                            onFollowUp={(questionId, followUpData) => {
+                              console.log('Follow-up triggered:', questionId, followUpData);
+                              // Handle follow-up questions or conditional logic
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Security Status Sidebar */}
+              <div className="lg:col-span-2">
+                <ResponseCatalog />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
+      </div>      {/* Footer */}
       <footer className="bg-white border-t mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-600">
@@ -480,23 +585,6 @@ function App() {
                 </div>
               </div>
             </div>
-            {/* Developer testing option */}
-            {window.location.hostname === 'localhost' && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => {
-                    console.log('Reset button clicked!');
-                    resetOnboardingForTesting();
-                  }}
-                  className="bg-red-100 text-red-600 px-3 py-2 rounded text-sm font-medium hover:bg-red-200 transition-colors"
-                >
-                  🔄 [Dev] Reset Onboarding & Start Over
-                </button>
-                <p className="text-xs text-gray-400 mt-1">
-                  This will clear all data and restart the onboarding flow
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </footer>

@@ -1,0 +1,88 @@
+{
+  "topics": {
+    "credential_reuse": {
+      "id": "credential_reuse",
+      "title": "Password Reuse Attacks",
+      "threat": "Prevent a leaked password from one account being used to log into another",
+      "description": "When hackers breach one website and steal passwords, they immediately try those same passwords on other popular sites. If you reuse passwords, one breach can cascade into multiple account compromises.",
+      "impact": "Account takeover, identity theft, financial loss",
+      "examples": [
+        "A gaming site gets hacked, exposing your password",
+        "Hackers try that password on your email, bank, and social media",
+        "They gain access to accounts where you reused the password"
+      ]
+    },
+    "physical_access": {
+      "id": "physical_access", 
+      "title": "Physical Device Access",
+      "threat": "Prevent unauthorized access when your device is unattended or stolen",
+      "description": "Unlocked devices are like open doors - anyone who finds or steals your device can access your personal information, accounts, and sensitive data instantly.",
+      "impact": "Data theft, account compromise, privacy violation",
+      "examples": [
+        "Someone picks up your unlocked phone at a coffee shop",
+        "A thief steals your laptop and accesses your saved passwords",
+        "A coworker looks through your computer while you're away"
+      ]
+    },
+    "account_takeover": {
+      "id": "account_takeover",
+      "title": "Account Hijacking",
+      "threat": "Prevent attackers from taking control of your most important accounts",
+      "description": "Your email and financial accounts are the keys to your digital life. If compromised, attackers can reset passwords, steal money, and impersonate you.",
+      "impact": "Complete identity theft, financial loss, reputation damage",
+      "examples": [
+        "Attacker gains email access and resets all your other passwords",
+        "Someone drains your bank account or makes unauthorized purchases",
+        "Your identity is used for fraud or to scam your contacts"
+      ]
+    },
+    "malware_infection": {
+      "id": "malware_infection",
+      "title": "Malware & Virus Attacks", 
+      "threat": "Prevent malicious software from infecting and controlling your device",
+      "description": "Malware can steal passwords, spy on your activities, encrypt your files for ransom, or turn your device into part of a criminal network.",
+      "impact": "Data theft, ransomware, device hijacking, financial loss",
+      "examples": [
+        "Ransomware encrypts all your files and demands payment",
+        "Spyware records your keystrokes and steals passwords",
+        "Your device is used to attack other computers without you knowing"
+      ]
+    },
+    "data_theft": {
+      "id": "data_theft",
+      "title": "Data Theft & Privacy Loss",
+      "threat": "Prevent personal information from being stolen or exposed",
+      "description": "Your personal data, photos, documents, and private communications can be stolen and used for blackmail, fraud, or sold on the dark web.",
+      "impact": "Privacy violation, blackmail, identity theft",
+      "examples": [
+        "Private photos or messages are stolen and used for blackmail",
+        "Personal documents are used to commit identity fraud",
+        "Your data is sold to criminals or used for targeted attacks"
+      ]
+    },
+    "network_attacks": {
+      "id": "network_attacks",
+      "title": "Network-Based Attacks",
+      "threat": "Prevent attackers from intercepting your internet traffic or gaining network access",
+      "description": "Unsecured network connections allow attackers to spy on your online activities, steal login credentials, or inject malicious content.",
+      "impact": "Data interception, credential theft, man-in-the-middle attacks",
+      "examples": [
+        "Someone on public WiFi intercepts your passwords",
+        "Attackers redirect you to fake websites that steal your information",
+        "Your internet traffic is monitored and personal information collected"
+      ]
+    },
+    "malicious_ads": {
+      "id": "malicious_ads",
+      "title": "Malicious Advertising & Fake Sites",
+      "threat": "Prevent ads and fake websites from tricking you into dangerous actions",
+      "description": "Malicious ads can redirect you to fake websites that steal your information, install malware, or trick you into downloading harmful software. Even legitimate sites can host dangerous ads.",
+      "impact": "Malware infection, credential theft, financial fraud",
+      "examples": [
+        "A fake 'Download' button actually installs malware",
+        "An ad redirects you to a fake bank login page that steals your credentials",
+        "Pop-up ads claiming your computer is infected trick you into downloading 'antivirus' malware"
+      ]
+    }
+  }
+}

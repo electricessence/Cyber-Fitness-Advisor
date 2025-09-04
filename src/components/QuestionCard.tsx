@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Zap, Clock, HelpCircle } from 'lucide-react';
 import type { Question } from '../features/assessment/engine/schema';
+import { EducationalInfo } from './EducationalInfo';
 
 interface QuestionCardProps {
   question: Question;
-  answer?: boolean | number;
-  onAnswer: (value: boolean | number) => void;
+  answer?: boolean | number | string;
+  onAnswer: (value: boolean | number | string) => void;
   domainTitle: string;
 }
 
@@ -20,10 +21,19 @@ export function QuestionCard({ question, answer, onAnswer, domainTitle }: Questi
     onAnswer(value);
   };
 
+  const handleActionAnswer = (optionId: string) => {
+    onAnswer(optionId);
+  };
+
   const isAnswered = answer !== undefined;
   const isPositiveAnswer = question.type === 'YN' 
     ? answer === true 
-    : typeof answer === 'number' && answer >= 4;
+    : question.type === 'SCALE' 
+    ? typeof answer === 'number' && answer >= 4
+    : question.type === 'ACTION' && typeof answer === 'string'
+    ? question.actionOptions?.find(opt => opt.id === answer)?.points && 
+      question.actionOptions.find(opt => opt.id === answer)!.points > 0
+    : false;
 
   return (
     <div 
@@ -117,7 +127,7 @@ export function QuestionCard({ question, answer, onAnswer, domainTitle }: Questi
             ❌ No
           </button>
         </div>
-      ) : (
+      ) : question.type === 'SCALE' ? (
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-gray-600 mb-2">
             <span>Not at all</span>
@@ -141,23 +151,44 @@ export function QuestionCard({ question, answer, onAnswer, domainTitle }: Questi
             ))}
           </div>
         </div>
-      )}
-
-      {/* Positive feedback for answered questions */}
-      {isAnswered && isPositiveAnswer && (
-        <div className="mt-3 p-2 bg-green-50 text-green-700 rounded-md text-sm">
-          <span className="font-medium">Great! </span>
-          {question.quickWin ? 'This quick win gives you an instant security boost! 🚀' 
-            : 'You\'re building good security habits! 👍'}
+      ) : question.type === 'ACTION' && question.actionOptions ? (
+        <div className="space-y-2">
+          {question.actionOptions.map((option) => (
+            <button
+              key={option.id}
+              onClick={() => handleActionAnswer(option.id)}
+              className={`
+                w-full py-3 px-4 rounded-lg font-medium text-left transition-all duration-200 flex items-center justify-between
+                ${answer === option.id
+                  ? option.points > 0
+                    ? 'bg-green-500 text-white shadow-md'
+                    : option.points === 0
+                    ? 'bg-yellow-500 text-white shadow-md' 
+                    : 'bg-gray-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }
+              `}
+            >
+              <span>{option.text}</span>
+              {option.points > 0 && <span className="text-sm opacity-75">+{option.points} pts</span>}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="p-4 bg-red-100 text-red-800 rounded-lg">
+          <p>Unknown question type: {question.type}</p>
+          <p>Question ID: {question.id}</p>
+          <pre className="text-xs mt-2">{JSON.stringify(question, null, 2)}</pre>
         </div>
       )}
 
-      {/* Encouragement for negative answers */}
-      {isAnswered && !isPositiveAnswer && question.actionHint && (
-        <div className="mt-3 p-2 bg-blue-50 text-blue-700 rounded-md text-sm">
-          <span className="font-medium">💡 Quick tip: </span>
-          {question.actionHint}
-        </div>
+      {/* Educational information for answered questions */}
+      {isAnswered && (
+        <EducationalInfo 
+          question={question} 
+          userAnswer={answer} 
+          isVisible={true} 
+        />
       )}
     </div>
   );

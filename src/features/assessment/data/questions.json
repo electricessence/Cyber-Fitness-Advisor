@@ -15,8 +15,11 @@
               "quickWin": true,
               "timeEstimate": "1 minute",
               "text": "Does your phone/computer lock automatically?",
+              "affirmativeText": "Device Auto-Lock Enabled",
+              "negativeText": "No Device Auto-Lock",
               "explanation": "Prevents unauthorized access if you walk away",
-              "actionHint": "Set auto-lock to 5 minutes or less"
+              "actionHint": "Set auto-lock to 5 minutes or less",
+              "relatedTopics": ["physical_access"]
             },
             {
               "id": "browser_passwords",
@@ -25,8 +28,11 @@
               "quickWin": true,
               "timeEstimate": "3 minutes",
               "text": "Do you let your browser save and generate passwords?",
+              "affirmativeText": "Browser Password Manager Active",
+              "negativeText": "No Browser Password Manager",
               "explanation": "Instant unique passwords for every account",
-              "actionHint": "Chrome/Edge/Safari all have built-in password managers"
+              "actionHint": "Chrome/Edge/Safari all have built-in password managers",
+              "relatedTopics": ["credential_reuse"]
             }
           ]
         }
@@ -46,6 +52,8 @@
               "quickWin": true,
               "timeEstimate": "5 minutes",
               "text": "Is two-factor authentication (2FA) enabled on your main email?",
+              "affirmativeText": "Email 2FA Protection Active",
+              "negativeText": "No Email 2FA Protection",
               "explanation": "Your email is the key to everything - protect it first!",
               "actionHint": "Gmail: Settings > Security > 2-Step Verification"
             },
@@ -145,13 +153,40 @@
           "questions": [
             {
               "id": "ad_blocker",
-              "type": "YN",
+              "type": "ACTION",
               "weight": 6,
               "quickWin": true,
               "timeEstimate": "3 minutes",
-              "text": "Do you use an ad blocker?",
+              "text": "Install uBlock Origin Ad Blocker",
               "explanation": "Blocks malicious ads and trackers",
-              "actionHint": "Install uBlock Origin from your browser's extension store"
+              "actionHint": "Available in Chrome, Firefox, and Edge extension stores",
+              "relatedTopics": ["malicious_content"],
+              "actionOptions": [
+                {
+                  "id": "installed",
+                  "text": "✅ Already installed",
+                  "points": 6,
+                  "impact": "Excellent! You're protected from malicious ads that could lead to fake sites or download malware."
+                },
+                {
+                  "id": "will_install",
+                  "text": "📥 I'll install it now",
+                  "points": 6,
+                  "impact": "Great choice! This will block ads that could redirect you to malicious sites or trick you into downloading malware."
+                },
+                {
+                  "id": "maybe_later",
+                  "text": "🤔 Maybe later",
+                  "points": 0,
+                  "impact": "That's okay! In the meantime, be extra careful about clicking on ads - they might lead you to fake sites designed to steal your information."
+                },
+                {
+                  "id": "not_interested",
+                  "text": "❌ Not interested",
+                  "points": 0,
+                  "impact": "No problem, everyone has their preferences! Just remember to be cautious with ads - avoid clicking on suspicious ads that promise unrealistic deals or claim your computer is infected."
+                }
+              ]
             },
             {
               "id": "https_everywhere",

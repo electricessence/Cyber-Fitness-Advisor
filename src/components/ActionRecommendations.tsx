@@ -13,6 +13,7 @@ interface ActionRecommendationsProps {
     mainConcerns: string[];
   };
   onActionComplete?: (actionId: string) => void;
+  onNavigateToSection?: (domainId: string) => void;
   className?: string;
 }
 
@@ -20,6 +21,7 @@ export function ActionRecommendations({
   browserInfo, 
   userProfile, 
   onActionComplete,
+  onNavigateToSection,
   className = "" 
 }: ActionRecommendationsProps) {
   const [completedActions, setCompletedActions] = useState<Set<string>>(() => {
@@ -121,9 +123,22 @@ export function ActionRecommendations({
                       </p>
 
                       {!isCompleted && (
-                        <p className="text-xs text-blue-600 mt-1">
-                          Click to see how to get started →
-                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <p className="text-xs text-blue-600">
+                            Click to see how to get started →
+                          </p>
+                          {action.id === 'ublock_origin' && onNavigateToSection && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNavigateToSection('browsing');
+                              }}
+                              className="ml-2 px-3 py-1 text-xs bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                            >
+                              Take Action Now
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>

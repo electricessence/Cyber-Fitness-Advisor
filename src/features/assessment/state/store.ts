@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { QuestionBank, Answer } from '../engine/schema';
+import type { QuestionBank, Answer, Question } from '../engine/schema';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints } from '../engine/scoring';
 import questionsData from '../data/questions.json';
 
@@ -76,10 +76,10 @@ interface AssessmentState {
   earnedBadges: string[];
   
   // Actions
-  answerQuestion: (questionId: string, value: boolean | number) => void;
+  answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => void;
   resetAssessment: () => void;
   getRecommendations: () => ReturnType<typeof getTopRecommendations>;
-  getHistoricAnswers: () => Array<Answer & { domain: string; level: number }>;
+  getHistoricAnswers: () => Array<Answer & { domain: string; level: number; question: Question | null }>;
   dismissCelebration: () => void;
 }
 
@@ -108,7 +108,8 @@ export const useAssessmentStore = create<AssessmentState>()(
     (set, get) => ({
       ...initialState,
       
-      answerQuestion: (questionId: string, value: boolean | number) => {
+      answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => {
+        console.log('Store answerQuestion called with:', questionId, value);
         const state = get();
         const previousScore = state.overallScore;
         
@@ -181,13 +182,15 @@ export const useAssessmentStore = create<AssessmentState>()(
           // Find which domain and level this question belongs to
           let domain = '';
           let level = 0;
+          let question = null;
           
           for (const d of state.questionBank.domains) {
             for (let l = 0; l < d.levels.length; l++) {
-              const question = d.levels[l].questions.find(q => q.id === answer.questionId);
-              if (question) {
+              const q = d.levels[l].questions.find(q => q.id === answer.questionId);
+              if (q) {
                 domain = d.title;
                 level = l + 1;
+                question = q;
                 break;
               }
             }
@@ -197,7 +200,8 @@ export const useAssessmentStore = create<AssessmentState>()(
           return {
             ...answer,
             domain,
-            level
+            level,
+            question
           };
         }).sort((a, b) => {
           // Sort by timestamp if available, otherwise by question ID
