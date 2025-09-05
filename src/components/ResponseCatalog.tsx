@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAssessmentStore } from '../features/assessment/state/store';
 import { CheckCircle, Clock, AlertTriangle, Edit, ChevronDown, ChevronUp, Shield, Users, Wifi, Database, Globe, Smartphone } from 'lucide-react';
 import { getSecurityTopic } from '../features/assessment/data/security-topics';
+import { SECURE_ACTIONS } from '../data/secureActions';
 
 type ResponseItem = {
   questionId: string;
@@ -58,7 +59,7 @@ export function ResponseCatalog() {
     const topicGroups: Record<string, TopicGroup> = {};
 
     Object.values(answers).forEach(answer => {
-      // Find the question
+      // Find the question in main question bank
       let question = null;
       let domain = '';
       
@@ -72,6 +73,21 @@ export function ResponseCatalog() {
           }
         }
         if (question) break;
+      }
+
+      // If not found in question bank, check if it's a secure action
+      if (!question) {
+        const action = SECURE_ACTIONS.find(a => a.id === answer.questionId);
+        if (action) {
+          // Create a question-like object for actions
+          question = {
+            id: action.id,
+            text: `Do you have ${action.title}?`,
+            relatedTopics: ['browser_security'], // Default topic for actions
+            weight: action.impact === 'high' ? 10 : action.impact === 'medium' ? 6 : 3
+          };
+          domain = 'Security Actions';
+        }
       }
 
       if (!question) return;
