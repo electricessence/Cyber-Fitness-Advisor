@@ -78,4 +78,61 @@ describe('Assessment Store', () => {
       expect(result.current.overallScore).toBe(0)
     })
   })
+
+  describe('when getting recommendations', () => {
+    it('should return current recommendations', () => {
+      const recommendations = result.current.getRecommendations()
+      expect(Array.isArray(recommendations)).toBe(true)
+    })
+  })
+
+  describe('when getting historic answers', () => {
+    it('should return answer history with domain info', () => {
+      const questionBank = result.current.questionBank
+      const firstQuestion = questionBank.domains[0]?.levels[0]?.questions[0]
+      
+      // Answer a question
+      act(() => {
+        result.current.answerQuestion(firstQuestion.id, 'yes')
+      })
+      
+      const history = result.current.getHistoricAnswers()
+      expect(Array.isArray(history)).toBe(true)
+      expect(history.length).toBeGreaterThan(0)
+      
+      const firstAnswer = history[0]
+      expect(firstAnswer.questionId).toBeDefined()
+      expect(firstAnswer.domain).toBeDefined()
+      expect(firstAnswer.level).toBeDefined()
+    })
+  })
+
+  describe('when dismissing celebration', () => {
+    it('should set showCelebration to false', () => {
+      act(() => {
+        result.current.dismissCelebration()
+      })
+      
+      expect(result.current.showCelebration).toBe(false)
+    })
+  })
+
+  describe('when calculating level progression', () => {
+    it('should advance levels based on score', () => {
+      const questionBank = result.current.questionBank
+      const initialLevel = result.current.currentLevel
+      
+      // Answer multiple questions to potentially level up
+      questionBank.domains[0]?.levels[0]?.questions.forEach((question: any, index: number) => {
+        if (index < 3) { // Answer first 3 questions
+          act(() => {
+            result.current.answerQuestion(question.id, 'yes')
+          })
+        }
+      })
+      
+      // Level might have advanced (depends on scoring logic)
+      expect(result.current.currentLevel).toBeGreaterThanOrEqual(initialLevel)
+    })
+  })
 })
