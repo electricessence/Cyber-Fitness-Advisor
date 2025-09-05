@@ -74,8 +74,27 @@ export function ScoreBar({
   }, [score, showAnimation]);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 sticky top-4 z-50 border-l-4 border-l-blue-500">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 sticky top-4 z-10 border-l-4 border-l-blue-500">
+      {/* Mobile Layout - Stacked */}
+      <div className="sm:hidden space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="text-xl font-bold text-gray-800">
+            {Math.round(displayScore)}
+            <span className="text-sm text-gray-500 font-normal">/100</span>
+          </div>
+          {quickWinsCompleted > 0 && (
+            <div className="text-sm font-medium text-green-600">
+              🚀 {quickWinsCompleted}/{totalQuickWins}
+            </div>
+          )}
+        </div>
+        <div className={`px-3 py-1 rounded-full text-sm font-medium text-white bg-gradient-to-r ${LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]} w-fit`}>
+          Level {level}: {LEVEL_NAMES[level as keyof typeof LEVEL_NAMES]}
+        </div>
+      </div>
+
+      {/* Desktop Layout - Side by Side */}
+      <div className="hidden sm:flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="text-2xl font-bold text-gray-800">
             {Math.round(displayScore)}

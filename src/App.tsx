@@ -46,6 +46,20 @@ function App() {
     console.log('App.tsx: Store userLevel changed to:', userLevel);
     navigation.setCurrentLevel(userLevel);
   }, [userLevel, navigation]);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (appState.showOnboarding) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [appState.showOnboarding]);
   
   const totalQuestions = questionBank.domains.reduce(
     (total, domain) => total + domain.levels.reduce(
@@ -132,15 +146,54 @@ function App() {
     <AppLayout>
       {/* Onboarding Modal */}
       {appState.showOnboarding && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
-            <GameifiedOnboarding
-              onComplete={() => {
-                appState.setShowOnboarding(false);
-                localStorage.setItem('cyber-fitness-onboarding-completed', 'true');
-                appState.setPrivacyNoticeMinimized(false);
-              }}
-            />
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] overflow-y-auto p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col">
+            <div className="flex-1 overflow-y-auto">
+              <GameifiedOnboarding
+                answerQuestion={(questionId, value) => {
+                  // Apply answer mappings for real-time sync
+                  const answerMappings: Record<string, string> = {
+                    'virus_scan_recent': 'antivirus',
+                    'password_strength': 'password_reuse'
+                  };
+                  
+                  const mappedId = answerMappings[questionId];
+                  if (mappedId) {
+                    let mappedValue = value;
+                    
+                    // Apply value mappings
+                    if (questionId === 'virus_scan_recent') {
+                      mappedValue = ['today', 'this_week'].includes(value) ? 'yes' : 'no';
+                    }
+                    
+                    if (questionId === 'password_strength') {
+                      const uniquenessToReuseMap: Record<string, string> = {
+                        'all_unique': '5',
+                        'mostly_unique': '4', 
+                        'some_same': '3',
+                        'mostly_same': '2'
+                      };
+                      mappedValue = uniquenessToReuseMap[value] || '1';
+                    }
+                    
+                    answerQuestion(mappedId, mappedValue);
+                  } else {
+                    // Store onboarding-specific questions as-is
+                    answerQuestion(questionId, value);
+                  }
+                }}
+                onComplete={(profile) => {
+                  // Store user profile info (answers are already stored in real-time)
+                  localStorage.setItem('cyber-fitness-tech-comfort', profile.detectedInfo.platform);
+                  localStorage.setItem('cyber-fitness-detected-browser', profile.detectedInfo.browser);
+                  
+                  // Close onboarding
+                  appState.setShowOnboarding(false);
+                  localStorage.setItem('cyber-fitness-onboarding-completed', 'true');
+                  appState.setPrivacyNoticeMinimized(false);
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -158,11 +211,6 @@ function App() {
 
       {/* Header */}
       <AppHeader
-        overallScore={overallScore}
-        currentLevel={userLevel}
-        nextLevelProgress={nextLevelProgress}
-        quickWinsCompleted={quickWinsCompleted}
-        totalQuickWins={totalQuickWins}
         totalQuestions={totalQuestions}
         answeredQuestions={answeredQuestions}
         mobileMenuOpen={navigation.mobileMenuOpen}

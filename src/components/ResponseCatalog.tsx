@@ -37,6 +37,8 @@ const TOPIC_ICONS: Record<string, React.ReactNode> = {
   malware_infection: <AlertTriangle className="w-4 h-4" />,
   data_theft: <Database className="w-4 h-4" />,
   network_attacks: <Wifi className="w-4 h-4" />,
+  system_info: <Smartphone className="w-4 h-4" />,
+  system_security: <Shield className="w-4 h-4" />,
   default: <Globe className="w-4 h-4" />
 };
 
@@ -90,6 +92,42 @@ export function ResponseCatalog() {
         }
       }
 
+      // If still not found, check if it's an onboarding question
+      if (!question) {
+        const onboardingQuestions: Record<string, any> = {
+          'platform_confirmation': {
+            id: 'platform_confirmation',
+            text: 'Platform confirmation',
+            relatedTopics: ['system_info'],
+            weight: 5
+          },
+          'virus_scan_recent': {
+            id: 'virus_scan_recent', 
+            text: 'Recent virus scan frequency',
+            relatedTopics: ['malware_infection'],
+            weight: 15
+          },
+          'password_strength': {
+            id: 'password_strength',
+            text: 'Password uniqueness across accounts', 
+            relatedTopics: ['credential_reuse'],
+            weight: 20
+          },
+          'software_updates': {
+            id: 'software_updates',
+            text: 'Software update habits',
+            relatedTopics: ['system_security'],
+            weight: 15
+          }
+        };
+
+        const onboardingQ = onboardingQuestions[answer.questionId];
+        if (onboardingQ) {
+          question = onboardingQ;
+          domain = 'Onboarding Assessment';
+        }
+      }
+
       if (!question) return;
 
       const responseData: ResponseItem = {
@@ -106,7 +144,7 @@ export function ResponseCatalog() {
         ? question.relatedTopics 
         : [`domain_${domain.toLowerCase().replace(/\s+/g, '_')}`];
 
-      topicsToProcess.forEach(topicId => {
+      topicsToProcess.forEach((topicId: string) => {
         if (!topicGroups[topicId]) {
           const securityTopic = getSecurityTopic(topicId);
           topicGroups[topicId] = {

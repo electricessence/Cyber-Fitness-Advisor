@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Shield, Plus, Zap } from 'lucide-react';
-import { ScoreBar } from './ScoreBar';
 import { SmartText } from './SmartText';
 
 interface GameQuestion {
@@ -24,6 +23,7 @@ interface GameifiedOnboardingProps {
       browser: string;
     };
   }) => void;
+  answerQuestion: (questionId: string, value: string) => void;
 }
 
 // Questions that immediately give points and feedback
@@ -148,7 +148,7 @@ const GAME_QUESTIONS: GameQuestion[] = [
   }
 ];
 
-export function GameifiedOnboarding({ onComplete }: GameifiedOnboardingProps) {
+export function GameifiedOnboarding({ onComplete, answerQuestion }: GameifiedOnboardingProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [answers, setAnswers] = useState<Record<string, { value: string; points: number }>>({});
@@ -181,14 +181,17 @@ export function GameifiedOnboarding({ onComplete }: GameifiedOnboardingProps) {
   const handleAnswer = (option: GameQuestion['options'][0]) => {
     const question = GAME_QUESTIONS[currentQuestion];
     
-    // Record the answer
+    // Record the answer locally for onboarding flow
     setAnswers(prev => ({
       ...prev,
       [question.id]: { value: option.value, points: option.points }
     }));
 
-    // Update score
+    // Update local score for onboarding display
     setScore(prev => prev + option.points);
+    
+    // IMMEDIATELY update the main assessment store
+    answerQuestion(question.id, option.value);
     
     // Show response
     setCurrentResponse({
@@ -226,23 +229,8 @@ export function GameifiedOnboarding({ onComplete }: GameifiedOnboardingProps) {
 
   if (showResponse) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="max-w-lg w-full">
-          {/* Score Bar */}
-          <div className="mb-6">
-            <ScoreBar
-              score={score}
-              level={Math.floor(score / 25)}
-              nextLevelProgress={{
-                currentLevel: Math.floor(score / 25),
-                nextLevel: Math.floor(score / 25) + 1,
-                pointsNeeded: (Math.floor(score / 25) + 1) * 25 - score,
-                progress: (score % 25) / 25
-              }}
-              quickWinsCompleted={Object.keys(answers).length}
-              totalQuickWins={GAME_QUESTIONS.length}
-            />
-          </div>
+      <div className="p-6 bg-gradient-to-br from-green-50 to-blue-50 min-h-[500px] flex flex-col justify-center">
+        <div className="max-w-lg mx-auto w-full">
 
           {/* Response Card */}
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center space-y-6 animate-bounce-in">
@@ -274,24 +262,8 @@ export function GameifiedOnboarding({ onComplete }: GameifiedOnboardingProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
-      <div className="max-w-lg w-full">
-        {/* Score Bar */}
-        <div className="mb-6">
-          <ScoreBar
-            score={score}
-            level={Math.floor(score / 25)}
-            nextLevelProgress={{
-              currentLevel: Math.floor(score / 25),
-              nextLevel: Math.floor(score / 25) + 1,
-              pointsNeeded: (Math.floor(score / 25) + 1) * 25 - score,
-              progress: (score % 25) / 25
-            }}
-            quickWinsCompleted={Object.keys(answers).length}
-            totalQuickWins={GAME_QUESTIONS.length}
-          />
-        </div>
-
+    <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-[500px] flex flex-col justify-center">
+      <div className="max-w-lg mx-auto w-full">
         {/* Question Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
           {/* Progress */}

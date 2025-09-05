@@ -1,17 +1,6 @@
 import { Menu, X, Shield, FileDown, FileUp, Github } from 'lucide-react';
-import { ScoreBar } from './ScoreBar';
 
 interface AppHeaderProps {
-  overallScore: number;
-  currentLevel: number;
-  nextLevelProgress: {
-    currentLevel: number;
-    nextLevel: number | null;
-    pointsNeeded: number;
-    progress: number;
-  };
-  quickWinsCompleted: number;
-  totalQuickWins: number;
   answeredQuestions: number;
   totalQuestions: number;
   mobileMenuOpen: boolean;
@@ -22,11 +11,6 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ 
-  overallScore, 
-  currentLevel, 
-  nextLevelProgress,
-  quickWinsCompleted,
-  totalQuickWins,
   answeredQuestions,
   totalQuestions,
   mobileMenuOpen,
@@ -88,17 +72,6 @@ export function AppHeader({
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
-      </div>
-
-      {/* Mobile Score Display */}
-      <div className="sm:hidden px-4 pb-3 border-t">
-        <ScoreBar 
-          score={overallScore} 
-          level={currentLevel}
-          nextLevelProgress={nextLevelProgress}
-          quickWinsCompleted={quickWinsCompleted}
-          totalQuickWins={totalQuickWins}
-        />
       </div>
     </header>
   );
