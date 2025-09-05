@@ -112,13 +112,22 @@ export const useAssessmentStore = create<AssessmentState>()(
         console.log('Store answerQuestion called with:', questionId, value);
         const state = get();
         const previousScore = state.overallScore;
+        const previousLevel = state.currentLevel;
+        console.log('Previous state:', { 
+          score: previousScore, 
+          level: previousLevel, 
+          answersCount: Object.keys(state.answers).length 
+        });
         
         // Find the question to get its details
         const question = state.questionBank.domains
           .flatMap(d => d.levels.flatMap(l => l.questions))
           .find(q => q.id === questionId);
         
+        console.log('Found question:', question?.id, question?.text?.substring(0, 50));
+        
         const pointsEarned = question ? calculateQuestionPoints(question, value) : 0;
+        console.log('Points earned:', pointsEarned);
         
         const newAnswers = {
           ...state.answers,
@@ -133,6 +142,12 @@ export const useAssessmentStore = create<AssessmentState>()(
         
         const scoreResult = calculateOverallScore(state.questionBank, newAnswers);
         const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
+        
+        console.log('New calculated state:', {
+          newScore: scoreResult.overallScore,
+          newLevel: scoreResult.level,
+          newAnswersCount: Object.keys(newAnswers).length
+        });
         
         const scoreIncrease = scoreResult.overallScore - previousScore;
         const shouldCelebrate = scoreIncrease > 5 || 
@@ -150,6 +165,12 @@ export const useAssessmentStore = create<AssessmentState>()(
         // Recalculate recommendations
         const newRecommendations = getTopRecommendations(state.questionBank, newAnswers);
         
+        console.log('About to update store with:', {
+          answersCount: Object.keys(newAnswers).length,
+          overallScore: scoreResult.overallScore,
+          currentLevel: scoreResult.level
+        });
+        
         set({
           answers: newAnswers,
           overallScore: scoreResult.overallScore,
@@ -163,6 +184,8 @@ export const useAssessmentStore = create<AssessmentState>()(
           lastScoreIncrease: scoreIncrease,
           earnedBadges: newBadges,
         });
+        
+        console.log('Store updated! New state should be available to components.');
       },
       
       resetAssessment: () => {

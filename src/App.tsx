@@ -47,9 +47,25 @@ function App() {
   useEffect(() => {
     initializeStore();
   }, []);
+  
+  // Sync local currentLevel with store userLevel and add debugging
+  useEffect(() => {
+    console.log('App.tsx: Store userLevel changed to:', userLevel);
+    console.log('App.tsx: Current local currentLevel:', currentLevel);
+    console.log('App.tsx: Total answers:', Object.keys(answers).length);
+    setCurrentLevel(userLevel);
+  }, [userLevel, answers]);
 
   const currentDomainData = questionBank.domains.find(d => d.id === currentDomain);
   const currentLevelData = currentDomainData?.levels.find(l => l.level === currentLevel);
+  
+  console.log('App.tsx render:', {
+    currentDomain,
+    currentLevel,
+    userLevel,
+    currentLevelData: currentLevelData ? `${currentLevelData.questions.length} questions` : 'none',
+    answersCount: Object.keys(answers).length
+  });
   
   const recommendations = getRecommendations();
   const totalQuestions = questionBank.domains.reduce(
@@ -430,7 +446,8 @@ function App() {
                           ]}
                           onAnswer={(answer) => {
                             console.log(`Action ${action.id} answered:`, answer);
-                            // Store this action answer if needed
+                            // Actually call the store function to save the answer
+                            answerQuestion(action.id, answer);
                           }}
                         />
                       ))}
@@ -453,9 +470,20 @@ function App() {
                     </div>
 
                     <div className="space-y-6">
-                      {currentLevelData.questions
-                        .filter(question => !answers[question.id]) // Only show unanswered questions
-                        .map((question) => (
+                      {(() => {
+                        const allQuestions = currentLevelData.questions;
+                        const answeredQuestionIds = Object.keys(answers);
+                        const unansweredQuestions = allQuestions.filter(question => !answers[question.id]);
+                        
+                        console.log('App.tsx question filtering:', {
+                          totalQuestions: allQuestions.length,
+                          answeredQuestionIds,
+                          unansweredCount: unansweredQuestions.length,
+                          unansweredIds: unansweredQuestions.map(q => q.id)
+                        });
+                        
+                        return unansweredQuestions;
+                      })().map((question) => (
                         <div key={question.id} id={`question-${question.id}`}>
                           <UniversalCard
                             mode="question"
