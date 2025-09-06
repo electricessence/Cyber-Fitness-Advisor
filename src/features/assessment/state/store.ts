@@ -120,9 +120,47 @@ export const useAssessmentStore = create<AssessmentState>()(
         });
         
         // Find the question to get its details
-        const question = state.questionBank.domains
+        let question = state.questionBank.domains
           .flatMap(d => d.levels.flatMap(l => l.questions))
           .find(q => q.id === questionId);
+        
+        // If not found in question bank, check if it's an onboarding question
+        if (!question) {
+          const onboardingQuestions: Record<string, any> = {
+            'platform_confirmation': {
+              id: 'platform_confirmation',
+              text: 'Platform confirmation',
+              weight: 5
+            },
+            'virus_scan_recent': {
+              id: 'virus_scan_recent', 
+              text: 'Recent virus scan frequency',
+              weight: 15
+            },
+            'password_strength': {
+              id: 'password_strength',
+              text: 'Password uniqueness across accounts', 
+              weight: 20
+            },
+            'software_updates': {
+              id: 'software_updates',
+              text: 'Software update habits',
+              weight: 15
+            },
+            'phishing_awareness': {
+              id: 'phishing_awareness',
+              text: 'Phishing awareness level',
+              weight: 20
+            },
+            'tech_comfort': {
+              id: 'tech_comfort',
+              text: 'Technology comfort level',
+              weight: 10
+            }
+          };
+
+          question = onboardingQuestions[questionId];
+        }
         
         console.log('Found question:', question?.id, question?.text?.substring(0, 50));
         

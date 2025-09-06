@@ -118,6 +118,18 @@ export function ResponseCatalog() {
             text: 'Software update habits',
             relatedTopics: ['system_security'],
             weight: 15
+          },
+          'phishing_awareness': {
+            id: 'phishing_awareness',
+            text: 'Phishing awareness level',
+            relatedTopics: ['account_takeover'],
+            weight: 20
+          },
+          'tech_comfort': {
+            id: 'tech_comfort',
+            text: 'Technology comfort level',
+            relatedTopics: ['system_info'],
+            weight: 10
           }
         };
 

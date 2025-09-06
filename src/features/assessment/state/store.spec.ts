@@ -135,4 +135,63 @@ describe('Assessment Store', () => {
       expect(result.current.currentLevel).toBeGreaterThanOrEqual(initialLevel)
     })
   })
+
+  describe('when answering onboarding questions', () => {
+    it('should handle onboarding questions with proper scoring', () => {
+      const initialScore = result.current.overallScore
+      
+      act(() => {
+        result.current.answerQuestion('phishing_awareness', 'high')
+      })
+      
+      expect(result.current.answers['phishing_awareness']).toBeDefined()
+      expect(result.current.answers['phishing_awareness'].value).toBe('high')
+      expect(result.current.answers['phishing_awareness'].pointsEarned).toBeGreaterThan(0)
+      expect(result.current.overallScore).toBeGreaterThan(initialScore)
+    })
+
+    it('should handle tech_comfort onboarding question', () => {
+      const initialScore = result.current.overallScore
+      
+      act(() => {
+        result.current.answerQuestion('tech_comfort', 'expert')
+      })
+      
+      expect(result.current.answers['tech_comfort']).toBeDefined()
+      expect(result.current.answers['tech_comfort'].pointsEarned).toBeGreaterThan(0)
+      expect(result.current.overallScore).toBeGreaterThan(initialScore)
+    })
+
+    it('should handle all onboarding questions and accumulate score', () => {
+      const initialScore = result.current.overallScore
+      const onboardingQuestions = [
+        { id: 'platform_confirmation', value: 'desktop' },
+        { id: 'virus_scan_recent', value: 'weekly' },
+        { id: 'password_strength', value: 'unique' },
+        { id: 'software_updates', value: 'automatic' },
+        { id: 'phishing_awareness', value: 'high' },
+        { id: 'tech_comfort', value: 'expert' }
+      ]
+      
+      let runningScore = initialScore
+      
+      onboardingQuestions.forEach(({ id, value }) => {
+        act(() => {
+          result.current.answerQuestion(id, value)
+        })
+        
+        expect(result.current.answers[id]).toBeDefined()
+        expect(result.current.answers[id].pointsEarned).toBeGreaterThan(0)
+        expect(result.current.overallScore).toBeGreaterThan(runningScore)
+        runningScore = result.current.overallScore
+      })
+      
+      // All onboarding questions should be stored
+      expect(Object.keys(result.current.answers).length).toBe(onboardingQuestions.length)
+      // Final score should be significantly higher than initial (onboarding gives meaningful points)
+      expect(result.current.overallScore).toBeGreaterThan(initialScore + 10)
+      // Score should reflect the total points earned from all questions
+      expect(result.current.overallScore).toBeGreaterThan(10)
+    })
+  })
 })

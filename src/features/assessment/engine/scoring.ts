@@ -22,6 +22,21 @@ export function normalizeAnswer(question: Question, value: boolean | number | st
 }
 
 export function calculateQuestionPoints(question: Question, value: boolean | number | string): number {
+  // Handle onboarding questions (they have weight but no type)
+  if (!question.type && question.weight) {
+    // For onboarding questions, give full points for positive responses
+    const positiveResponses = ['yes', 'weekly', 'monthly', 'unique', 'strong', 'automatic', 'high', 'expert', 'desktop', 'mobile'];
+    const partialResponses = ['sometimes', 'basic', 'medium', 'novice'];
+    
+    if (positiveResponses.includes(value as string)) {
+      return question.weight;
+    } else if (partialResponses.includes(value as string)) {
+      return question.weight * 0.6; // 60% credit for partial answers
+    } else {
+      return question.weight * 0.2; // 20% credit for any answer (better than nothing)
+    }
+  }
+
   // Handle new three-option system
   if (value === 'yes') {
     let points = question.weight || 0;
@@ -94,7 +109,7 @@ export function calculateDomainScore(
 
 export function calculateOverallScore(
   questionBank: QuestionBank,
-  answers: Record<string, { questionId: string; value: boolean | number | string }>
+  answers: Record<string, { questionId: string; value: boolean | number | string; pointsEarned?: number }>
 ): { 
   overallScore: number;
   domainScores: Record<string, number>;
@@ -136,6 +151,25 @@ export function calculateOverallScore(
       });
     });
   });
+
+  // Add points from onboarding questions and other standalone questions
+  let onboardingPoints = 0;
+  Object.values(answers).forEach(answer => {
+    // Check if this is an onboarding question (has pointsEarned but not in question bank)
+    const isInQuestionBank = questionBank.domains.some(d => 
+      d.levels.some(l => l.questions.some(q => q.id === answer.questionId))
+    );
+    
+    if (!isInQuestionBank && answer.pointsEarned && answer.pointsEarned > 0) {
+      onboardingPoints += answer.pointsEarned;
+    }
+  });
+
+  // Include onboarding points in overall score calculation
+  if (onboardingPoints > 0) {
+    totalWeightedScore += onboardingPoints;
+    totalWeight += 1; // Give onboarding questions equal weight to a domain
+  }
 
   const overallScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
   const level = calculateLevel(overallScore);
