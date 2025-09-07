@@ -194,4 +194,72 @@ describe('Assessment Store', () => {
       expect(result.current.overallScore).toBeGreaterThan(10)
     })
   })
+
+  describe('when managing answer expiration', () => {
+    it('should set expiration for time-sensitive answers', () => {
+      act(() => {
+        result.current.answerQuestion('virus_scan_recent', 'this_week')
+      })
+      
+      const answer = result.current.answers['virus_scan_recent']
+      expect(answer).toBeDefined()
+      expect(answer.expiresAt).toBeDefined()
+      expect(answer.expirationReason).toBe('Weekly scans need follow-up')
+      expect(answer.isExpired).toBe(false)
+    })
+    
+    it('should not set expiration for automatic/permanent answers', () => {
+      act(() => {
+        result.current.answerQuestion('software_updates', 'automatic')
+      })
+      
+      const answer = result.current.answers['software_updates']
+      expect(answer).toBeDefined()
+      expect(answer.expiresAt).toBeUndefined()
+      expect(answer.expirationReason).toBeUndefined()
+    })
+    
+    it('should identify expired answers', () => {
+      // Mock an expired answer by directly setting it
+      const expiredAnswer = {
+        questionId: 'test_expired',
+        value: 'this_week',
+        timestamp: new Date(),
+        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
+        expirationReason: 'Test expiration',
+        isExpired: false,
+        pointsEarned: 5
+      }
+      
+      act(() => {
+        result.current.answerQuestion = result.current.answerQuestion // Trigger re-render
+      })
+      
+      // Manually add expired answer for testing
+      result.current.answers['test_expired'] = expiredAnswer
+      
+      const expiredAnswers = result.current.getExpiredAnswers()
+      expect(expiredAnswers).toHaveLength(1)
+      expect(expiredAnswers[0].questionId).toBe('test_expired')
+    })
+    
+    it('should find expiring answers', () => {
+      // Add an answer expiring in 3 days
+      const expiringAnswer = {
+        questionId: 'test_expiring',
+        value: 'manual',
+        timestamp: new Date(),
+        expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+        expirationReason: 'Test expiring soon',
+        isExpired: false,
+        pointsEarned: 5
+      }
+      
+      result.current.answers['test_expiring'] = expiringAnswer
+      
+      const expiringAnswers = result.current.getExpiringAnswers(7) // Within 7 days
+      expect(expiringAnswers).toHaveLength(1)
+      expect(expiringAnswers[0].questionId).toBe('test_expiring')
+    })
+  })
 })

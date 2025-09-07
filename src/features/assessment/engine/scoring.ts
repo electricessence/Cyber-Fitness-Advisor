@@ -289,3 +289,215 @@ export function getTopRecommendations(
     })
     .slice(0, limit);
 }
+
+/**
+ * Calculate expiration date and reason for time-sensitive answers
+ */
+export function calculateAnswerExpiration(questionId: string, value: boolean | number | string): { 
+  expiresAt?: Date; 
+  expirationReason?: string; 
+} {
+  const now = new Date();
+  
+  // Define expiration rules based on question and answer patterns
+  const expirationRules: Record<string, Record<string, { days: number; reason: string }>> = {
+    // DEBUG: Immediate expiration for testing
+    'debug_expiration_test': {
+      'yes': { days: -1, reason: 'DEBUG: This expired yesterday for testing' },
+      'test_immediate': { days: 0, reason: 'DEBUG: This expires right now' },
+      'test_soon': { days: 1, reason: 'DEBUG: This expires tomorrow' }
+    },
+    
+    // Windows Updates - main question with different follow-up schedules
+    'windows_updates': {
+      // 'automatic' has no expiration - it's self-maintaining
+      'manual_when_notified': { days: 90, reason: 'Check if manual update routine is working well' },
+      'every_so_often': { days: 30, reason: 'Monthly update check - establish better routine' },
+      'never': { days: 7, reason: 'Urgent - unpatched systems are high-risk targets' }
+    },
+    
+    // Windows Updates follow-ups
+    'windows_updates_followup_manual': {
+      'up_to_date': { days: 90, reason: 'Quarterly check-in on manual update habits' },
+      'will_update_now': { days: 90, reason: 'Quarterly check-in on manual update habits' },
+      'behind_updates': { days: 30, reason: 'Monthly check until update routine is established' }
+    },
+    
+    'windows_updates_followup_sporadic': {
+      'within_month': { days: 30, reason: 'Monthly reminder to maintain update routine' },
+      'few_months': { days: 7, reason: 'Weekly check until update routine is established' },
+      'long_time': { days: 7, reason: 'Weekly check until update routine is established' }
+    },
+    
+    'windows_updates_followup_never': {
+      'enable_automatic': { days: 180, reason: 'Verify automatic updates are working correctly' },
+      'manual_commitment': { days: 7, reason: 'Weekly accountability check for manual update commitment' },
+      'still_resistant': { days: 3, reason: 'High-risk: frequent check-ins needed for unpatched system' }
+    },
+    
+    // Virus/malware scanning questions
+    'virus_scan_recent': {
+      'today': { days: 7, reason: 'Daily scans should be checked weekly' },
+      'this_week': { days: 7, reason: 'Weekly scans need follow-up' },
+      'this_month': { days: 14, reason: 'Monthly scans should be more frequent' },
+      'few_months': { days: 30, reason: 'Old scans need immediate attention' },
+      'never': { days: 1, reason: 'No scanning protection - urgent action needed' }
+    },
+    
+    // Software update questions
+    'software_updates': {
+      'manual': { days: 30, reason: 'Manual updates should be checked monthly' },
+      'weekly': { days: 7, reason: 'Check for new updates' },
+      'monthly': { days: 30, reason: 'Time for update check' }
+      // 'automatic' has no expiration - it's self-maintaining
+    },
+    
+    // Password-related questions
+    'password_change_frequency': {
+      'never': { days: 90, reason: 'Passwords should be changed regularly' },
+      'yearly': { days: 365, reason: 'Time for annual password update' },
+      'few_months': { days: 90, reason: 'Quarterly password review due' }
+    },
+    
+    // Backup questions
+    'data_backup': {
+      'weekly': { days: 7, reason: 'Weekly backup check due' },
+      'monthly': { days: 30, reason: 'Monthly backup verification needed' },
+      'rarely': { days: 30, reason: 'Backup system needs attention' }
+    },
+    
+    // Security training/awareness
+    'security_training': {
+      'last_year': { days: 365, reason: 'Annual security training refresh' },
+      'few_years': { days: 180, reason: 'Security knowledge needs updating' }
+    }
+  };
+  
+  // Check for direct question matches
+  if (expirationRules[questionId]) {
+    const rule = expirationRules[questionId][value as string];
+    if (rule) {
+      const expiresAt = new Date(now.getTime() + rule.days * 24 * 60 * 60 * 1000);
+      return { expiresAt, expirationReason: rule.reason };
+    }
+  }
+  
+  // Check for pattern-based matches (for onboarding questions)
+  const valueStr = value.toString().toLowerCase();
+  
+  // Time-based patterns
+  if (valueStr.includes('week') || valueStr === 'weekly') {
+    const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return { expiresAt, expirationReason: 'Weekly task due for review' };
+  }
+  
+  if (valueStr.includes('month') || valueStr === 'monthly') {
+    const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    return { expiresAt, expirationReason: 'Monthly security check due' };
+  }
+  
+  if (valueStr.includes('never') || valueStr.includes('no')) {
+    const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return { expiresAt, expirationReason: 'Security gap needs immediate attention' };
+  }
+  
+  // No expiration needed (e.g., "automatic", "yes", "always")
+  return {};
+}
+
+/**
+ * Check if a question's conditions are met and it should be available
+ */
+export function shouldQuestionBeAvailable(
+  question: Question,
+  answers: { [questionId: string]: any },
+  _userProgress?: any
+): boolean {
+  // If no conditions, question is always available
+  if (!question.conditions) {
+    return true;
+  }
+
+  const { requireAnswers, browserInfo, userProfile } = question.conditions;
+
+  // Check required answers
+  if (requireAnswers) {
+    for (const [requiredQuestionId, allowedValues] of Object.entries(requireAnswers)) {
+      const userAnswer = answers[requiredQuestionId];
+      
+      if (!userAnswer) {
+        return false; // Required question not answered yet
+      }
+
+      // Handle different answer types
+      let answerValue: string;
+      if (typeof userAnswer === 'object' && userAnswer.value !== undefined) {
+        answerValue = String(userAnswer.value);
+      } else {
+        answerValue = String(userAnswer);
+      }
+
+      if (!allowedValues.includes(answerValue)) {
+        return false; // Answer doesn't match required values
+      }
+    }
+  }
+
+  // Check browser/platform requirements
+  if (browserInfo) {
+    // TODO: Implement browser/platform detection if needed
+    // For now, assume all browser/platform conditions are met
+  }
+
+  // Check user profile requirements  
+  if (userProfile) {
+    // TODO: Implement user profile checking if needed
+    // For now, assume all user profile conditions are met
+  }
+
+  return true;
+}
+
+/**
+ * Get follow-up expiration schedule based on original answer
+ */
+export function getFollowUpExpirationSchedule(
+  _originalQuestionId: string,
+  originalAnswer: any
+): { expiresAt?: Date; expirationReason?: string } {
+  const answerValue = typeof originalAnswer === 'object' && originalAnswer.value !== undefined 
+    ? String(originalAnswer.value) 
+    : String(originalAnswer);
+
+  const now = new Date();
+
+  // Define follow-up schedules for different answer patterns
+  const followUpSchedules: { [key: string]: { days: number; reason: string } } = {
+    // Good practices - long follow-up schedules
+    'automatic': { days: 90, reason: 'Quarterly check-in' },
+    'yes': { days: 60, reason: 'Bi-monthly verification' },
+    'always': { days: 90, reason: 'Quarterly validation' },
+    
+    // Manual/inconsistent practices - medium follow-up
+    'manual': { days: 30, reason: 'Monthly reminder' },
+    'sometimes': { days: 21, reason: 'Bi-weekly check' },
+    'occasionally': { days: 14, reason: 'Bi-weekly reminder' },
+    
+    // Poor practices - short follow-up schedules
+    'never': { days: 7, reason: 'Urgent security gap follow-up' },
+    'no': { days: 14, reason: 'Security improvement needed' },
+    'rarely': { days: 10, reason: 'Security practice improvement' },
+  };
+
+  // Find matching schedule
+  for (const [pattern, schedule] of Object.entries(followUpSchedules)) {
+    if (answerValue.toLowerCase().includes(pattern)) {
+      const expiresAt = new Date(now.getTime() + schedule.days * 24 * 60 * 60 * 1000);
+      return { expiresAt, expirationReason: schedule.reason };
+    }
+  }
+
+  // Default follow-up schedule (monthly)
+  const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  return { expiresAt, expirationReason: 'Monthly security follow-up' };
+}

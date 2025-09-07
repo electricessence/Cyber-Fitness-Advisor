@@ -33,6 +33,19 @@
               "explanation": "Instant unique passwords for every account",
               "actionHint": "Chrome/Edge/Safari all have built-in password managers",
               "relatedTopics": ["credential_reuse"]
+            },
+            {
+              "id": "debug_expiration_test",
+              "type": "YN",
+              "weight": 1,
+              "quickWin": true,
+              "timeEstimate": "0 seconds",
+              "text": "DEBUG: Test expiration system (expires immediately)",
+              "affirmativeText": "Debug Test Completed",
+              "negativeText": "Debug Test Skipped",
+              "explanation": "This is a debug question that expires immediately to test the expiration system",
+              "actionHint": "This is for testing only",
+              "relatedTopics": ["testing"]
             }
           ]
         }
@@ -118,6 +131,43 @@
               "text": "Is your firewall turned on?",
               "explanation": "Blocks unauthorized network connections",
               "actionHint": "Windows: Settings > Network > Windows Defender Firewall"
+            },
+            {
+              "id": "windows_updates",
+              "type": "ACTION",
+              "weight": 8,
+              "quickWin": true,
+              "timeEstimate": "2 minutes",
+              "text": "How often do you update Windows?",
+              "explanation": "Regular updates patch security vulnerabilities",
+              "actionHint": "Windows Settings > Update & Security > Windows Update",
+              "relatedTopics": ["system_security"],
+              "actionOptions": [
+                {
+                  "id": "automatic",
+                  "text": "🔄 Automatic updates enabled",
+                  "points": 8,
+                  "impact": "Perfect! Your system stays protected automatically."
+                },
+                {
+                  "id": "manual_when_notified", 
+                  "text": "📢 Manually when notified",
+                  "points": 6,
+                  "impact": "Good practice! We'll check in periodically to make sure you're staying current."
+                },
+                {
+                  "id": "every_so_often",
+                  "text": "🤷 Every so often",
+                  "points": 3,
+                  "impact": "This leaves you vulnerable between updates. We'll remind you monthly to stay secure."
+                },
+                {
+                  "id": "never",
+                  "text": "❌ Never/rarely",
+                  "points": 0,
+                  "impact": "This is very risky! Unpatched systems are prime targets. Let's fix this immediately."
+                }
+              ]
             }
           ]
         },
@@ -133,12 +183,123 @@
               "actionHint": "Windows: BitLocker, Mac: FileVault, built into most phones"
             },
             {
+              "id": "windows_update_frequency",
+              "type": "ACTION",
+              "weight": 10,
+              "text": "How often do you update Windows?",
+              "explanation": "Security patches are critical for protection",
+              "actionHint": "Automatic updates are recommended for best security",
+              "relatedTopics": ["system_security"],
+              "actionOptions": [
+                { "id": "automatic", "text": "Automatic updates", "points": 10 },
+                { "id": "manual_when_notified", "text": "Manually when notified", "points": 7 },
+                { "id": "every_so_often", "text": "Every so often", "points": 4 },
+                { "id": "never", "text": "Never or rarely", "points": 0 }
+              ]
+            },
+            {
               "id": "usb_autorun",
               "type": "YN",
               "weight": 4,
               "text": "Have you disabled USB autorun?",
               "explanation": "Prevents malware from USB drives auto-executing",
               "actionHint": "Windows: gpedit.msc > Computer Config > Admin Templates > Windows Components > Autoplay Policies"
+            },
+            {
+              "id": "windows_updates_followup_manual",
+              "type": "ACTION", 
+              "weight": 4,
+              "text": "Have you installed the latest Windows updates?",
+              "explanation": "Since you update manually, let's make sure you're current",
+              "actionHint": "Check Windows Settings > Update & Security > Check for updates",
+              "relatedTopics": ["system_security"],
+              "conditions": {
+                "requireAnswers": { "windows_update_frequency": ["manual_when_notified"] }
+              },
+              "actionOptions": [
+                {
+                  "id": "up_to_date",
+                  "text": "✅ Yes, I'm up to date",
+                  "points": 4,
+                  "impact": "Excellent! Keep this good habit up."
+                },
+                {
+                  "id": "will_update_now",
+                  "text": "🔄 I'll check and update now", 
+                  "points": 4,
+                  "impact": "Great! Installing the latest updates will close security gaps."
+                },
+                {
+                  "id": "behind_updates",
+                  "text": "📅 I'm behind on updates",
+                  "points": 1,
+                  "impact": "Let's get you caught up! Updates patch critical vulnerabilities."
+                }
+              ]
+            },
+            {
+              "id": "windows_updates_followup_sporadic",
+              "type": "ACTION",
+              "weight": 3,
+              "text": "When did you last update Windows?", 
+              "explanation": "Since you update sporadically, let's establish a routine",
+              "actionHint": "Set a monthly calendar reminder to check for updates",
+              "relatedTopics": ["system_security"],
+              "conditions": {
+                "requireAnswers": { "windows_update_frequency": ["every_so_often"] }
+              },
+              "actionOptions": [
+                {
+                  "id": "within_month",
+                  "text": "📅 Within the last month",
+                  "points": 3,
+                  "impact": "Not bad! Try to make this a monthly habit for better security."
+                },
+                {
+                  "id": "few_months",
+                  "text": "⏰ A few months ago", 
+                  "points": 1,
+                  "impact": "You're likely missing important security patches. Let's update now!"
+                },
+                {
+                  "id": "long_time",
+                  "text": "❌ It's been a long time",
+                  "points": 0,
+                  "impact": "This is very risky! Your system has known vulnerabilities that need patching immediately."
+                }
+              ]
+            },
+            {
+              "id": "windows_updates_followup_never",
+              "type": "ACTION",
+              "weight": 5,
+              "text": "Are you ready to enable automatic Windows updates?",
+              "explanation": "Manual updating hasn't worked - let's automate your security",
+              "actionHint": "Windows Settings > Update & Security > Advanced options > Automatic",
+              "relatedTopics": ["system_security"], 
+              "conditions": {
+                "requireAnswers": { "windows_update_frequency": ["never"] }
+              },
+              "actionOptions": [
+                {
+                  "id": "enable_automatic",
+                  "text": "✅ Yes, enable automatic updates",
+                  "points": 5,
+                  "impact": "Perfect! Your system will now stay protected automatically."
+                },
+                {
+                  "id": "manual_commitment",
+                  "text": "📋 I'll commit to manual updates",
+                  "points": 3,
+                  "impact": "Okay, we'll check in weekly to make sure you follow through."
+                },
+                {
+                  "id": "still_resistant",
+                  "text": "❌ I prefer to stay manual",
+                  "points": 0,
+                  "impact": "This leaves you very vulnerable. We'll keep checking in frequently."
+                }
+              ]
             }
           ]
         }

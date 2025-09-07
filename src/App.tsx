@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAssessmentStore, initializeStore } from './features/assessment/state/store';
+import { DeviceOnboarding } from './components/DeviceOnboarding';
 import { ScoreBar } from './components/ScoreBar';
 import { Celebration } from './components/Celebration';
 import { GameifiedOnboarding } from './components/GameifiedOnboarding';
@@ -15,8 +16,13 @@ import { ResetModal } from './components/layout/ResetModal';
 import { useNavigation } from './hooks/useNavigation';
 import { useAppState } from './hooks/useAppState';
 import { useBrowserDetection } from './hooks/useBrowserDetection';
+import type { DeviceProfile } from './features/assessment/engine/deviceScenarios';
 
 function App() {
+  const [showDeviceOnboarding, setShowDeviceOnboarding] = useState(false);
+  const deviceProfile = useAssessmentStore(state => state.deviceProfile);
+  const setDeviceProfile = useAssessmentStore(state => state.setDeviceProfile);
+  
   // Use custom hooks for state management
   const navigation = useNavigation();
   const appState = useAppState();
@@ -40,8 +46,19 @@ function App() {
   // Initialize store on app load
   useEffect(() => {
     initializeStore();
-  }, []);
-  
+    
+    // Check if we need device onboarding
+    if (!deviceProfile) {
+      setShowDeviceOnboarding(true);
+    }
+  }, [deviceProfile]);
+
+  const handleDeviceOnboardingComplete = (profile: DeviceProfile) => {
+    console.log('Device onboarding complete:', profile);
+    setDeviceProfile(profile);
+    setShowDeviceOnboarding(false);
+  };
+
   useEffect(() => {
     console.log('App.tsx: Store userLevel changed to:', userLevel);
     navigation.setCurrentLevel(userLevel);
@@ -141,6 +158,11 @@ function App() {
     // Force a page reload to ensure clean state
     setTimeout(() => window.location.reload(), 100);
   };
+
+  // Show device onboarding for new users
+  if (showDeviceOnboarding && !deviceProfile) {
+    return <DeviceOnboarding onComplete={handleDeviceOnboardingComplete} />;
+  }
 
   return (
     <AppLayout>

@@ -95,6 +95,11 @@ export interface Answer {
   timestamp?: Date;
   pointsEarned?: number;
   questionText?: string; // Store for historic reference
+  
+  // Expiration system for time-sensitive answers
+  expiresAt?: Date; // When this answer becomes outdated
+  expirationReason?: string; // Why this expires (e.g., "Virus scan should be done weekly")
+  isExpired?: boolean; // Cached expiration status for quick access
 }
 
 export interface UserProgress {

@@ -1,7 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { QuestionBank, Answer, Question } from '../engine/schema';
-import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints } from '../engine/scoring';
+import type { DeviceProfile } from '../engine/deviceScenarios';
+import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
+import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration, shouldQuestionBeAvailable } from '../engine/scoring';
+import { createPersonalizedQuestionBank } from '../../onboarding/personalizedQuestionBank';
 import questionsData from '../data/questions.json';
 
 // Smart pre-population from onboarding data
@@ -53,6 +56,11 @@ interface AssessmentState {
   // Data
   questionBank: QuestionBank;
   answers: Record<string, Answer>;
+  deviceProfile: DeviceProfile | null;
+  
+  // Task Management
+  taskResponses: Record<string, TaskResponse>;
+  taskReminders: TaskReminder[];
   
   // Computed state
   overallScore: number;
@@ -77,15 +85,30 @@ interface AssessmentState {
   
   // Actions
   answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => void;
+  handleTaskResponse: (questionId: string, taskResponse: TaskResponse) => void;
+  setDeviceProfile: (profile: DeviceProfile) => void;
   resetAssessment: () => void;
+  getAvailableQuestions: () => Question[];
   getRecommendations: () => ReturnType<typeof getTopRecommendations>;
   getHistoricAnswers: () => Array<Answer & { domain: string; level: number; question: Question | null }>;
   dismissCelebration: () => void;
+  
+  // Task Management
+  getTodaysTasks: () => Question[];
+  getRoomForImprovementTasks: () => Question[];
+  
+  // Expiration management
+  getExpiredAnswers: () => Answer[];
+  updateExpiredAnswers: () => void;
+  getExpiringAnswers: (daysAhead?: number) => Answer[];
 }
 
 const initialState = {
   questionBank: questionsData as QuestionBank,
   answers: {},
+  deviceProfile: null as DeviceProfile | null,
+  taskResponses: {},
+  taskReminders: [],
   overallScore: 0,
   domainScores: {},
   currentLevel: 0,
@@ -127,6 +150,12 @@ export const useAssessmentStore = create<AssessmentState>()(
         // If not found in question bank, check if it's an onboarding question
         if (!question) {
           const onboardingQuestions: Record<string, any> = {
+            // DEBUG: Test expiration question
+            'debug_expiration_test': {
+              id: 'debug_expiration_test',
+              text: 'DEBUG: Test expiration system',
+              weight: 1
+            },
             'platform_confirmation': {
               id: 'platform_confirmation',
               text: 'Platform confirmation',
@@ -167,6 +196,9 @@ export const useAssessmentStore = create<AssessmentState>()(
         const pointsEarned = question ? calculateQuestionPoints(question, value) : 0;
         console.log('Points earned:', pointsEarned);
         
+        // Calculate expiration for time-sensitive answers
+        const expirationData = calculateAnswerExpiration(questionId, value);
+        
         const newAnswers = {
           ...state.answers,
           [questionId]: {
@@ -174,7 +206,9 @@ export const useAssessmentStore = create<AssessmentState>()(
             value,
             timestamp: new Date(),
             pointsEarned,
-            questionText: question?.text
+            questionText: question?.text,
+            ...expirationData,
+            isExpired: false // Initially not expired
           } as Answer,
         };
         
@@ -226,10 +260,58 @@ export const useAssessmentStore = create<AssessmentState>()(
         console.log('Store updated! New state should be available to components.');
       },
       
+      setDeviceProfile: (profile: DeviceProfile) => {
+        console.log('Setting device profile:', profile);
+        
+        // Create comprehensive question bank with universal + device-specific + onboarding questions
+        const personalizedQuestionBank = createPersonalizedQuestionBank(profile);
+        console.log('Created personalized question bank:', personalizedQuestionBank);
+        
+        set({ 
+          deviceProfile: profile,
+          questionBank: personalizedQuestionBank
+        });
+      },
+      
       resetAssessment: () => {
+        // Clear persisted data from localStorage
+        localStorage.removeItem('cyber-fitness-assessment');
+        localStorage.removeItem('cyber-fitness-onboarding-answers');
+        
+        // Reset in-memory state
         set({
           ...initialState,
           questionBank: get().questionBank, // Keep the question bank
+        });
+      },
+      
+      getAvailableQuestions: () => {
+        const state = get();
+        const allQuestions: Question[] = [];
+        
+        // Collect all questions from all domains and levels
+        state.questionBank.domains.forEach(domain => {
+          domain.levels.forEach(level => {
+            level.questions.forEach(question => {
+              allQuestions.push(question);
+            });
+          });
+        });
+        
+        // Filter questions based on conditions and answer status
+        return allQuestions.filter(question => {
+          // Check if question meets conditional requirements
+          if (!shouldQuestionBeAvailable(question, state.answers)) {
+            return false;
+          }
+          
+          // Check if question is already answered and not expired
+          const existingAnswer = state.answers[question.id];
+          if (existingAnswer && !existingAnswer.isExpired) {
+            return false; // Already answered and not expired
+          }
+          
+          return true; // Question is available
         });
       },
       
@@ -275,6 +357,188 @@ export const useAssessmentStore = create<AssessmentState>()(
       
       dismissCelebration: () => {
         set({ showCelebration: false });
+      },
+      
+      // Expiration management functions
+      getExpiredAnswers: () => {
+        const state = get();
+        const now = new Date();
+        return Object.values(state.answers).filter(answer => 
+          answer.expiresAt && answer.expiresAt < now
+        );
+      },
+      
+      updateExpiredAnswers: () => {
+        const state = get();
+        const now = new Date();
+        const updatedAnswers = { ...state.answers };
+        let hasChanges = false;
+        
+        Object.keys(updatedAnswers).forEach(questionId => {
+          const answer = updatedAnswers[questionId];
+          if (answer.expiresAt) {
+            const wasExpired = answer.isExpired;
+            const isNowExpired = answer.expiresAt < now;
+            
+            if (wasExpired !== isNowExpired) {
+              updatedAnswers[questionId] = { ...answer, isExpired: isNowExpired };
+              hasChanges = true;
+            }
+          }
+        });
+        
+        if (hasChanges) {
+          set({ answers: updatedAnswers });
+        }
+      },
+      
+      getExpiringAnswers: (daysAhead: number = 7) => {
+        const state = get();
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + daysAhead);
+        
+        return Object.values(state.answers).filter(answer => 
+          answer.expiresAt && 
+          answer.expiresAt <= futureDate && 
+          answer.expiresAt > new Date()
+        );
+      },
+
+      // Task Management Methods
+      handleTaskResponse: (questionId: string, taskResponse: TaskResponse) => {
+        const state = get();
+        
+        // Update task responses
+        const newTaskResponses = {
+          ...state.taskResponses,
+          [questionId]: taskResponse
+        };
+
+        // Update task reminders if snoozed
+        let newTaskReminders = state.taskReminders;
+        if (taskResponse.status === 'snoozed') {
+          const existingReminderIndex = newTaskReminders.findIndex(r => r.questionId === questionId);
+          const now = new Date();
+          
+          if (existingReminderIndex >= 0) {
+            newTaskReminders = [...newTaskReminders];
+            newTaskReminders[existingReminderIndex] = {
+              ...newTaskReminders[existingReminderIndex],
+              reminderCount: newTaskReminders[existingReminderIndex].reminderCount + 1,
+              lastSnoozed: now,
+              reminderDate: taskResponse.snoozeUntil!
+            };
+          } else {
+            newTaskReminders = [
+              ...newTaskReminders,
+              {
+                questionId,
+                reminderCount: 0,
+                lastSnoozed: now,
+                reminderDate: taskResponse.snoozeUntil!
+              }
+            ];
+          }
+        }
+
+        // If task was completed, convert to Answer format for scoring
+        let newAnswers = state.answers;
+        if (taskResponse.status === 'completed' && taskResponse.selectedAction) {
+          newAnswers = {
+            ...state.answers,
+            [questionId]: {
+              questionId,
+              value: taskResponse.selectedAction,
+              timestamp: taskResponse.timestamp,
+              pointsEarned: taskResponse.pointsEarned || 0,
+              questionText: `Task completed: ${taskResponse.selectedAction}`
+            }
+          };
+        }
+
+        // Recalculate scores if task was completed
+        let scoreUpdate = {};
+        if (taskResponse.status === 'completed') {
+          const scoreResult = calculateOverallScore(state.questionBank, newAnswers);
+          const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
+          
+          scoreUpdate = {
+            overallScore: scoreResult.overallScore,
+            domainScores: scoreResult.domainScores,
+            currentLevel: scoreResult.level,
+            quickWinsCompleted: scoreResult.quickWinsCompleted,
+            totalQuickWins: scoreResult.totalQuickWins,
+            nextLevelProgress
+          };
+        }
+
+        set({
+          taskResponses: newTaskResponses,
+          taskReminders: newTaskReminders,
+          answers: newAnswers,
+          ...scoreUpdate
+        });
+      },
+
+      getTodaysTasks: () => {
+        const state = get();
+        const allQuestions: Question[] = [];
+        
+        // Collect all ACTION questions
+        state.questionBank.domains.forEach(domain => {
+          domain.levels.forEach(level => {
+            level.questions.forEach(question => {
+              if (question.type === 'ACTION') {
+                allQuestions.push(question);
+              }
+            });
+          });
+        });
+
+        // Filter to get today's tasks (new + due snoozed tasks)
+        return allQuestions.filter(question => {
+          const taskResponse = state.taskResponses[question.id];
+          
+          // New task (never answered)
+          if (!taskResponse) return true;
+          
+          // Completed or dismissed tasks don't appear in today's list
+          if (taskResponse.status === 'completed' || taskResponse.status === 'dismissed') {
+            return false;
+          }
+          
+          // Snoozed task that's due
+          if (taskResponse.status === 'snoozed' && taskResponse.snoozeUntil) {
+            return new Date() >= taskResponse.snoozeUntil;
+          }
+          
+          return false;
+        });
+      },
+
+      getRoomForImprovementTasks: () => {
+        const state = get();
+        const allQuestions: Question[] = [];
+        
+        // Collect all ACTION questions
+        state.questionBank.domains.forEach(domain => {
+          domain.levels.forEach(level => {
+            level.questions.forEach(question => {
+              if (question.type === 'ACTION') {
+                allQuestions.push(question);
+              }
+            });
+          });
+        });
+
+        // Return dismissed and snoozed tasks
+        return allQuestions.filter(question => {
+          const taskResponse = state.taskResponses[question.id];
+          return taskResponse && (
+            taskResponse.status === 'dismissed' || 
+            taskResponse.status === 'snoozed'
+          );
+        });
       },
     }),
     {

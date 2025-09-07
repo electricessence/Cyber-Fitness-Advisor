@@ -1,0 +1,309 @@
+{
+  "version": 2,
+  "deviceScenarios": {
+    "windows_desktop": {
+      "id": "windows_desktop",
+      "name": "Windows Desktop/Laptop Security",
+      "description": "Windows-specific security settings and protections",
+      "domains": [
+        {
+          "id": "windows_updates",
+          "title": "Windows Updates",
+          "levels": [
+            {
+              "level": 0,
+              "questions": [
+                {
+                  "id": "windows_update_frequency",
+                  "type": "ACTION",
+                  "weight": 10,
+                  "text": "How often do you update Windows?",
+                  "explanation": "Security patches are critical for protection",
+                  "actionHint": "Automatic updates are recommended for best security",
+                  "relatedTopics": ["system_security"],
+                  "actionOptions": [
+                    { "id": "automatic", "text": "Automatic updates", "points": 10 },
+                    { "id": "manual_when_notified", "text": "Manually when notified", "points": 7 },
+                    { "id": "every_so_often", "text": "Every so often", "points": 4 },
+                    { "id": "never", "text": "Never or rarely", "points": 0 }
+                  ]
+                },
+                {
+                  "id": "windows_updates_followup_manual",
+                  "type": "ACTION", 
+                  "weight": 4,
+                  "text": "Have you installed the latest Windows updates?",
+                  "explanation": "Since you update manually, let's make sure you're current",
+                  "actionHint": "Check Windows Settings > Update & Security > Check for updates",
+                  "relatedTopics": ["system_security"],
+                  "conditions": {
+                    "requireAnswers": { "windows_update_frequency": ["manual_when_notified"] }
+                  },
+                  "actionOptions": [
+                    {
+                      "id": "up_to_date",
+                      "text": "✅ Yes, I'm up to date",
+                      "points": 4,
+                      "impact": "Great! Installing the latest updates will close security gaps."
+                    },
+                    {
+                      "id": "behind_updates",
+                      "text": "📅 I'm behind on updates",
+                      "points": 1,
+                      "impact": "Let's get you caught up! Updates patch critical vulnerabilities."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "windows_defender",
+          "title": "Windows Security",
+          "levels": [
+            {
+              "level": 0,
+              "questions": [
+                {
+                  "id": "windows_defender_enabled",
+                  "type": "YN",
+                  "weight": 8,
+                  "text": "Is Windows Defender (built-in antivirus) enabled?",
+                  "explanation": "Windows Defender provides real-time malware protection",
+                  "actionHint": "Windows Security app > Virus & threat protection > Manage settings"
+                },
+                {
+                  "id": "windows_firewall_enabled",
+                  "type": "YN", 
+                  "weight": 6,
+                  "text": "Is Windows Firewall turned on?",
+                  "explanation": "Firewall blocks unauthorized network connections",
+                  "actionHint": "Control Panel > System and Security > Windows Defender Firewall"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "mac_desktop": {
+      "id": "mac_desktop",
+      "name": "Mac Desktop/Laptop Security",
+      "description": "macOS-specific security settings and protections",
+      "domains": [
+        {
+          "id": "macos_updates",
+          "title": "macOS Updates",
+          "levels": [
+            {
+              "level": 0,
+              "questions": [
+                {
+                  "id": "macos_update_frequency",
+                  "type": "ACTION",
+                  "weight": 10,
+                  "text": "How often do you update macOS?",
+                  "explanation": "Security patches are critical for protection",
+                  "actionHint": "System Preferences > Software Update > Automatically keep my Mac up to date",
+                  "relatedTopics": ["system_security"],
+                  "actionOptions": [
+                    { "id": "automatic", "text": "Automatic updates", "points": 10 },
+                    { "id": "manual_when_notified", "text": "Manually when notified", "points": 7 },
+                    { "id": "every_so_often", "text": "Every so often", "points": 4 },
+                    { "id": "never", "text": "Never or rarely", "points": 0 }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "macos_security",
+          "title": "macOS Security Features",
+          "levels": [
+            {
+              "level": 0,
+              "questions": [
+                {
+                  "id": "gatekeeper_enabled",
+                  "type": "YN",
+                  "weight": 8,
+                  "text": "Do you allow apps only from the App Store and identified developers?",
+                  "explanation": "Gatekeeper prevents malicious software from running",
+                  "actionHint": "System Preferences > Security & Privacy > General"
+                },
+                {
+                  "id": "filevault_enabled",
+                  "type": "YN",
+                  "weight": 9,
+                  "text": "Is FileVault (disk encryption) turned on?",
+                  "explanation": "Encrypts your entire disk to protect data if stolen",
+                  "actionHint": "System Preferences > Security & Privacy > FileVault"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "ios_mobile": {
+      "id": "ios_mobile", 
+      "name": "iPhone/iPad Security",
+      "description": "iOS-specific security settings and app protections",
+      "domains": [
+        {
+          "id": "ios_basics",
+          "title": "iOS Security Basics",
+          "levels": [
+            {
+              "level": 0,
+              "questions": [
+                {
+                  "id": "ios_passcode_enabled",
+                  "type": "YN",
+                  "weight": 10,
+                  "text": "Do you have a passcode set on your iPhone/iPad?",
+                  "explanation": "Passcode is your first line of defense",
+                  "actionHint": "Settings > Face ID & Passcode (or Touch ID & Passcode)"
+                },
+                {
+                  "id": "ios_biometric_enabled",
+                  "type": "YN",
+                  "weight": 8,
+                  "text": "Do you use Face ID or Touch ID?",
+                  "explanation": "Biometric authentication is convenient and secure",
+                  "actionHint": "Settings > Face ID & Passcode > Set up Face ID"
+                },
+                {
+                  "id": "ios_auto_updates",
+                  "type": "YN",
+                  "weight": 9,
+                  "text": "Do you have automatic iOS updates enabled?",
+                  "explanation": "Automatic updates install critical security patches",
+                  "actionHint": "Settings > General > Software Update > Automatic Updates"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "android_mobile": {
+      "id": "android_mobile",
+      "name": "Android Phone/Tablet Security", 
+      "description": "Android-specific security settings and app protections",
+      "domains": [
+        {
+          "id": "android_basics",
+          "title": "Android Security Basics",
+          "levels": [
+            {
+              "level": 0,
+              "questions": [
+                {
+                  "id": "android_screen_lock",
+                  "type": "ACTION",
+                  "weight": 10,
+                  "text": "What type of screen lock do you use?",
+                  "explanation": "Screen locks prevent unauthorized access",
+                  "actionHint": "Settings > Security > Screen lock",
+                  "actionOptions": [
+                    { "id": "fingerprint", "text": "Fingerprint", "points": 10 },
+                    { "id": "face", "text": "Face unlock", "points": 8 },
+                    { "id": "pin", "text": "PIN", "points": 7 },
+                    { "id": "pattern", "text": "Pattern", "points": 6 },
+                    { "id": "password", "text": "Password", "points": 9 },
+                    { "id": "none", "text": "No screen lock", "points": 0 }
+                  ]
+                },
+                {
+                  "id": "android_auto_updates",
+                  "type": "YN",
+                  "weight": 9,
+                  "text": "Do you have automatic system updates enabled?",
+                  "explanation": "Automatic updates install critical security patches",
+                  "actionHint": "Settings > System > System update > Auto-download over Wi-Fi"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "cross_platform": {
+      "id": "cross_platform",
+      "name": "Universal Security",
+      "description": "Security practices that apply to all devices",
+      "domains": [
+        {
+          "id": "password_security",
+          "title": "Password & Account Security",
+          "levels": [
+            {
+              "level": 0,
+              "questions": [
+                {
+                  "id": "password_manager_usage",
+                  "type": "ACTION",
+                  "weight": 15,
+                  "text": "How do you manage your passwords?",
+                  "explanation": "Strong, unique passwords are essential for security",
+                  "actionHint": "Consider using a password manager like 1Password, Bitwarden, or your browser's built-in manager",
+                  "actionOptions": [
+                    { "id": "dedicated_password_manager", "text": "Dedicated password manager (1Password, Bitwarden)", "points": 15 },
+                    { "id": "browser_password_manager", "text": "Browser's built-in password manager", "points": 12 },
+                    { "id": "reuse_few_passwords", "text": "I reuse a few different passwords", "points": 5 },
+                    { "id": "same_password_everywhere", "text": "Same password everywhere", "points": 0 }
+                  ]
+                },
+                {
+                  "id": "two_factor_auth_usage",
+                  "type": "ACTION",
+                  "weight": 12,
+                  "text": "Do you use two-factor authentication (2FA)?",
+                  "explanation": "2FA adds an extra layer of security to your accounts",
+                  "actionHint": "Enable 2FA on important accounts like email, banking, social media",
+                  "actionOptions": [
+                    { "id": "most_accounts", "text": "On most important accounts", "points": 12 },
+                    { "id": "some_accounts", "text": "On some accounts", "points": 8 },
+                    { "id": "banking_only", "text": "Only on banking/financial accounts", "points": 6 },
+                    { "id": "not_using", "text": "Not using 2FA", "points": 0 }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "email_security",
+          "title": "Email Security",
+          "levels": [
+            {
+              "level": 0,
+              "questions": [
+                {
+                  "id": "email_provider_security",
+                  "type": "ACTION",
+                  "weight": 8,
+                  "text": "What email provider do you use for your main email?",
+                  "explanation": "Some email providers have better security than others",
+                  "actionHint": "Gmail, Outlook, and Apple Mail have strong security features",
+                  "actionOptions": [
+                    { "id": "gmail", "text": "Gmail", "points": 8 },
+                    { "id": "outlook", "text": "Outlook/Hotmail", "points": 8 },
+                    { "id": "apple_mail", "text": "Apple Mail (iCloud)", "points": 8 },
+                    { "id": "yahoo", "text": "Yahoo Mail", "points": 5 },
+                    { "id": "other_major", "text": "Other major provider", "points": 6 },
+                    { "id": "work_email", "text": "Work/company email", "points": 7 },
+                    { "id": "small_provider", "text": "Small/local provider", "points": 4 }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

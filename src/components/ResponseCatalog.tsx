@@ -95,6 +95,13 @@ export function ResponseCatalog() {
       // If still not found, check if it's an onboarding question
       if (!question) {
         const onboardingQuestions: Record<string, any> = {
+          // DEBUG: Test expiration question
+          'debug_expiration_test': {
+            id: 'debug_expiration_test',
+            text: 'DEBUG: Test expiration system',
+            relatedTopics: ['system_info'],
+            weight: 1
+          },
           'platform_confirmation': {
             id: 'platform_confirmation',
             text: 'Platform confirmation',
@@ -214,6 +221,24 @@ export function ResponseCatalog() {
     categorized.needsImprovement.sort((a, b) => b.totalPoints - a.totalPoints);
 
     return categorized;
+  };
+
+  const getExpirationStatus = (answer: any) => {
+    if (!answer.expiresAt) return null;
+    
+    const now = new Date();
+    const expiresAt = new Date(answer.expiresAt);
+    const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntilExpiry < 0) {
+      return { status: 'expired', message: 'Expired', color: 'text-red-600', bgColor: 'bg-red-50' };
+    } else if (daysUntilExpiry <= 3) {
+      return { status: 'expiring', message: `${daysUntilExpiry} days left`, color: 'text-orange-600', bgColor: 'bg-orange-50' };
+    } else if (daysUntilExpiry <= 7) {
+      return { status: 'warning', message: `${daysUntilExpiry} days left`, color: 'text-yellow-600', bgColor: 'bg-yellow-50' };
+    }
+    
+    return null; // No warning needed for answers expiring in >7 days
   };
 
   const categorized = categorizeByTopics();
@@ -339,25 +364,37 @@ export function ResponseCatalog() {
                 </div>
                 
                 <div className="space-y-3">
-                  {topic.responses.map((response) => (
-                    <div key={response.questionId} className="flex items-start justify-between py-3 px-4 bg-white rounded-lg border">
-                      <div className="flex items-center gap-3 flex-1">
-                        <span className="text-green-600 font-bold text-sm">
-                          +{response.points}
-                        </span>
-                        <span className="text-gray-800 font-medium text-sm flex-1">
-                          ✓ {formatResponseDescription(response.answer, response.questionText, response.questionId)}
-                        </span>
+                  {topic.responses.map((response) => {
+                    const expirationStatus = getExpirationStatus(response);
+                    
+                    return (
+                      <div key={response.questionId} className="flex items-start justify-between py-3 px-4 bg-white rounded-lg border">
+                        <div className="flex items-center gap-3 flex-1">
+                          <span className="text-green-600 font-bold text-sm">
+                            +{response.points}
+                          </span>
+                          <span className="text-gray-800 font-medium text-sm flex-1">
+                            ✓ {formatResponseDescription(response.answer, response.questionText, response.questionId)}
+                          </span>
+                          
+                          {/* Expiration indicator */}
+                          {expirationStatus && (
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${expirationStatus.bgColor} ${expirationStatus.color}`}>
+                              <Clock className="w-3 h-3" />
+                              <span>{expirationStatus.message}</span>
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleEditAnswer(response.questionId)}
+                          className="text-gray-400 hover:text-blue-600 p-1 ml-3 flex-shrink-0"
+                          title="Edit this response"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleEditAnswer(response.questionId)}
-                        className="text-gray-400 hover:text-blue-600 p-1 ml-3 flex-shrink-0"
-                        title="Edit this response"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
