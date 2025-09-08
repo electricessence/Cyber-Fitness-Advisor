@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { QuestionBank, Answer, Question } from '../engine/schema';
 import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
-import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration, shouldQuestionBeAvailable } from '../engine/scoring';
+import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration } from '../engine/scoring';
 import { createSimpleQuestionBank } from '../../progress/simpleProgress';
 import { ConditionEngine } from '../engine/conditions';
 import questionsData from '../data/questions.json';
@@ -356,6 +356,7 @@ export const useAssessmentStore = create<AssessmentState>()(
       
       getAvailableQuestions: () => {
         const state = get();
+        const visibleQuestionIds = state.getVisibleQuestionIds();
         const allQuestions: Question[] = [];
         
         // Collect all questions from all domains and levels
@@ -367,10 +368,17 @@ export const useAssessmentStore = create<AssessmentState>()(
           });
         });
         
-        // Filter questions based on conditions and answer status
+        // Add suite questions
+        state.questionBank.suites?.forEach(suite => {
+          suite.questions.forEach(question => {
+            allQuestions.push(question);
+          });
+        });
+        
+        // Filter to only visible questions that aren't already answered
         return allQuestions.filter(question => {
-          // Check if question meets conditional requirements
-          if (!shouldQuestionBeAvailable(question, state.answers)) {
+          // Must be visible according to condition engine
+          if (!visibleQuestionIds.includes(question.id)) {
             return false;
           }
           
