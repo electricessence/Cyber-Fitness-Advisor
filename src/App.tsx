@@ -264,9 +264,6 @@ function App() {
         setShowResetModal={appState.setShowResetModal}
         onReset={handleReset}
       />
-      
-      {/* Debug Panel */}
-      <DebugPanel />
     </AppLayout>
   );
 }
