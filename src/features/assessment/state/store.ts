@@ -7,6 +7,8 @@ import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, cal
 import { createSimpleQuestionBank } from '../../progress/simpleProgress';
 import { ConditionEngine } from '../engine/conditions';
 import questionsData from '../data/questions.json';
+import unifiedQuestionBank from '../data/questionBank';
+import { USE_UNIFIED_QUESTION_BANK } from '../../../config/featureFlags';
 
 // Smart pre-population from onboarding data
 function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
@@ -130,6 +132,11 @@ interface AssessmentState {
   getVisibleQuestionIds: () => string[];
   getUnlockedSuiteIds: () => string[];
   getEffectivePatches: () => Record<string, Partial<Question>>;
+
+  // Unified model derived (feature-flagged)
+  getOrderedAvailableQuestions?: () => Question[];
+  getOnboardingPendingCount?: () => number;
+  isOnboardingComplete?: () => boolean;
   
   // Task Management
   getTodaysTasks: () => Question[];
@@ -143,7 +150,7 @@ interface AssessmentState {
 
 // Helper to create the initial condition engine
 function createInitialConditionEngine(): ConditionEngine {
-  const questionBank = questionsData as QuestionBank;
+  const questionBank = (USE_UNIFIED_QUESTION_BANK ? unifiedQuestionBank : (questionsData as QuestionBank));
   const allQuestions: Question[] = [];
   
   // Collect all questions from domains
@@ -172,7 +179,7 @@ function createInitialConditionEngine(): ConditionEngine {
 }
 
 const initialState = {
-  questionBank: questionsData as QuestionBank,
+  questionBank: (USE_UNIFIED_QUESTION_BANK ? unifiedQuestionBank : (questionsData as QuestionBank)),
   answers: {},
   deviceProfile: null as DeviceProfile | null,
   conditionEngine: createInitialConditionEngine(),
@@ -390,6 +397,33 @@ export const useAssessmentStore = create<AssessmentState>()(
           
           return true; // Question is available
         });
+      },
+
+      // Unified model ordering (phase aware). Only meaningful when flag enabled.
+      getOrderedAvailableQuestions: () => {
+        if (!USE_UNIFIED_QUESTION_BANK) return get().getAvailableQuestions();
+        const raw = get().getAvailableQuestions();
+        return [...raw].sort((a, b) => {
+          const ao = a.phaseOrder ?? 9999;
+          const bo = b.phaseOrder ?? 9999;
+          if (ao !== bo) return ao - bo;
+          return a.id.localeCompare(b.id);
+        });
+      },
+
+      getOnboardingPendingCount: () => {
+        if (!USE_UNIFIED_QUESTION_BANK) return 0;
+        const state = get();
+        const answered = Object.keys(state.answers);
+        const onboarding = state.questionBank.domains.find(d => d.id === 'onboarding_phase');
+        if (!onboarding) return 0;
+        const all = onboarding.levels.flatMap(l => l.questions);
+        return all.filter(q => !answered.includes(q.id)).length;
+      },
+
+      isOnboardingComplete: () => {
+        if (!USE_UNIFIED_QUESTION_BANK) return true;
+        return (get().getOnboardingPendingCount?.() || 0) === 0;
       },
       
       getRecommendations: () => {
