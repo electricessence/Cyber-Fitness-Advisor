@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAssessmentStore, initializeStore } from './features/assessment/state/store';
-import { DeviceOnboarding } from './components/DeviceOnboarding';
+import { UnifiedOnboarding } from './components/UnifiedOnboarding';
 import { ScoreBar } from './components/ScoreBar';
 import { Celebration } from './components/Celebration';
-import { GameifiedOnboarding } from './components/GameifiedOnboarding';
 import { PrivacyNotice } from './components/PrivacyNotice';
 import { AppHeader } from './components/AppHeader';
 import { AppLayout } from './components/layout/AppLayout';
@@ -57,6 +56,10 @@ function App() {
     console.log('Device onboarding complete:', profile);
     setDeviceProfile(profile);
     setShowDeviceOnboarding(false);
+    
+    // Mark onboarding as completed to prevent modal from showing
+    appState.setShowOnboarding(false);
+    localStorage.setItem('cyber-fitness-onboarding-completed', 'true');
   };
 
   useEffect(() => {
@@ -64,9 +67,9 @@ function App() {
     navigation.setCurrentLevel(userLevel);
   }, [userLevel, navigation]);
 
-  // Lock body scroll when modal is open
+  // Lock body scroll when device onboarding is open
   useEffect(() => {
-    if (appState.showOnboarding) {
+    if (showDeviceOnboarding) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -76,7 +79,7 @@ function App() {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [appState.showOnboarding]);
+  }, [showDeviceOnboarding]);
   
   const totalQuestions = questionBank.domains.reduce(
     (total, domain) => total + domain.levels.reduce(
@@ -159,66 +162,15 @@ function App() {
     setTimeout(() => window.location.reload(), 100);
   };
 
-  // Show device onboarding for new users
+  // Show unified onboarding for new users
   if (showDeviceOnboarding && !deviceProfile) {
-    return <DeviceOnboarding onComplete={handleDeviceOnboardingComplete} />;
+    return <UnifiedOnboarding onComplete={handleDeviceOnboardingComplete} />;
   }
 
   return (
     <AppLayout>
-      {/* Onboarding Modal */}
-      {appState.showOnboarding && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] overflow-y-auto p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col">
-            <div className="flex-1 overflow-y-auto">
-              <GameifiedOnboarding
-                answerQuestion={(questionId, value) => {
-                  // Apply answer mappings for real-time sync
-                  const answerMappings: Record<string, string> = {
-                    'virus_scan_recent': 'antivirus',
-                    'password_strength': 'password_reuse'
-                  };
-                  
-                  const mappedId = answerMappings[questionId];
-                  if (mappedId) {
-                    let mappedValue = value;
-                    
-                    // Apply value mappings
-                    if (questionId === 'virus_scan_recent') {
-                      mappedValue = ['today', 'this_week'].includes(value) ? 'yes' : 'no';
-                    }
-                    
-                    if (questionId === 'password_strength') {
-                      const uniquenessToReuseMap: Record<string, string> = {
-                        'all_unique': '5',
-                        'mostly_unique': '4', 
-                        'some_same': '3',
-                        'mostly_same': '2'
-                      };
-                      mappedValue = uniquenessToReuseMap[value] || '1';
-                    }
-                    
-                    answerQuestion(mappedId, mappedValue);
-                  } else {
-                    // Store onboarding-specific questions as-is
-                    answerQuestion(questionId, value);
-                  }
-                }}
-                onComplete={(profile) => {
-                  // Store user profile info (answers are already stored in real-time)
-                  localStorage.setItem('cyber-fitness-tech-comfort', profile.detectedInfo.platform);
-                  localStorage.setItem('cyber-fitness-detected-browser', profile.detectedInfo.browser);
-                  
-                  // Close onboarding
-                  appState.setShowOnboarding(false);
-                  localStorage.setItem('cyber-fitness-onboarding-completed', 'true');
-                  appState.setPrivacyNoticeMinimized(false);
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Onboarding Modal - Removed redundant modal version */}
+      {/* Device onboarding is handled separately above */}
 
       {/* Privacy Notice */}
       {appState.showPrivacyNotice && !appState.showOnboarding && (
@@ -270,7 +222,7 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
               <div className="lg:col-span-3">
                 {/* Action Recommendations - High-Impact Security Actions */}
-                {!appState.showOnboarding && (
+                {!showDeviceOnboarding && (
                   <Recommendations
                     answeredQuestions={answeredQuestions}
                     getBrowserInfo={getBrowserInfo}

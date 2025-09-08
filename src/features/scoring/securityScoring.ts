@@ -248,12 +248,12 @@ function isQuestionRelevantForDevice(question: Question, deviceProfile: DevicePr
  */
 function getDeviceMultiplier(question: Question, deviceProfile: DeviceProfile, baseMultiplier: number): number {
   // Antivirus more important on Windows
-  if (question.id.includes('antivirus') && deviceProfile.operatingSystem === 'Windows') {
+  if (question.id.includes('antivirus') && deviceProfile.currentDevice.os === 'windows') {
     return baseMultiplier;
   }
   
   // Device lock more important on mobile
-  if (question.id.includes('lock') && ['Android', 'iOS'].includes(deviceProfile.operatingSystem)) {
+  if (question.id.includes('lock') && ['android', 'ios'].includes(deviceProfile.currentDevice.os)) {
     return baseMultiplier;
   }
   
@@ -306,8 +306,8 @@ function getCategoryFromQuestion(question: Question): keyof SecurityScore['break
  * Check if question requires action
  */
 function isActionableQuestion(question: Question): boolean {
-  return question.type === 'action' || 
-         question.type === 'boolean' ||
+  return question.type === 'ACTION' || 
+         question.type === 'YN' ||
          question.id.includes('install') ||
          question.id.includes('enable') ||
          question.id.includes('setup');

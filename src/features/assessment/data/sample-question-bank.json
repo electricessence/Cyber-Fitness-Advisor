@@ -1,0 +1,421 @@
+{
+  "version": 2,
+  "domains": [
+    {
+      "id": "foundation",
+      "title": "Security Foundations",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "password_manager_yn",
+              "text": "Do you use a password manager to store your passwords?",
+              "type": "YN",
+              "weight": 25,
+              "quickWin": true,
+              "explanation": "Password managers generate unique passwords for every account, eliminating the biggest security risk: password reuse.",
+              "actionHint": "Popular options: Bitwarden (free), 1Password, or built-in browser managers",
+              "timeEstimate": "10 minutes to set up",
+              "affirmativeText": "Uses a password manager for secure password storage",
+              "negativeText": "Managing passwords manually - high risk of password reuse"
+            },
+            {
+              "id": "email_2fa_yn",
+              "text": "Do you have two-factor authentication (2FA) enabled on your email account?",
+              "type": "YN", 
+              "weight": 20,
+              "quickWin": true,
+              "explanation": "Email is the 'master key' to most other accounts. If compromised, attackers can reset passwords for banks, social media, and more.",
+              "actionHint": "Look for 'Security' or '2-Step Verification' in your email settings",
+              "timeEstimate": "5 minutes",
+              "affirmativeText": "Email protected with two-factor authentication",
+              "negativeText": "Email vulnerable - only password protection"
+            },
+            {
+              "id": "password_reuse_scale",
+              "text": "How often do you use the same password across different accounts?",
+              "type": "SCALE",
+              "weight": 20,
+              "explanation": "When one site gets breached, attackers try those passwords on other sites. Unique passwords contain the damage.",
+              "options": [
+                {
+                  "id": "always_same",
+                  "text": "I use the same password everywhere",
+                  "points": 0,
+                  "target": "needs-improvement",
+                  "impact": "High risk: One breach compromises all accounts"
+                },
+                {
+                  "id": "few_different",
+                  "text": "I use 2-3 different passwords",
+                  "points": 5,
+                  "target": "needs-improvement", 
+                  "impact": "Some risk: Limited password variety"
+                },
+                {
+                  "id": "mixed_approach",
+                  "text": "Mix of unique and reused passwords",
+                  "points": 10,
+                  "target": "todo",
+                  "impact": "Medium risk: Important accounts should be unique"
+                },
+                {
+                  "id": "mostly_unique",
+                  "text": "Most passwords are unique",
+                  "points": 15,
+                  "target": "shields-up",
+                  "impact": "Good practice: Minor improvement possible"
+                },
+                {
+                  "id": "all_unique",
+                  "text": "Every account has a unique password", 
+                  "points": 20,
+                  "target": "shields-up",
+                  "impact": "Excellent: Maximum password security"
+                }
+              ]
+            },
+            {
+              "id": "software_updates_action",
+              "text": "Enable automatic security updates for your operating system",
+              "type": "ACTION",
+              "weight": 20,
+              "quickWin": true,
+              "explanation": "Software vulnerabilities are discovered daily. Automatic updates ensure you're protected from known threats.",
+              "timeEstimate": "5 minutes",
+              "actionOptions": [
+                {
+                  "id": "auto_enabled",
+                  "text": "Automatic updates are already enabled",
+                  "points": 20,
+                  "impact": "Your system gets critical security patches automatically"
+                },
+                {
+                  "id": "will_enable_auto",
+                  "text": "I'll enable automatic security updates",
+                  "points": 20,
+                  "impact": "Future vulnerabilities will be patched quickly"
+                },
+                {
+                  "id": "manual_preferred",
+                  "text": "I prefer to review and install updates manually",
+                  "points": 15,
+                  "impact": "Manual updates work if you're consistent"
+                },
+                {
+                  "id": "delayed_updates",
+                  "text": "I'll update monthly or when convenient",
+                  "points": 10,
+                  "impact": "Some protection, but delays leave you vulnerable"
+                }
+              ]
+            },
+            {
+              "id": "phishing_awareness_scale",
+              "text": "How confident are you in identifying phishing emails?",
+              "type": "SCALE",
+              "weight": 25,
+              "explanation": "Phishing is the most common attack vector. Recognition skills are your first line of defense.",
+              "options": [
+                {
+                  "id": "not_confident",
+                  "text": "I'm not sure what to look for",
+                  "points": 0,
+                  "target": "todo",
+                  "impact": "Consider phishing awareness training"
+                },
+                {
+                  "id": "somewhat_aware",
+                  "text": "I know some warning signs",
+                  "points": 8,
+                  "target": "todo",
+                  "impact": "Basic awareness helps, but more training beneficial"
+                },
+                {
+                  "id": "moderately_confident",
+                  "text": "I can spot obvious phishing attempts",
+                  "points": 15,
+                  "target": "shields-up",
+                  "impact": "Good skills for obvious attacks"
+                },
+                {
+                  "id": "very_confident",
+                  "text": "I can identify subtle phishing attempts",
+                  "points": 20,
+                  "target": "shields-up", 
+                  "impact": "Strong awareness protects against advanced attacks"
+                },
+                {
+                  "id": "expert_level",
+                  "text": "I could teach others about phishing",
+                  "points": 25,
+                  "target": "shields-up",
+                  "impact": "Expert-level awareness provides maximum protection"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "device_security", 
+      "title": "Device Protection",
+      "levels": [
+        {
+          "level": 1,
+          "questions": [
+            {
+              "id": "antivirus_protection",
+              "text": "Do you have antivirus software installed and actively running?",
+              "type": "YN",
+              "weight": 25,
+              "explanation": "Antivirus provides real-time protection against malware, viruses, and other threats.",
+              "conditions": {
+                "browserInfo": { "platforms": ["windows"] }
+              },
+              "actionHint": "Windows Defender is built-in and effective, or consider third-party options",
+              "affirmativeText": "Protected by active antivirus software",
+              "negativeText": "Device vulnerable to malware attacks"
+            },
+            {
+              "id": "device_encryption",
+              "text": "Enable full disk encryption on your device",
+              "type": "ACTION",
+              "weight": 35,
+              "explanation": "Encryption protects your data if your device is lost, stolen, or accessed by unauthorized users.",
+              "timeEstimate": "10 minutes (may take hours to encrypt)",
+              "actionOptions": [
+                {
+                  "id": "already_encrypted",
+                  "text": "My device is already fully encrypted",
+                  "points": 35,
+                  "impact": "Your data is protected even if device is compromised"
+                },
+                {
+                  "id": "will_encrypt",
+                  "text": "I'll enable encryption now",
+                  "points": 35,
+                  "impact": "Strong protection for sensitive data"
+                },
+                {
+                  "id": "partial_encryption",
+                  "text": "I'll encrypt just my important folders",
+                  "points": 20,
+                  "impact": "Partial protection is better than none"
+                },
+                {
+                  "id": "concerned_performance",
+                  "text": "I'm worried about performance impact",
+                  "points": 0,
+                  "impact": "Modern devices handle encryption with minimal performance impact"
+                }
+              ]
+            },
+            {
+              "id": "screen_lock_timeout",
+              "text": "How quickly does your screen lock when idle?",
+              "type": "SCALE",
+              "weight": 15,
+              "explanation": "Quick screen locks prevent unauthorized access if you step away from your device.",
+              "conditions": {
+                "browserInfo": { "platforms": ["windows", "mac", "mobile"] }
+              },
+              "options": [
+                {
+                  "id": "never_locks",
+                  "text": "Screen never locks automatically",
+                  "points": 0,
+                  "target": "needs-improvement",
+                  "impact": "High risk if device is left unattended"
+                },
+                {
+                  "id": "long_timeout",
+                  "text": "Locks after 15+ minutes",
+                  "points": 5,
+                  "target": "needs-improvement",
+                  "impact": "Long window for unauthorized access"
+                },
+                {
+                  "id": "medium_timeout",
+                  "text": "Locks after 5-15 minutes", 
+                  "points": 10,
+                  "target": "todo",
+                  "impact": "Reasonable balance of security and convenience"
+                },
+                {
+                  "id": "quick_timeout",
+                  "text": "Locks after 1-5 minutes",
+                  "points": 15,
+                  "target": "shields-up",
+                  "impact": "Good security with minimal inconvenience"
+                }
+              ]
+            },
+            {
+              "id": "browser_security_review",
+              "text": "Review and secure your web browser settings",
+              "type": "ACTION",
+              "weight": 30,
+              "explanation": "Browsers are common attack targets. Proper configuration significantly improves security.",
+              "timeEstimate": "15 minutes",
+              "actionOptions": [
+                {
+                  "id": "already_secured",
+                  "text": "My browser is already configured securely",
+                  "points": 30,
+                  "impact": "Strong web security foundation"
+                },
+                {
+                  "id": "will_secure_now",
+                  "text": "I'll review and improve my browser security",
+                  "points": 30,
+                  "impact": "Significantly reduces web-based attack risks"
+                },
+                {
+                  "id": "basic_improvements",
+                  "text": "I'll make some basic security changes",
+                  "points": 20,
+                  "impact": "Some improvement in web security"
+                },
+                {
+                  "id": "default_settings",
+                  "text": "I'll stick with default browser settings",
+                  "points": 10,
+                  "impact": "Default settings provide basic protection"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "network_privacy",
+      "title": "Network & Privacy",
+      "levels": [
+        {
+          "level": 2,
+          "questions": [
+            {
+              "id": "home_wifi_security",
+              "text": "Is your home WiFi network secured with WPA3 or WPA2 encryption?",
+              "type": "YN",
+              "weight": 25,
+              "explanation": "Unsecured WiFi allows neighbors and passersby to access your network and potentially your data.",
+              "actionHint": "Check your router settings or contact your ISP for help",
+              "affirmativeText": "Home WiFi secured with strong encryption",
+              "negativeText": "WiFi network may be vulnerable to unauthorized access"
+            },
+            {
+              "id": "public_wifi_caution",
+              "text": "How do you handle sensitive activities on public WiFi?",
+              "type": "SCALE", 
+              "weight": 20,
+              "explanation": "Public WiFi is often unsecured, making your data visible to other users and potential attackers.",
+              "options": [
+                {
+                  "id": "no_precautions",
+                  "text": "I use public WiFi normally for everything",
+                  "points": 0,
+                  "target": "needs-improvement",
+                  "impact": "High risk: Sensitive data exposed on public networks"
+                },
+                {
+                  "id": "some_awareness",
+                  "text": "I avoid banking but use it for most things",
+                  "points": 8,
+                  "target": "todo",
+                  "impact": "Some risk reduction, but many activities still exposed"
+                },
+                {
+                  "id": "limited_use",
+                  "text": "I only browse and check email on public WiFi",
+                  "points": 15,
+                  "target": "shields-up",
+                  "impact": "Good practice for most sensitive activities"
+                },
+                {
+                  "id": "vpn_protected",
+                  "text": "I use a VPN on all public WiFi",
+                  "points": 20,
+                  "target": "shields-up",
+                  "impact": "Excellent: All traffic encrypted on public networks"
+                }
+              ]
+            },
+            {
+              "id": "data_backup_setup",
+              "text": "Set up regular, encrypted backups of your important data",
+              "type": "ACTION",
+              "weight": 40,
+              "explanation": "Backups protect against ransomware, hardware failure, theft, and accidental deletion.",
+              "timeEstimate": "30 minutes to set up",
+              "actionOptions": [
+                {
+                  "id": "encrypted_automated",
+                  "text": "I have encrypted, automated backups running",
+                  "points": 40,
+                  "impact": "Maximum data protection and recovery capability"
+                },
+                {
+                  "id": "will_setup_auto",
+                  "text": "I'll set up automated encrypted backups",
+                  "points": 40,
+                  "impact": "Strong protection against data loss"
+                },
+                {
+                  "id": "manual_backups",
+                  "text": "I'll do manual backups regularly",
+                  "points": 25,
+                  "impact": "Good protection if you maintain the routine"
+                },
+                {
+                  "id": "cloud_only",
+                  "text": "I'll just rely on cloud storage sync",
+                  "points": 15,
+                  "impact": "Some protection, but not true backup (sync ≠ backup)"
+                }
+              ]
+            },
+            {
+              "id": "social_media_privacy",
+              "text": "Review and tighten your social media privacy settings",
+              "type": "ACTION",
+              "weight": 25,
+              "explanation": "Social media oversharing provides data for identity theft, social engineering, and targeting attacks.",
+              "timeEstimate": "20 minutes",
+              "actionOptions": [
+                {
+                  "id": "already_private",
+                  "text": "My profiles are already set to maximum privacy",
+                  "points": 25,
+                  "impact": "Strong protection against information gathering"
+                },
+                {
+                  "id": "will_review_all",
+                  "text": "I'll review and improve all my social media privacy",
+                  "points": 25,
+                  "impact": "Significantly reduces information exposure"
+                },
+                {
+                  "id": "main_accounts_only",
+                  "text": "I'll secure my main social media accounts",
+                  "points": 18,
+                  "impact": "Good protection for primary accounts"
+                },
+                {
+                  "id": "minimal_sharing",
+                  "text": "I don't share much personal information anyway",
+                  "points": 12,
+                  "impact": "Behavioral privacy is good, but settings matter too"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import { UniversalCard } from '../UniversalCard';
 import { SecurityLevelDisplay } from '../SecurityLevelDisplay';
 import { useAssessmentStore } from '../../features/assessment/state/store';
 import { prioritizeQuestions, getTodaysTask, sortQuestionsByPriority } from '../../features/prioritization/questionPriority';
-import { getPersonalizedProgress } from '../../features/onboarding/personalizedQuestionBank';
+import { getPersonalizedProgress } from '../../features/progress/simpleProgress';
 import { calculateSecurityProgression } from '../../features/progression/securityLevels';
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 

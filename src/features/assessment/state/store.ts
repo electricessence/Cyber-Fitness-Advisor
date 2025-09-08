@@ -4,7 +4,7 @@ import type { QuestionBank, Answer, Question } from '../engine/schema';
 import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration, shouldQuestionBeAvailable } from '../engine/scoring';
-import { createPersonalizedQuestionBank } from '../../onboarding/personalizedQuestionBank';
+import { createSimpleQuestionBank } from '../../progress/simpleProgress';
 import questionsData from '../data/questions.json';
 
 // Smart pre-population from onboarding data
@@ -264,7 +264,7 @@ export const useAssessmentStore = create<AssessmentState>()(
         console.log('Setting device profile:', profile);
         
         // Create comprehensive question bank with universal + device-specific + onboarding questions
-        const personalizedQuestionBank = createPersonalizedQuestionBank(profile);
+        const personalizedQuestionBank = createSimpleQuestionBank(profile);
         console.log('Created personalized question bank:', personalizedQuestionBank);
         
         set({ 
