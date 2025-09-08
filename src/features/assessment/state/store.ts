@@ -359,13 +359,6 @@ export const useAssessmentStore = create<AssessmentState>()(
         const visibleQuestionIds = state.getVisibleQuestionIds();
         const allQuestions: Question[] = [];
         
-        console.log('getAvailableQuestions DEBUG:', {
-          visibleQuestionIds: visibleQuestionIds.slice(0, 5),
-          visibleCount: visibleQuestionIds.length,
-          domainsCount: state.questionBank.domains.length,
-          suitesCount: state.questionBank.suites?.length || 0
-        });
-        
         // Collect all questions from all domains and levels
         state.questionBank.domains.forEach(domain => {
           domain.levels.forEach(level => {
@@ -382,32 +375,21 @@ export const useAssessmentStore = create<AssessmentState>()(
           });
         });
         
-        console.log('All questions collected:', {
-          totalQuestions: allQuestions.length,
-          questionIds: allQuestions.slice(0, 5).map(q => q.id)
-        });
-        
         // Filter to only visible questions that aren't already answered
-        const availableQuestions = allQuestions.filter(question => {
+        return allQuestions.filter(question => {
           // Must be visible according to condition engine
-          const isVisible = visibleQuestionIds.includes(question.id);
+          if (!visibleQuestionIds.includes(question.id)) {
+            return false;
+          }
           
           // Check if question is already answered and not expired
           const existingAnswer = state.answers[question.id];
-          const isAnswered = existingAnswer && !existingAnswer.isExpired;
-          
-          const shouldShow = isVisible && !isAnswered;
-          
-          if (!shouldShow) {
-            console.log(`Question ${question.id}: visible=${isVisible}, answered=${isAnswered}, shouldShow=${shouldShow}`);
+          if (existingAnswer && !existingAnswer.isExpired) {
+            return false; // Already answered and not expired
           }
           
-          return shouldShow;
+          return true; // Question is available
         });
-        
-        console.log('Final available questions:', availableQuestions.length);
-        
-        return availableQuestions;
       },
       
       getRecommendations: () => {

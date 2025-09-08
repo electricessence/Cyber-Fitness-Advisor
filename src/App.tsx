@@ -12,7 +12,6 @@ import { Recommendations } from './components/layout/Recommendations';
 import { SecurityStatus } from './components/layout/SecurityStatus';
 import { Footer } from './components/layout/Footer';
 import { ResetModal } from './components/layout/ResetModal';
-import { DebugPanel } from './components/DebugPanel';
 import { useNavigation } from './hooks/useNavigation';
 import { useAppState } from './hooks/useAppState';
 import { useBrowserDetection } from './hooks/useBrowserDetection';
