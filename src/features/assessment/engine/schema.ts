@@ -80,6 +80,25 @@ export interface Question {
   // UI hints
   defaultLayout?: 'buttons' | 'radio' | 'dropdown'; // Suggested UI layout
   allowMultiple?: boolean; // Allow selecting multiple options
+
+  // Unified model extensions (Phase: onboarding vs assessment)
+  phase?: 'onboarding' | 'assessment';
+  phaseOrder?: number; // Ordering within its phase (lower first)
+  // Simple prerequisite system (lightweight vs full gates) for onboarding ordering
+  prerequisites?: {
+    // All of these question IDs must be answered (any value)
+    answered?: string[];
+    // At least one of these must be answered (any value)
+    anyAnswered?: string[];
+  };
+  // Device/browser targeting (declarative replacement for imperative showIf in legacy onboarding)
+  deviceFilter?: {
+    os?: string[]; // e.g. ['windows','mac','linux','mobile']
+    browser?: string[]; // e.g. ['chrome','firefox','safari','edge']
+  };
+  // Optional custom predicate (kept narrow in scope and non-persistent). Prefer declarative fields above.
+  // Not persisted; evaluated at runtime only. Avoid heavy logic.
+  runtimeVisibleFn?: (ctx: { answers: Record<string, unknown>; deviceProfile?: any }) => boolean;
 }
 
 export interface Level {
