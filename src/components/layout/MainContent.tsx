@@ -8,42 +8,29 @@ interface MainContentProps {
 
 export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
   const { 
-    questionBank, 
     answers, 
-    answerQuestion
+    answerQuestion,
+    getAvailableQuestions
   } = useAssessmentStore();
 
-  // Get current questions based on selected domain and level
-  const currentDomainObj = questionBank.domains.find(d => d.id === currentDomain);
-  const currentLevelObj = currentDomainObj?.levels.find(l => l.level === currentLevel);
+  // Get available questions from condition engine instead of filtering by domain/level
+  const availableQuestions = getAvailableQuestions();
   
   // Debug logging
   console.log('MainContent Debug:', {
     currentDomain,
     currentLevel,
-    currentDomainObj: currentDomainObj?.id,
-    currentLevelObj: currentLevelObj?.level,
-    questionsCount: currentLevelObj?.questions?.length || 0,
+    availableQuestionsCount: availableQuestions.length,
     answersCount: Object.keys(answers).length,
-    answerKeys: Object.keys(answers)
-  });
-  
-  // Filter out already answered questions, but include expired ones
-  const allQuestions = currentLevelObj?.questions || [];
-  const unansweredQuestions = allQuestions.filter(question => {
-    const answer = answers[question.id];
-    const isUnanswered = !answer || (answer.isExpired === true);
-    console.log(`Question ${question.id}: hasAnswer=${!!answer}, isExpired=${answer?.isExpired}, willShow=${isUnanswered}`);
-    // Show if not answered, or if answered but expired
-    return isUnanswered;
+    availableQuestionIds: availableQuestions.map(q => q.id)
   });
 
-  if (unansweredQuestions.length === 0 && allQuestions.length > 0) {
+  if (availableQuestions.length === 0) {
     return (
       <div className="lg:col-span-3">
         <div className="text-center py-8 text-gray-600 bg-white rounded-lg shadow-md">
-          <p className="text-lg">🎉 All questions in this level completed!</p>
-          <p className="text-sm mt-2">Select another level to continue your assessment.</p>
+          <p className="text-lg">🎉 All available questions completed!</p>
+          <p className="text-sm mt-2">Great progress! Keep exploring other areas.</p>
         </div>
       </div>
     );
@@ -51,32 +38,28 @@ export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
 
   return (
     <div className="lg:col-span-3">
-      {currentDomainObj && currentLevelObj && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            {currentDomainObj.title} - Level {currentLevel}
-          </h2>
-          <p className="text-gray-600">
-            {currentLevel === 0 ? 'Start with these essential security basics!' :
-             currentLevel === 1 ? 'Build on your foundation with these improvements!' :
-             'Advanced security measures for comprehensive protection!'}
-          </p>
-        </div>
-      )}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          Available Questions
+        </h2>
+        <p className="text-gray-600">
+          Answer these questions to improve your cybersecurity posture and unlock advanced topics.
+        </p>
+      </div>
       
       <div className="space-y-6">
-        {unansweredQuestions.length === 0 ? (
+        {availableQuestions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>No questions available for this level.</p>
+            <p>No questions available right now.</p>
           </div>
         ) : (
-          unansweredQuestions.map((question) => (
+          availableQuestions.map((question) => (
             <div key={question.id} id={`question-${question.id}`}>
               <UniversalCard
                 mode="question"
                 id={question.id}
                 title={question.text}
-                category={currentDomainObj?.title || ''}
+                category="Assessment"
                 priority={question.weight}
                 isQuickWin={question.quickWin}
                 timeEstimate={question.timeEstimate}
