@@ -488,15 +488,14 @@
   "suites": [
     {
       "id": "advanced_security",
-      "title": "Advanced Security Features",
+      "title": "Advanced Security Features", 
       "description": "Unlocked when you demonstrate strong basic security practices",
       "gates": [
         {
           "all": [
             { "questionId": "lock_screen", "when": "equals", "value": "yes" },
             { "questionId": "browser_passwords", "when": "equals", "value": "yes" }
-          ],
-          "unlockSuites": ["advanced_security"]
+          ]
         }
       ],
       "questions": [

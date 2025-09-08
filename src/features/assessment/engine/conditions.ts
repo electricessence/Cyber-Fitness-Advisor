@@ -386,9 +386,23 @@ export class ConditionEngine {
     const unlockedSuites: Suite[] = [];
     const questionPatches: Record<string, QuestionPatch['patch']> = {};
     
-    // First pass: determine base visibility (default visible if no gates)
+    // Get all suite question IDs for special handling
+    const suiteQuestionIds = new Set<string>();
+    for (const suite of this.suites) {
+      for (const questionId of suite.questionIds) {
+        suiteQuestionIds.add(questionId);
+      }
+    }
+    
+    // First pass: determine base visibility 
+    // - Non-suite questions with no gates are visible by default
+    // - Suite questions are hidden by default
     for (const question of this.questions) {
-      if (!question.gates || question.gates.length === 0) {
+      if (suiteQuestionIds.has(question.id)) {
+        // Suite questions are hidden by default
+        hiddenQuestionIds.add(question.id);
+      } else if (!question.gates || question.gates.length === 0) {
+        // Regular questions with no gates are visible
         visibleQuestionIds.add(question.id);
       }
     }
@@ -487,6 +501,12 @@ export class ConditionEngine {
       
       if (anyGatePasses && !unlockedSuites.some(s => s.id === suite.id)) {
         unlockedSuites.push(suite);
+        
+        // Make suite questions visible when suite is unlocked
+        for (const questionId of suite.questionIds) {
+          hiddenQuestionIds.delete(questionId);
+          visibleQuestionIds.add(questionId);
+        }
       }
     }
     

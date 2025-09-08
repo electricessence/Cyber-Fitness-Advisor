@@ -50,6 +50,35 @@ function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Rec
     };
   }
 
+  // Map virus scan frequency to antivirus question
+  if (onboardingAnswers.virus_scan_recent && !updatedAnswers.antivirus) {
+    const scanFrequency = onboardingAnswers.virus_scan_recent.value;
+    // If they scan weekly/monthly, they have some antivirus
+    const hasAntivirus = ['weekly', 'monthly', 'this_week', 'this_month'].includes(scanFrequency);
+    
+    updatedAnswers.antivirus = {
+      questionId: 'antivirus',
+      value: hasAntivirus ? 'yes' : 'no',
+      timestamp: new Date(),
+      pointsEarned: hasAntivirus ? 7.5 : 0,
+      questionText: 'Antivirus software usage (inferred from onboarding scan frequency)'
+    };
+  }
+
+  // Map software update habits to windows_updates question
+  if (onboardingAnswers.software_updates && !updatedAnswers.windows_updates) {
+    const updateBehavior = onboardingAnswers.software_updates.value;
+    const automaticUpdates = updateBehavior === 'automatic';
+    
+    updatedAnswers.windows_updates = {
+      questionId: 'windows_updates',
+      value: automaticUpdates ? 'yes' : 'no', 
+      timestamp: new Date(),
+      pointsEarned: automaticUpdates ? 15 : 0,
+      questionText: 'Automatic updates (inferred from onboarding)'
+    };
+  }
+
   return updatedAnswers;
 }
 
@@ -124,15 +153,20 @@ function createInitialConditionEngine(): ConditionEngine {
     }
   }
   
-  // Convert schema suites to condition engine format
-  const conditionSuites = (questionBank.suites || []).map(suite => ({
-    id: suite.id,
-    title: suite.title,
-    description: suite.description,
-    gates: suite.gates,
-    questionIds: suite.questions.map(q => q.id),
-    priority: 0
-  }));
+  // Collect questions from suites and add them to the engine
+  const conditionSuites = (questionBank.suites || []).map(suite => {
+    // Add suite questions to the main questions list
+    allQuestions.push(...suite.questions);
+    
+    return {
+      id: suite.id,
+      title: suite.title,
+      description: suite.description,
+      gates: suite.gates,
+      questionIds: suite.questions.map(q => q.id),
+      priority: 0
+    };
+  });
   
   return new ConditionEngine(allQuestions, conditionSuites);
 }
@@ -580,8 +614,11 @@ export const useAssessmentStore = create<AssessmentState>()(
       getVisibleQuestionIds: () => {
         const state = get();
         const context = {
-          answers: state.answers,
-          questionBank: state.questionBank
+          answers: Object.fromEntries(
+            Object.entries(state.answers).map(([id, answer]) => [id, answer.value])
+          ),
+          deviceProfile: state.deviceProfile,
+          metadata: {}
         };
         const result = state.conditionEngine.evaluate(context);
         return result.visibleQuestionIds;
@@ -590,8 +627,11 @@ export const useAssessmentStore = create<AssessmentState>()(
       getUnlockedSuiteIds: () => {
         const state = get();
         const context = {
-          answers: state.answers,
-          questionBank: state.questionBank
+          answers: Object.fromEntries(
+            Object.entries(state.answers).map(([id, answer]) => [id, answer.value])
+          ),
+          deviceProfile: state.deviceProfile,
+          metadata: {}
         };
         const result = state.conditionEngine.evaluate(context);
         return result.unlockedSuites.map(suite => suite.id);
@@ -601,7 +641,8 @@ export const useAssessmentStore = create<AssessmentState>()(
         const state = get();
         const context = {
           answers: state.answers,
-          questionBank: state.questionBank
+          deviceProfile: state.deviceProfile,
+          metadata: {}
         };
         const result = state.conditionEngine.evaluate(context);
         return result.questionPatches;
