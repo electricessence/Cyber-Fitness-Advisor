@@ -11,7 +11,12 @@ The Cyber Fitness Advisor is a privacy-first cybersecurity assessment tool built
 - No tracking, analytics, or data collection
 - Make privacy guarantees explicit in UI components
 
-### 2. Modular Component Architecture
+### 2. Test File Organization Policy
+- **`.spec.ts` files**: True spec files that are paired with their source file and live in the same directory
+- **`.test.ts` files**: Broader integration tests, utilities, or non-paired tests that live in the `tests/` folder
+- **Rule**: If it's not a direct unit test of a specific source file, it belongs in `tests/` as `.test.ts`
+
+### 3. Modular Component Architecture
 **Lesson Learned**: As SPAs grow from "simple concepts" to "serious applications," modular architecture becomes essential from the start.
 
 #### Key Guidelines:

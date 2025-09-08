@@ -1,5 +1,6 @@
 import { UniversalCard } from '../UniversalCard';
 import { useAssessmentStore } from '../../features/assessment/state/store';
+import { OnboardingBanner } from '../OnboardingBanner';
 
 interface MainContentProps {
   currentDomain: string;
@@ -38,6 +39,8 @@ export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
 
   return (
     <div className="lg:col-span-3">
+      <OnboardingBanner />
+      
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           Available Questions

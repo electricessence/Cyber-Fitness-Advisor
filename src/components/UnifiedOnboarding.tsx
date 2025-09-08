@@ -86,13 +86,11 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     // Process answers to create onboarding profile
     processOnboardingAnswers(finalAnswers, detectedDevice);
     
-    // Save onboarding answers to localStorage for pre-population
-    console.log('Saving onboarding answers:', finalAnswers);
-    localStorage.setItem('cyber-fitness-onboarding-answers', JSON.stringify(finalAnswers));
+    console.log('Onboarding completed with answers:', finalAnswers);
     
-    // DEBUG: Let's also clear any existing assessment answers to see fresh questions
-    localStorage.removeItem('cyber-fitness-assessment');
-    console.log('Cleared assessment storage for fresh start');
+    // NOTE: Current onboarding answers are device detection focused (windows_confirmation, etc.)
+    // These don't map to assessment questions, so we skip direct storage
+    // Future enhancement: Add behavior questions to onboarding that can map to assessment
     
     // Convert to DeviceProfile format expected by the app
     const deviceProfile: DeviceProfile = {
@@ -115,8 +113,12 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     onComplete(deviceProfile);
   };
 
+  // Determine which questions are actually visible/applicable given current answers & device
+  const applicableQuestions = UNIFIED_ONBOARDING_QUESTIONS.filter(q => !q.showIf || q.showIf(detectedDevice, answers));
   const currentQ = UNIFIED_ONBOARDING_QUESTIONS[currentQuestion];
-  const progress = ((currentQuestion + 1) / UNIFIED_ONBOARDING_QUESTIONS.length) * 100;
+  // Map current question to its position within the visible sequence (fallback to 0)
+  const visibleIndex = Math.max(0, applicableQuestions.findIndex(q => q.id === currentQ.id));
+  const progress = ((visibleIndex + 1) / Math.max(1, applicableQuestions.length)) * 100;
 
   // Response/Feedback Screen (no points popup)
   if (showResponse) {
@@ -153,7 +155,7 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
         <div className="mb-8">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
             <span>Setup Progress</span>
-            <span>{currentQuestion + 1} of {UNIFIED_ONBOARDING_QUESTIONS.length}</span>
+            <span>{visibleIndex + 1} of {applicableQuestions.length}</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 

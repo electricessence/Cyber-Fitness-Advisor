@@ -6,9 +6,7 @@ import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration } from '../engine/scoring';
 import { createSimpleQuestionBank } from '../../progress/simpleProgress';
 import { ConditionEngine } from '../engine/conditions';
-import questionsData from '../data/questions.json';
 import unifiedQuestionBank from '../data/questionBank';
-import { USE_UNIFIED_QUESTION_BANK } from '../../../config/featureFlags';
 
 // Smart pre-population from onboarding data
 function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
@@ -150,7 +148,7 @@ interface AssessmentState {
 
 // Helper to create the initial condition engine
 function createInitialConditionEngine(): ConditionEngine {
-  const questionBank = (USE_UNIFIED_QUESTION_BANK ? unifiedQuestionBank : (questionsData as QuestionBank));
+  const questionBank = unifiedQuestionBank;
   const allQuestions: Question[] = [];
   
   // Collect all questions from domains
@@ -179,7 +177,7 @@ function createInitialConditionEngine(): ConditionEngine {
 }
 
 const initialState = {
-  questionBank: (USE_UNIFIED_QUESTION_BANK ? unifiedQuestionBank : (questionsData as QuestionBank)),
+  questionBank: unifiedQuestionBank,
   answers: {},
   deviceProfile: null as DeviceProfile | null,
   conditionEngine: createInitialConditionEngine(),
@@ -399,9 +397,8 @@ export const useAssessmentStore = create<AssessmentState>()(
         });
       },
 
-      // Unified model ordering (phase aware). Only meaningful when flag enabled.
+      // Unified model ordering (phase aware)
       getOrderedAvailableQuestions: () => {
-        if (!USE_UNIFIED_QUESTION_BANK) return get().getAvailableQuestions();
         const raw = get().getAvailableQuestions();
         return [...raw].sort((a, b) => {
           const ao = a.phaseOrder ?? 9999;
@@ -412,7 +409,6 @@ export const useAssessmentStore = create<AssessmentState>()(
       },
 
       getOnboardingPendingCount: () => {
-        if (!USE_UNIFIED_QUESTION_BANK) return 0;
         const state = get();
         const answered = Object.keys(state.answers);
         const onboarding = state.questionBank.domains.find(d => d.id === 'onboarding_phase');
@@ -422,7 +418,6 @@ export const useAssessmentStore = create<AssessmentState>()(
       },
 
       isOnboardingComplete: () => {
-        if (!USE_UNIFIED_QUESTION_BANK) return true;
         return (get().getOnboardingPendingCount?.() || 0) === 0;
       },
       
