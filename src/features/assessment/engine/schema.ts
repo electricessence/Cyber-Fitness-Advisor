@@ -1,5 +1,8 @@
 export type QuestionType = 'YN' | 'SCALE' | 'ACTION';
 
+// Import gate types from conditions to avoid duplication
+import type { Gate } from './conditions';
+
 export interface AnswerOption {
   id: string;
   text: string; // What the user sees as the choice
@@ -61,7 +64,13 @@ export interface Question {
   // New flexible answer options - optional for backward compatibility
   options?: AnswerOption[]; // All possible answers - if not provided, will be generated from type
   
-  // Conditions for when this question should appear
+  // Phase 2.2: Gates system for conditional visibility
+  gates?: Gate[]; // When this question should appear (OR logic - any gate passes)
+  
+  // Phase 2.2: Onboarding support
+  nonScoring?: boolean; // If true, this question doesn't contribute to score
+  
+  // Legacy conditions (kept for backward compatibility)
   conditions?: {
     requireAnswers?: { [questionId: string]: string[] }; // Require specific answers to other questions
     browserInfo?: { browsers?: string[]; platforms?: string[] }; // Browser/platform requirements
@@ -87,6 +96,16 @@ export interface Domain {
 export interface QuestionBank {
   version: number;
   domains: Domain[];
+  suites?: Suite[]; // Phase 2.2: Unlockable question suites
+}
+
+// Phase 2.2: Unlockable question suites
+export interface Suite {
+  id: string;
+  title: string;
+  description: string;
+  gates: Gate[]; // Multiple gates with OR semantics - unlocks if any passes
+  questions: Question[];
 }
 
 export interface Answer {

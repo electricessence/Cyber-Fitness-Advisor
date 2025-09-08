@@ -5,6 +5,7 @@ import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration, shouldQuestionBeAvailable } from '../engine/scoring';
 import { createSimpleQuestionBank } from '../../progress/simpleProgress';
+import { ConditionEngine } from '../engine/conditions';
 import questionsData from '../data/questions.json';
 
 // Smart pre-population from onboarding data
@@ -58,6 +59,9 @@ interface AssessmentState {
   answers: Record<string, Answer>;
   deviceProfile: DeviceProfile | null;
   
+  // Phase 2.2: Condition engine for contextual Q/A
+  conditionEngine: ConditionEngine;
+  
   // Task Management
   taskResponses: Record<string, TaskResponse>;
   taskReminders: TaskReminder[];
@@ -93,6 +97,11 @@ interface AssessmentState {
   getHistoricAnswers: () => Array<Answer & { domain: string; level: number; question: Question | null }>;
   dismissCelebration: () => void;
   
+  // Phase 2.2: Derived selectors for contextual Q/A
+  getVisibleQuestionIds: () => string[];
+  getUnlockedSuiteIds: () => string[];
+  getEffectivePatches: () => Record<string, Partial<Question>>;
+  
   // Task Management
   getTodaysTasks: () => Question[];
   getRoomForImprovementTasks: () => Question[];
@@ -103,10 +112,36 @@ interface AssessmentState {
   getExpiringAnswers: (daysAhead?: number) => Answer[];
 }
 
+// Helper to create the initial condition engine
+function createInitialConditionEngine(): ConditionEngine {
+  const questionBank = questionsData as QuestionBank;
+  const allQuestions: Question[] = [];
+  
+  // Collect all questions from domains
+  for (const domain of questionBank.domains) {
+    for (const level of domain.levels) {
+      allQuestions.push(...level.questions);
+    }
+  }
+  
+  // Convert schema suites to condition engine format
+  const conditionSuites = (questionBank.suites || []).map(suite => ({
+    id: suite.id,
+    title: suite.title,
+    description: suite.description,
+    gates: suite.gates,
+    questionIds: suite.questions.map(q => q.id),
+    priority: 0
+  }));
+  
+  return new ConditionEngine(allQuestions, conditionSuites);
+}
+
 const initialState = {
   questionBank: questionsData as QuestionBank,
   answers: {},
   deviceProfile: null as DeviceProfile | null,
+  conditionEngine: createInitialConditionEngine(),
   taskResponses: {},
   taskReminders: [],
   overallScore: 0,
@@ -539,6 +574,37 @@ export const useAssessmentStore = create<AssessmentState>()(
             taskResponse.status === 'snoozed'
           );
         });
+      },
+      
+      // Phase 2.2: Condition engine selectors
+      getVisibleQuestionIds: () => {
+        const state = get();
+        const context = {
+          answers: state.answers,
+          questionBank: state.questionBank
+        };
+        const result = state.conditionEngine.evaluate(context);
+        return result.visibleQuestionIds;
+      },
+      
+      getUnlockedSuiteIds: () => {
+        const state = get();
+        const context = {
+          answers: state.answers,
+          questionBank: state.questionBank
+        };
+        const result = state.conditionEngine.evaluate(context);
+        return result.unlockedSuites.map(suite => suite.id);
+      },
+      
+      getEffectivePatches: () => {
+        const state = get();
+        const context = {
+          answers: state.answers,
+          questionBank: state.questionBank
+        };
+        const result = state.conditionEngine.evaluate(context);
+        return result.questionPatches;
       },
     }),
     {

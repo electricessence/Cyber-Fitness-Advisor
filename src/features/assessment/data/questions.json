@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "domains": [
     {
       "id": "quickwins",
@@ -481,6 +481,34 @@
               "actionHint": "Many routers have built-in VPN, or use services like ProtonVPN"
             }
           ]
+        }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "advanced_security",
+      "title": "Advanced Security Features",
+      "description": "Unlocked when you demonstrate strong basic security practices",
+      "gates": [
+        {
+          "all": [
+            { "questionId": "lock_screen", "when": "equals", "value": "yes" },
+            { "questionId": "browser_passwords", "when": "equals", "value": "yes" }
+          ],
+          "unlockSuites": ["advanced_security"]
+        }
+      ],
+      "questions": [
+        {
+          "id": "advanced_2fa",
+          "type": "YN",
+          "weight": 15,
+          "text": "Do you use hardware security keys (like YubiKey) for 2FA?",
+          "affirmativeText": "Hardware 2FA Keys Used",
+          "negativeText": "No Hardware 2FA",
+          "explanation": "Hardware keys provide the strongest form of 2FA protection",
+          "actionHint": "Consider YubiKey or similar FIDO2 security keys"
         }
       ]
     }

@@ -22,6 +22,11 @@ export function normalizeAnswer(question: Question, value: boolean | number | st
 }
 
 export function calculateQuestionPoints(question: Question, value: boolean | number | string): number {
+  // Phase 2.2: Onboarding questions don't contribute to score
+  if (question.nonScoring) {
+    return 0;
+  }
+
   // Handle onboarding questions (they have weight but no type)
   if (!question.type && question.weight) {
     // For onboarding questions, give full points for positive responses
