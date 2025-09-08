@@ -2,9 +2,9 @@
 
 ## Overview
 
-Questions are the heart of the Cyber Fitness Advisor experience. This guide covers how to create engaging, impactful security assessment questions that follow our "quick wins first" philosophy.
+Questions are the heart of the Cyber Fitness Advisor experience. This guide covers how to create engaging, impactful security assessment questions that follow our "quick wins first" philosophy and support conditional visibility through the gate system.
 
-## Question Schema
+## Question Schema v2
 
 ### Basic Structure
 ```json
@@ -16,9 +16,39 @@ Questions are the heart of the Cyber Fitness Advisor experience. This guide cove
   "quickWin": boolean (optional),
   "timeEstimate": "2 minutes" (optional),
   "explanation": "Why this matters..." (optional),
-  "actionHint": "How to do this..." (optional)
+  "actionHint": "How to do this..." (optional),
+  "gates": [ // NEW: Conditional visibility gates
+    {
+      "all": [{"questionId": "prereq", "when": "equals", "value": "yes"}],
+      "show": ["follow_up_question"],
+      "hide": ["basic_question"],
+      "patch": {"target_q": {"text": "Modified question text"}},
+      "unlockSuites": ["advanced_suite"]
+    }
+  ]
 }
 ```
+
+## Gate System
+
+### Gate Structure
+Each gate can contain:
+- **Conditions**: `all`, `any`, `none` arrays with logic operators
+- **Actions**: `show`, `hide`, `patch`, `unlockSuites` to take when gate passes
+
+### Comparators
+- **`equals`** / **`not_equals`**: Exact value matching
+- **`in`** / **`not_in`**: Value in array: `{"values": ["yes", "maybe"]}`
+- **`contains`** / **`not_contains`**: Substring or array element matching
+- **`exists`** / **`not_exists`**: Check if answer exists
+- **`greater_than`** / **`less_than`** / **`greater_equal`** / **`less_equal`**: Numeric comparisons
+- **`truthy`** / **`falsy`**: Boolean evaluation (useful for any non-empty value)
+
+### Visibility Rules
+1. **Default**: Questions without gates are always visible
+2. **Any Gate Passes**: Question is visible if ANY gate passes
+3. **Hide Overrides Show**: Hide actions always take precedence over show actions
+4. **Deterministic**: Conflicts resolved by question ID alphabetical order
 
 ### Field Definitions
 

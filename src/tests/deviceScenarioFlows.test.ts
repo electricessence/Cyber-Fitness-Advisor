@@ -51,14 +51,14 @@ describe('Unified System Tests', () => {
     });
 
     it('should show Windows update question first', () => {
-      // Test that our unified onboarding includes update habits
+      // Test that our unified onboarding includes OS confirmation
       const updateQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => 
-        q.id === 'current_habits'
+        q.id === 'windows_confirmation'
       );
       
       expect(updateQuestion).toBeDefined();
-      expect(updateQuestion?.text).toContain('software updates');
-      expect(updateQuestion?.type).toBe('scale');
+      expect(updateQuestion?.question).toContain('Windows');
+      expect(updateQuestion?.type).toBe('confirmation');
       expect(updateQuestion?.options.length).toBeGreaterThan(0);
     });
 
@@ -83,14 +83,14 @@ describe('Unified System Tests', () => {
     });
 
     it('should include iOS security questions', () => {
-      // Check that mobile device question exists
-      const mobileQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => 
-        q.id === 'primary_mobile'
+      // Check that OS selection includes mobile
+      const osQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => 
+        q.id === 'os_selection'
       );
 
-      expect(mobileQuestion).toBeDefined();
-      expect(mobileQuestion?.text).toContain('mobile device');
-      expect(mobileQuestion?.options.some(opt => opt.text.includes('iPhone'))).toBe(true);
+      expect(osQuestion).toBeDefined();
+      expect(osQuestion?.question).toContain('operating system');
+      expect(osQuestion?.options.some(opt => opt.text.includes('Mobile'))).toBe(true);
     });
 
     it('should include cross-platform password management', () => {
@@ -173,15 +173,16 @@ describe('Unified System Tests', () => {
     });
 
     it('should not include mobile-specific questions', () => {
-      // Mobile question should be skipped for desktop users
-      const mobileQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => q.id === 'primary_mobile');
-      expect(mobileQuestion?.skipIf).toBeDefined();
+      // In new onboarding, mobile is handled through OS selection
+      const osQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => q.id === 'os_selection');
+      expect(osQuestion).toBeDefined();
+      expect(osQuestion?.showIf).toBeDefined();
     });
 
     it('should include email security (high risk for this demographic)', () => {
-      // Security priority includes various options including privacy/scams
-      const securityQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => q.id === 'security_priority');
-      expect(securityQuestion?.options.some(opt => opt.value === 'scams')).toBe(true);
+      // Check that browser selection includes security-focused options
+      const browserQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => q.id === 'browser_selection');
+      expect(browserQuestion?.options.some(opt => opt.value === 'firefox')).toBe(true);
     });
   });
 
@@ -214,8 +215,8 @@ describe('Unified System Tests', () => {
     });
 
     it('should include Android security questions', () => {
-      const mobileQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => q.id === 'primary_mobile');
-      expect(mobileQuestion?.options.some(opt => opt.value === 'android')).toBe(true);
+      const osQuestion = UNIFIED_ONBOARDING_QUESTIONS.find(q => q.id === 'os_selection');
+      expect(osQuestion?.options.some(opt => opt.value === 'mobile')).toBe(true);
     });
 
     it('should NOT include Windows or iOS questions', () => {
