@@ -7,11 +7,11 @@ import type { DetectedDevice } from '../device/deviceDetection';
 
 export interface OnboardingQuestion {
   id: string;
-  text: string;
+  question: string;
   context: string;
   type: 'confirmation' | 'selection' | 'scale';
   options: OnboardingOption[];
-  skipIf?: (device: DetectedDevice, answers: Record<string, string>) => boolean;
+  showIf?: (device: DetectedDevice, answers: Record<string, string>) => boolean;
   category: 'device' | 'security' | 'experience';
 }
 
@@ -27,243 +27,250 @@ export interface OnboardingOption {
 /**
  * Comprehensive onboarding questions that replace all previous systems
  */
+/**
+ * OS-Specific Sequential Onboarding Questions
+ * Each question builds on the previous answers with targeted, device-specific questions
+ */
 export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
+  // Step 1: OS Confirmation - Show the specific OS we detected
   {
-    id: 'device_confirmation',
-    text: 'I detected you\'re using a {{deviceDescription}}. Is that correct?',
-    context: 'Knowing your device helps us give you specific, actionable security advice.',
+    id: 'windows_confirmation',
+    question: 'Are you using a Windows computer?',
+    context: 'We detected Windows. Confirming this helps us provide specific security recommendations.',
     type: 'confirmation',
     category: 'device',
+    showIf: (device) => device.os === 'windows',
     options: [
       {
         value: 'yes',
-        text: '✅ Yes, that\'s correct',
+        text: '✅ Yes, I\'m using Windows',
         points: 0,
-        feedback: '✅ Great! We can give you device-specific security tips.',
-        tip: 'Device-specific advice is always more effective!'
+        feedback: '✅ Great! We\'ll provide Windows-specific security advice.',
+        tip: 'Windows has excellent built-in security features we can help you enable!'
       },
       {
         value: 'no',
-        text: '❌ No, let me specify',
+        text: '❌ No, different operating system',
         points: 0,
-        feedback: '👍 Thanks for the correction! What device are you using?',
-        tip: 'Being accurate helps us help you better.'
-      }
-    ]
-  },
-  
-  {
-    id: 'browser_confirmation',
-    text: 'Is {{browserName}} your primary browser?',
-    context: 'Knowing your primary browser helps us provide relevant security settings and extensions.',
-    type: 'confirmation',
-    category: 'device',
-    options: [
-      {
-        value: 'yes',
-        text: '✅ Yes, that\'s my primary browser',
-        points: 0,
-        feedback: '✅ Great! We can give you browser-specific security advice.',
-        tip: 'Browser-specific recommendations are more actionable!'
-      },
-      {
-        value: 'no',
-        text: '❌ No, I use a different browser primarily',
-        points: 0,
-        feedback: '👍 Thanks! What browser do you use most often?',
-        tip: 'We\'ll ask you to specify your main browser next'
-      }
-    ]
-  },
-  
-  {
-    id: 'primary_mobile',
-    text: 'What type of mobile device do you primarily use?',
-    context: 'Mobile devices have different security considerations than desktop computers.',
-    type: 'selection', 
-    category: 'device',
-    options: [
-      {
-        value: 'iphone',
-        text: '📱 iPhone',
-        description: 'Any iPhone model',
-        points: 0,
-        feedback: '📱 iPhone users get iOS-specific security recommendations!',
-        tip: 'iPhones have excellent built-in security features'
-      },
-      {
-        value: 'android',
-        text: '🤖 Android phone', 
-        description: 'Samsung, Google Pixel, etc.',
-        points: 0,
-        feedback: '🤖 Android users get Google Play security tips!',
-        tip: 'Android has great customization and security options'
-      },
-      {
-        value: 'other_smartphone',
-        text: '📲 Other smartphone',
-        description: 'Windows Phone, BlackBerry, or other',
-        points: 0,
-        feedback: '📲 Other smartphone users get general mobile security tips!',
-        tip: 'Basic smartphone security principles apply across platforms'
-      },
-      {
-        value: 'basic_phone',
-        text: '📞 Basic/flip phone',
-        description: 'Calls and texts only', 
-        points: 0,
-        feedback: '📞 Basic phones are naturally more secure!',
-        tip: 'Fewer features mean fewer attack vectors'
-      },
-      {
-        value: 'none',
-        text: '❌ I don\'t have a mobile device',
-        points: 0,
-        feedback: '💻 Desktop-focused security coming up!',
-        tip: 'We\'ll focus on computer security best practices'
-      }
-    ],
-    skipIf: (device) => device.type === 'mobile'
-  },
-
-  {
-    id: 'tech_comfort',
-    text: 'How comfortable are you with technology and security settings?',
-    context: 'This helps us adjust the complexity of our recommendations and instructions.',
-    type: 'scale',
-    category: 'experience', 
-    options: [
-      {
-        value: 'expert',
-        text: '🧠 Very comfortable',
-        description: 'I can handle technical instructions',
-        points: 10,
-        feedback: '🧠 Expert mode activated! You\'ll get advanced security tips.',
-        tip: 'We\'ll show you the most effective security practices'
-      },
-      {
-        value: 'intermediate', 
-        text: '⚡ Somewhat comfortable',
-        description: 'I can follow detailed step-by-step guides',
-        points: 8,
-        feedback: '⚡ Perfect! You\'ll get detailed but manageable guidance.',
-        tip: 'Great balance of security and usability coming up'
-      },
-      {
-        value: 'beginner',
-        text: '🌱 Not very comfortable', 
-        description: 'I prefer simple, visual instructions',
-        points: 6,
-        feedback: '🌱 No problem! We\'ll keep things simple and effective.',
-        tip: 'Simple security steps can be just as powerful'
-      },
-      {
-        value: 'cautious',
-        text: '⚠️ Very cautious',
-        description: 'I want to understand before I change anything',
-        points: 7,
-        feedback: '⚠️ Smart approach! We\'ll explain everything clearly.',
-        tip: 'Understanding security makes you more secure'
+        feedback: '👍 Thanks for the correction! We\'ll ask what you\'re using.',
+        tip: 'Accuracy helps us give you the best recommendations.'
       }
     ]
   },
 
   {
-    id: 'security_priority',
-    text: 'What\'s your biggest security concern right now?',
-    context: 'We\'ll prioritize recommendations based on what worries you most.',
+    id: 'mac_confirmation',
+    question: 'Are you using a Mac computer?',
+    context: 'We detected macOS. Confirming this helps us provide specific security recommendations.',
+    type: 'confirmation',
+    category: 'device',
+    showIf: (device) => device.os === 'mac',
+    options: [
+      {
+        value: 'yes',
+        text: '✅ Yes, I\'m using macOS',
+        points: 0,
+        feedback: '✅ Great! We\'ll provide macOS-specific security advice.',
+        tip: 'Macs have excellent security features built-in!'
+      },
+      {
+        value: 'no',
+        text: '❌ No, different operating system',
+        points: 0,
+        feedback: '👍 Thanks for the correction! We\'ll ask what you\'re using.',
+        tip: 'Accuracy helps us give you the best recommendations.'
+      }
+    ]
+  },
+
+  {
+    id: 'linux_confirmation',
+    question: 'Are you using a Linux computer?',
+    context: 'We detected Linux. Confirming this helps us provide specific security recommendations.',
+    type: 'confirmation',
+    category: 'device',
+    showIf: (device) => device.os === 'linux',
+    options: [
+      {
+        value: 'yes',
+        text: '✅ Yes, I\'m using Linux',
+        points: 0,
+        feedback: '✅ Great! We\'ll provide Linux-specific security advice.',
+        tip: 'Linux users tend to be security-conscious - we\'ll help optimize!'
+      },
+      {
+        value: 'no',
+        text: '❌ No, different operating system',
+        points: 0,
+        feedback: '👍 Thanks for the correction! We\'ll ask what you\'re using.',
+        tip: 'Accuracy helps us give you the best recommendations.'
+      }
+    ]
+  },
+
+  // Step 2: OS Selection for unknown or denied detection
+  {
+    id: 'os_selection',
+    question: 'What operating system are you using?',
+    context: 'Please help us identify your operating system so we can give you relevant advice.',
     type: 'selection',
-    category: 'security',
+    category: 'device',
+    showIf: (device, answers) => {
+      // Show if OS detection failed or user denied the detected OS
+      return device.os === 'unknown' || 
+             answers.windows_confirmation === 'no' ||
+             answers.mac_confirmation === 'no' ||
+             answers.linux_confirmation === 'no';
+    },
     options: [
       {
-        value: 'passwords',
-        text: '🔐 Password security',
-        description: 'Managing and securing passwords',
-        points: 8,
-        feedback: '🔐 Password security is the foundation! Great choice.',
-        tip: 'Strong passwords prevent 80% of security breaches'
+        value: 'windows',
+        text: '� Windows',
+        description: 'Windows 10, 11, or other version',
+        points: 0,
+        feedback: '✅ Thanks! We\'ll provide Windows-specific security advice.',
+        tip: 'Windows has many built-in security features we can help you enable!'
       },
       {
-        value: 'privacy',
-        text: '🕵️ Online privacy',
-        description: 'Protecting personal information online',
-        points: 8, 
-        feedback: '🕵️ Privacy-focused recommendations coming up!',
-        tip: 'Privacy and security go hand in hand'
+        value: 'mac',
+        text: '🍎 macOS',
+        description: 'Any Mac computer',
+        points: 0,
+        feedback: '✅ Thanks! We\'ll provide macOS-specific security advice.',
+        tip: 'Macs have excellent security features built-in!'
       },
       {
-        value: 'scams',
-        text: '🎣 Scams and phishing',
-        description: 'Avoiding malicious emails and websites',
-        points: 8,
-        feedback: '🎣 Anti-scam training is incredibly valuable!',
-        tip: 'Recognizing scams is a superpower in 2025'
+        value: 'linux',
+        text: '🐧 Linux',
+        description: 'Ubuntu, Debian, Fedora, etc.',
+        points: 0,
+        feedback: '✅ Thanks! We\'ll provide Linux-specific security advice.',
+        tip: 'Linux users tend to be security-conscious!'
       },
       {
-        value: 'device_security',
-        text: '💻 Device security',
-        description: 'Keeping devices secure and updated',
-        points: 8,
-        feedback: '💻 Device security creates a strong foundation!',
-        tip: 'Secure devices protect everything else'
+        value: 'mobile',
+        text: '📱 Mobile device',
+        description: 'iPhone or Android',
+        points: 0,
+        feedback: '📱 We\'ll provide mobile-specific security advice.',
+        tip: 'Mobile security is just as important as computer security!'
+      }
+    ]
+  },
+
+  // Step 3: Browser Confirmation (only show for confirmed computer users)
+  {
+    id: 'chrome_confirmation',
+    question: 'Are you primarily using Google Chrome as your web browser?',
+    context: 'We detected Chrome. Knowing your browser helps us recommend specific security settings.',
+    type: 'confirmation',
+    category: 'device',
+    showIf: (device, answers) => {
+      const hasConfirmedOS = answers.windows_confirmation === 'yes' || 
+                           answers.mac_confirmation === 'yes' || 
+                           answers.linux_confirmation === 'yes' ||
+                           ['windows', 'mac', 'linux'].includes(answers.os_selection);
+      return hasConfirmedOS && device.browser === 'chrome';
+    },
+    options: [
+      {
+        value: 'yes',
+        text: '✅ Yes, Chrome is my main browser',
+        points: 0,
+        feedback: '✅ Great! We\'ll provide Chrome-specific security recommendations.',
+        tip: 'Chrome has excellent security features and extension support!'
       },
       {
-        value: 'not_sure',
-        text: '🤷 Not sure',
-        description: 'I want to learn what\'s most important',
-        points: 5,
-        feedback: '🤷 Perfect! We\'ll show you the highest-impact areas.',
-        tip: 'We\'ll help you identify your biggest risks'
+        value: 'no',
+        text: '❌ No, I use a different browser',
+        points: 0,
+        feedback: '� Thanks! We\'ll ask which browser you prefer.',
+        tip: 'All modern browsers have good security features!'
       }
     ]
   },
 
   {
-    id: 'current_habits',
-    text: 'How do you currently handle software updates?',
-    context: 'Updates patch security holes that hackers try to exploit daily.',
-    type: 'scale',
-    category: 'security',
+    id: 'firefox_confirmation',
+    question: 'Are you primarily using Mozilla Firefox as your web browser?',
+    context: 'We detected Firefox. Knowing your browser helps us recommend specific security settings.',
+    type: 'confirmation',
+    category: 'device',
+    showIf: (device, answers) => {
+      const hasConfirmedOS = answers.windows_confirmation === 'yes' || 
+                           answers.mac_confirmation === 'yes' || 
+                           answers.linux_confirmation === 'yes' ||
+                           ['windows', 'mac', 'linux'].includes(answers.os_selection);
+      return hasConfirmedOS && device.browser === 'firefox';
+    },
     options: [
       {
-        value: 'automatic',
-        text: '🔥 Automatic updates enabled',
-        description: 'Updates install automatically',
-        points: 20,
-        feedback: '🔥 Gold Star! You\'ve got the ultimate "set and forget" security!',
-        tip: 'Automatic updates are the lazy person\'s path to great security!'
+        value: 'yes',
+        text: '✅ Yes, Firefox is my main browser',
+        points: 0,
+        feedback: '✅ Excellent choice! Firefox has great privacy features.',
+        tip: 'Firefox is excellent for privacy-conscious users!'
       },
       {
-        value: 'install_quickly',
-        text: '⚡ Install them quickly',
-        description: 'I update within a few days',
-        points: 18,
-        feedback: '⚡ Excellent! Your quick update habits are top-tier security!',
-        tip: 'You\'ve got great instincts - staying current is key!'
+        value: 'no',
+        text: '❌ No, I use a different browser',
+        points: 0,
+        feedback: '👍 Thanks! We\'ll ask which browser you prefer.',
+        tip: 'All modern browsers have good security features!'
+      }
+    ]
+  },
+
+  // Step 4: Browser Selection (fallback for unknown browsers or denied detection)
+  {
+    id: 'browser_selection',
+    question: 'What web browser do you use most often?',
+    context: 'Knowing your primary browser helps us recommend specific security settings.',
+    type: 'selection',
+    category: 'device',
+    showIf: (device, answers) => {
+      const hasConfirmedOS = answers.windows_confirmation === 'yes' || 
+                           answers.mac_confirmation === 'yes' || 
+                           answers.linux_confirmation === 'yes' ||
+                           ['windows', 'mac', 'linux'].includes(answers.os_selection);
+      const deniedBrowser = answers.chrome_confirmation === 'no' || 
+                          answers.firefox_confirmation === 'no';
+      const unknownBrowser = device.browser === 'unknown';
+      
+      return hasConfirmedOS && (deniedBrowser || unknownBrowser);
+    },
+    options: [
+      {
+        value: 'chrome',
+        text: '🟢 Google Chrome',
+        description: 'Most popular browser',
+        points: 0,
+        feedback: '✅ Chrome has excellent security features and extension support!',
+        tip: 'Chrome updates automatically and has strong sandboxing!'
       },
       {
-        value: 'install_eventually',
-        text: '📅 Install them eventually',
-        description: 'I update within a week or two',
-        points: 12,
-        feedback: '📅 You\'re updating, which puts you ahead of most people!',
-        tip: 'Consider: auto-updates OR weekly reminders to stay current?'
+        value: 'firefox',
+        text: '🦊 Mozilla Firefox',
+        description: 'Privacy-focused browser',
+        points: 0,
+        feedback: '✅ Excellent choice! Firefox prioritizes user privacy.',
+        tip: 'Firefox has excellent tracking protection built-in!'
       },
       {
-        value: 'rarely_update',
-        text: '😅 I rarely update',
-        description: 'I postpone or ignore most updates',
-        points: 5,
-        feedback: '😅 Let\'s make this super easy for you!',
-        tip: 'Try: enable auto-updates OR set a monthly "update day" reminder?'
+        value: 'safari',
+        text: '🧭 Safari',
+        description: 'Default on Mac/iPhone',
+        points: 0,
+        feedback: '✅ Safari has strong privacy features and tight OS integration.',
+        tip: 'Safari blocks many trackers by default!'
       },
       {
-        value: 'not_sure',
-        text: '❓ I\'m not sure',
-        description: 'I don\'t pay attention to updates',
-        points: 3,
-        feedback: '❓ No problem! We\'ll show you how to stay secure effortlessly.',
-        tip: 'Understanding updates is the first step to better security'
+        value: 'edge',
+        text: '🔷 Microsoft Edge',
+        description: 'Default on Windows',
+        points: 0,
+        feedback: '✅ Edge has improved significantly with good security features!',
+        tip: 'Modern Edge is built on Chromium with enhanced security!'
       }
     ]
   }
@@ -274,10 +281,8 @@ export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
  */
 export interface OnboardingProfile {
   deviceInfo: DetectedDevice;
-  techComfort: 'expert' | 'intermediate' | 'beginner' | 'cautious';
-  securityPriority: 'passwords' | 'privacy' | 'scams' | 'device_security' | 'not_sure';
-  updateHabits: 'automatic' | 'install_quickly' | 'install_eventually' | 'rarely_update' | 'not_sure';
-  mobileDevice: 'iphone' | 'android' | 'basic_phone' | 'none';
+  confirmedOS: 'windows' | 'mac' | 'linux' | 'mobile' | 'unknown';
+  confirmedBrowser: 'chrome' | 'firefox' | 'safari' | 'edge' | 'unknown';
   totalScore: number;
   answers: Record<string, string>;
 }
@@ -302,12 +307,35 @@ export function processOnboardingAnswers(
     }
   });
   
+  // Determine confirmed OS
+  let confirmedOS: OnboardingProfile['confirmedOS'] = 'unknown';
+  if (answers.windows_confirmation === 'yes') confirmedOS = 'windows';
+  else if (answers.mac_confirmation === 'yes') confirmedOS = 'mac';  
+  else if (answers.linux_confirmation === 'yes') confirmedOS = 'linux';
+  else if (answers.os_selection) confirmedOS = answers.os_selection as OnboardingProfile['confirmedOS'];
+  else {
+    // Map detected device OS to confirmed OS
+    switch (detectedDevice.os) {
+      case 'windows': confirmedOS = 'windows'; break;
+      case 'mac': confirmedOS = 'mac'; break;
+      case 'linux': confirmedOS = 'linux'; break;
+      case 'ios':
+      case 'android': confirmedOS = 'mobile'; break;
+      default: confirmedOS = 'unknown'; break;
+    }
+  }
+  
+  // Determine confirmed browser
+  let confirmedBrowser: OnboardingProfile['confirmedBrowser'] = 'unknown';
+  if (answers.chrome_confirmation === 'yes') confirmedBrowser = 'chrome';
+  else if (answers.firefox_confirmation === 'yes') confirmedBrowser = 'firefox';
+  else if (answers.browser_selection) confirmedBrowser = answers.browser_selection as OnboardingProfile['confirmedBrowser'];
+  else confirmedBrowser = detectedDevice.browser === 'unknown' ? 'unknown' : detectedDevice.browser;
+  
   return {
     deviceInfo: detectedDevice,
-    techComfort: (answers.tech_comfort as any) || 'beginner',
-    securityPriority: (answers.security_priority as any) || 'not_sure',
-    updateHabits: (answers.current_habits as any) || 'not_sure',
-    mobileDevice: (answers.primary_mobile as any) || 'none',
+    confirmedOS,
+    confirmedBrowser,
     totalScore,
     answers
   };

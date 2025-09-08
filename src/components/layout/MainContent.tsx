@@ -17,12 +17,25 @@ export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
   const currentDomainObj = questionBank.domains.find(d => d.id === currentDomain);
   const currentLevelObj = currentDomainObj?.levels.find(l => l.level === currentLevel);
   
+  // Debug logging
+  console.log('MainContent Debug:', {
+    currentDomain,
+    currentLevel,
+    currentDomainObj: currentDomainObj?.id,
+    currentLevelObj: currentLevelObj?.level,
+    questionsCount: currentLevelObj?.questions?.length || 0,
+    answersCount: Object.keys(answers).length,
+    answerKeys: Object.keys(answers)
+  });
+  
   // Filter out already answered questions, but include expired ones
   const allQuestions = currentLevelObj?.questions || [];
   const unansweredQuestions = allQuestions.filter(question => {
     const answer = answers[question.id];
+    const isUnanswered = !answer || (answer.isExpired === true);
+    console.log(`Question ${question.id}: hasAnswer=${!!answer}, isExpired=${answer?.isExpired}, willShow=${isUnanswered}`);
     // Show if not answered, or if answered but expired
-    return !answer || (answer.isExpired === true);
+    return isUnanswered;
   });
 
   if (unansweredQuestions.length === 0 && allQuestions.length > 0) {

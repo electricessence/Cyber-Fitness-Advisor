@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { Monitor, Smartphone } from 'lucide-react';
-import { detectCurrentDevice, getDeviceDescription } from '../features/device/deviceDetection';
+import { detectCurrentDevice } from '../features/device/deviceDetection';
 import { 
   UNIFIED_ONBOARDING_QUESTIONS, 
   processOnboardingAnswers
@@ -21,14 +21,24 @@ interface UnifiedOnboardingProps {
 }
 
 export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [detectedDevice, setDetectedDevice] = useState(detectCurrentDevice());
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [currentQuestion, setCurrentQuestion] = useState(() => {
+    // Find first question that should be shown based on device detection
+    const device = detectCurrentDevice();
+    for (let i = 0; i < UNIFIED_ONBOARDING_QUESTIONS.length; i++) {
+      const question = UNIFIED_ONBOARDING_QUESTIONS[i];
+      if (!question.showIf || question.showIf(device, {})) {
+        return i;
+      }
+    }
+    return 0; // fallback
+  });
   const [showResponse, setShowResponse] = useState(false);
   const [currentResponse, setCurrentResponse] = useState<{ 
     text: string; 
     tip?: string 
   }>({ text: '' });
-  const [detectedDevice, setDetectedDevice] = useState(detectCurrentDevice());
 
   useEffect(() => {
     setDetectedDevice(detectCurrentDevice());
@@ -53,11 +63,12 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     setTimeout(() => {
       setShowResponse(false);
       
-      // Find next question (skip if conditions apply)
+      // Find next question based on showIf conditions
       let nextIndex = currentQuestion + 1;
       while (nextIndex < UNIFIED_ONBOARDING_QUESTIONS.length) {
         const nextQ = UNIFIED_ONBOARDING_QUESTIONS[nextIndex];
-        if (!nextQ.skipIf || !nextQ.skipIf(detectedDevice, newAnswers)) {
+        // Show the question if no showIf condition OR if showIf condition is true
+        if (!nextQ.showIf || nextQ.showIf(detectedDevice, newAnswers)) {
           break;
         }
         nextIndex++;
@@ -74,6 +85,14 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   const completeOnboarding = (finalAnswers: Record<string, string>) => {
     // Process answers to create onboarding profile
     processOnboardingAnswers(finalAnswers, detectedDevice);
+    
+    // Save onboarding answers to localStorage for pre-population
+    console.log('Saving onboarding answers:', finalAnswers);
+    localStorage.setItem('cyber-fitness-onboarding-answers', JSON.stringify(finalAnswers));
+    
+    // DEBUG: Let's also clear any existing assessment answers to see fresh questions
+    localStorage.removeItem('cyber-fitness-assessment');
+    console.log('Cleared assessment storage for fresh start');
     
     // Convert to DeviceProfile format expected by the app
     const deviceProfile: DeviceProfile = {
@@ -98,10 +117,6 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
 
   const currentQ = UNIFIED_ONBOARDING_QUESTIONS[currentQuestion];
   const progress = ((currentQuestion + 1) / UNIFIED_ONBOARDING_QUESTIONS.length) * 100;
-  
-  // Replace template variables in question text
-  let questionText = currentQ.text.replace('{{deviceDescription}}', getDeviceDescription(detectedDevice));
-  questionText = questionText.replace('{{browserName}}', detectedDevice.browser || 'your browser');
 
   // Response/Feedback Screen (no points popup)
   if (showResponse) {
@@ -156,30 +171,10 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
               {currentQ.category === 'security' && <Smartphone className="w-8 h-8 text-blue-600" />}
             </div>
             
-            {/* Split statement and question as requested */}
-            {currentQ.id === 'device_confirmation' ? (
-              <div className="space-y-2">
-                <p className="text-lg text-gray-700">
-                  It appears you are using {getDeviceDescription(detectedDevice)}.
-                </p>
-                <h2 className="text-2xl font-bold text-blue-600">
-                  Is that correct?
-                </h2>
-              </div>
-            ) : currentQ.id === 'browser_confirmation' ? (
-              <div className="space-y-2">
-                <p className="text-lg text-gray-700">
-                  It appears you are using {detectedDevice.browser || 'an unknown browser'}.
-                </p>
-                <h2 className="text-2xl font-bold text-blue-600">
-                  Is this your primary browser?
-                </h2>
-              </div>
-            ) : (
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                {questionText}
-              </h2>
-            )}
+            {/* Question display - clean and simple */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              {currentQ.question}
+            </h2>
             
             <p className="text-gray-600">
               {currentQ.context}

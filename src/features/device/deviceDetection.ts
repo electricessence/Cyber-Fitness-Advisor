@@ -98,6 +98,28 @@ export function getDeviceDescription(device: DetectedDevice): string {
 }
 
 /**
+ * Generate OS and device type description (without browser)
+ */
+export function getOSDescription(device: DetectedDevice): string {
+  const osName = {
+    windows: 'Windows',
+    mac: 'macOS', 
+    linux: 'Linux',
+    ios: 'iOS',
+    android: 'Android',
+    unknown: 'Unknown OS'
+  }[device.os];
+  
+  const deviceType = {
+    desktop: device.os === 'mac' ? 'Mac' : device.os === 'windows' ? 'PC' : 'computer',
+    mobile: 'phone',
+    tablet: 'tablet'
+  }[device.type];
+  
+  return `${osName} ${deviceType}`;
+}
+
+/**
  * Check if device needs specific security recommendations
  */
 export function getSecurityPriorities(device: DetectedDevice): {
