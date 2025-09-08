@@ -11,11 +11,11 @@ export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
   const { 
     answers, 
     answerQuestion,
-    getAvailableQuestions
+    getOrderedAvailableQuestions
   } = useAssessmentStore();
 
-  // Get available questions from condition engine instead of filtering by domain/level
-  const availableQuestions = getAvailableQuestions();
+  // Get available questions with proper ordering (onboarding first)
+  const availableQuestions = getOrderedAvailableQuestions?.() || [];
   
   // Debug logging
   console.log('MainContent Debug:', {

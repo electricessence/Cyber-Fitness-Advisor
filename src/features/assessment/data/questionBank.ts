@@ -51,6 +51,32 @@ const onboardingQuestions: Question[] = [
     ]
   },
   {
+    id: 'ios_confirmation',
+    text: 'Are you using an iPhone or iPad?',
+    weight: 0,
+    phase: 'onboarding',
+    phaseOrder: 3.5,
+    nonScoring: true,
+    deviceFilter: { os: ['ios'] },
+    options: [
+      { id: 'yes', text: 'Yes, iOS device', points: 0, target: 'hidden' },
+      { id: 'no', text: 'No', points: 0, target: 'hidden' }
+    ]
+  },
+  {
+    id: 'android_confirmation',
+    text: 'Are you using an Android device?',
+    weight: 0,
+    phase: 'onboarding',
+    phaseOrder: 3.6,
+    nonScoring: true,
+    deviceFilter: { os: ['android'] },
+    options: [
+      { id: 'yes', text: 'Yes, Android device', points: 0, target: 'hidden' },
+      { id: 'no', text: 'No', points: 0, target: 'hidden' }
+    ]
+  },
+  {
     id: 'os_selection',
     text: 'What operating system are you using?',
     weight: 0,
@@ -58,12 +84,15 @@ const onboardingQuestions: Question[] = [
     phaseOrder: 4,
     nonScoring: true,
     // Appears if no OS confirmed; runtime predicate for initial phase
-    runtimeVisibleFn: ({ answers }) => {
-      const denied = ['windows_confirmation','mac_confirmation','linux_confirmation']
+    runtimeVisibleFn: ({ answers, deviceProfile }) => {
+      const denied = ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation']
         .some(id => answers[id] === 'no');
-      const confirmed = ['windows_confirmation','mac_confirmation','linux_confirmation']
+      const confirmed = ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation']
         .some(id => answers[id] === 'yes');
-      return !confirmed && denied; // only if user denied detected OS
+      
+      // Show if user denied detected OS OR if device is unknown (no OS detected)
+      const unknownDevice = !deviceProfile || deviceProfile.os === 'unknown';
+      return (!confirmed && denied) || unknownDevice;
     },
     options: [
       { id: 'windows', text: 'Windows', points: 0, target: 'hidden' },
@@ -80,7 +109,13 @@ const onboardingQuestions: Question[] = [
     phaseOrder: 5,
     nonScoring: true,
     deviceFilter: { browser: ['chrome'] },
-    prerequisites: { anyAnswered: ['windows_confirmation','mac_confirmation','linux_confirmation','os_selection'] },
+    prerequisites: { anyAnswered: ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation','os_selection'] },
+    runtimeVisibleFn: ({ answers }): boolean => {
+      // Don't show browser questions if any OS was denied (user correcting detection)
+      const osDenied = ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation']
+        .some(id => answers[id] === 'no');
+      return !osDenied;
+    },
     options: [
       { id: 'yes', text: 'Yes, Chrome', points: 0, target: 'hidden' },
       { id: 'no', text: 'No', points: 0, target: 'hidden' }
@@ -94,7 +129,13 @@ const onboardingQuestions: Question[] = [
     phaseOrder: 6,
     nonScoring: true,
     deviceFilter: { browser: ['firefox'] },
-    prerequisites: { anyAnswered: ['windows_confirmation','mac_confirmation','linux_confirmation','os_selection'] },
+    prerequisites: { anyAnswered: ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation','os_selection'] },
+    runtimeVisibleFn: ({ answers }): boolean => {
+      // Don't show browser questions if any OS was denied (user correcting detection)
+      const osDenied = ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation']
+        .some(id => answers[id] === 'no');
+      return !osDenied;
+    },
     options: [
       { id: 'yes', text: 'Yes, Firefox', points: 0, target: 'hidden' },
       { id: 'no', text: 'No', points: 0, target: 'hidden' }
@@ -107,11 +148,18 @@ const onboardingQuestions: Question[] = [
     phase: 'onboarding',
     phaseOrder: 7,
     nonScoring: true,
-    prerequisites: { answered: ['chrome_confirmation','firefox_confirmation'] },
-    runtimeVisibleFn: ({ answers }) => {
+    prerequisites: { anyAnswered: ['chrome_confirmation','firefox_confirmation','os_selection'] },
+    runtimeVisibleFn: ({ answers }): boolean => {
+      // Show if user denied detected browsers OR selected a desktop OS
       const deniedChrome = answers.chrome_confirmation === 'no';
       const deniedFirefox = answers.firefox_confirmation === 'no';
-      return deniedChrome || deniedFirefox; // show only if user denied detected browser
+      const selectedDesktopOS = answers.os_selection && ['windows', 'mac', 'linux'].includes(String(answers.os_selection));
+      
+      // Don't show if mobile OS was selected
+      const selectedMobileOS = answers.os_selection === 'mobile';
+      if (selectedMobileOS) return false;
+      
+      return deniedChrome || deniedFirefox || Boolean(selectedDesktopOS);
     },
     options: [
       { id: 'chrome', text: 'Chrome', points: 0, target: 'hidden' },

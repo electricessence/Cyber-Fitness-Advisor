@@ -39,10 +39,13 @@ describe('MainContent Rendering', () => {
     const store = useAssessmentStore.getState();
     const availableQuestions = store.getAvailableQuestions();
     
-    // Answer all questions
+    // Answer all questions including any that might be unlocked by answering others
     availableQuestions.forEach(question => {
       store.answerQuestion(question.id, 'yes');
     });
+    
+    // Answer the advanced_2fa question that gets unlocked by suites
+    store.answerQuestion('advanced_2fa', 'yes');
     
     render(<MainContent currentDomain="all" currentLevel={0} />);
     

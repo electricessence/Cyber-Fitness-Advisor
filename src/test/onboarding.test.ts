@@ -5,9 +5,9 @@
 
 import { describe, it, expect } from 'vitest';
 import { 
-  UNIFIED_ONBOARDING_QUESTIONS, 
   processOnboardingAnswers 
 } from '../features/onboarding/unifiedOnboarding';
+import { onboardingQuestions } from '../features/assessment/data/questionBank';
 import type { DetectedDevice } from '../features/device/deviceDetection';
 import { TEST_DEVICES } from '../testing/testData';
 
@@ -16,8 +16,36 @@ function simulateOnboardingFlow(device: DetectedDevice, answers: Record<string, 
   const questionsShown: string[] = [];
   const finalAnswers = { ...answers };
 
-  for (const question of UNIFIED_ONBOARDING_QUESTIONS) {
-    const shouldShow = !question.showIf || question.showIf(device, finalAnswers);
+  for (const question of onboardingQuestions) {
+    let shouldShow = true;
+
+    // Check device filter
+    if (question.deviceFilter) {
+      if (question.deviceFilter.os && !question.deviceFilter.os.includes(device.os)) {
+        shouldShow = false;
+      }
+      if (question.deviceFilter.browser && !question.deviceFilter.browser.includes(device.browser)) {
+        shouldShow = false;
+      }
+    }
+
+    // Check prerequisites
+    if (question.prerequisites) {
+      if (question.prerequisites.anyAnswered) {
+        const hasAnyPrereq = question.prerequisites.anyAnswered.some(id => finalAnswers[id] !== undefined);
+        if (!hasAnyPrereq) shouldShow = false;
+      }
+      if (question.prerequisites.answered) {
+        const hasAllPrereqs = question.prerequisites.answered.every(id => finalAnswers[id] !== undefined);
+        if (!hasAllPrereqs) shouldShow = false;
+      }
+    }
+
+    // Check runtime visibility function
+    if (shouldShow && question.runtimeVisibleFn) {
+      shouldShow = question.runtimeVisibleFn({ answers: finalAnswers, deviceProfile: device });
+    }
+
     if (shouldShow) {
       questionsShown.push(question.id);
     }
@@ -172,14 +200,14 @@ describe('Onboarding Flow Tests', () => {
       }
     });
 
-    it('should have valid showIf conditions for all questions', () => {
-      // Test that all showIf functions don't throw errors
-      UNIFIED_ONBOARDING_QUESTIONS.forEach((question) => {
-        if (question.showIf) {
+    it('should have valid runtimeVisibleFn conditions for all questions', () => {
+      // Test that all runtimeVisibleFn functions don't throw errors
+      onboardingQuestions.forEach((question) => {
+        if (question.runtimeVisibleFn) {
           expect(() => {
-            question.showIf!(TEST_DEVICES.windowsChrome, {});
-            question.showIf!(TEST_DEVICES.unknownDevice, { windows_confirmation: 'no' });
-          }).not.toThrow(`Question ${question.id} showIf condition should not throw`);
+            question.runtimeVisibleFn!({ answers: {}, deviceProfile: TEST_DEVICES.windowsChrome });
+            question.runtimeVisibleFn!({ answers: { windows_confirmation: 'no' }, deviceProfile: TEST_DEVICES.unknownDevice });
+          }).not.toThrow(`Question ${question.id} runtimeVisibleFn condition should not throw`);
         }
       });
     });
