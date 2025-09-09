@@ -22,6 +22,7 @@ interface UniversalCardProps {
 }
 
 export function UniversalCard({
+  id: _id, // Marked as potentially unused
   title,
   category: _category, // Keep for potential future use
   priority,
@@ -104,11 +105,20 @@ export function UniversalCard({
 
   return (
     <div 
+      role={mode === 'question' ? 'button' : 'article'}
+      tabIndex={mode === 'question' ? 0 : -1}
+      aria-label={`${title} ${isQuickWin ? '- Quick Win' : ''} ${timeEstimate ? `- ${timeEstimate}` : ''}`}
       className={`
         border rounded-lg p-4 transition-all duration-200 ${styling.border} ${styling.background} ${styling.hover}
-        ${mode === 'question' ? 'cursor-pointer' : ''}
+        ${mode === 'question' ? 'cursor-pointer focus:ring-2 focus:ring-blue-500 focus:ring-offset-2' : ''}
       `}
       onClick={mode === 'question' ? onClick : undefined}
+      onKeyDown={(e) => {
+        if (mode === 'question' && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">

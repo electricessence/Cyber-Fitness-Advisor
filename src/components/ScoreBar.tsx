@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { DEFAULT_LEVEL_THRESHOLDS } from '../features/assessment/engine/schema';
+import ExplainPopover from './development/ExplainPopover';
 
 interface ScoreBarProps {
   score: number;
@@ -43,38 +44,73 @@ export function ScoreBar({
 }: ScoreBarProps) {
   const [displayScore, setDisplayScore] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [previousLevel, setPreviousLevel] = useState(level);
+  const [showLevelUp, setShowLevelUp] = useState(false);
 
-  // Animate score changes
+  // Enhanced smooth score animation with easing
   useEffect(() => {
     if (!showAnimation) {
       setDisplayScore(score);
       return;
     }
 
+    if (Math.abs(score - displayScore) < 0.1) {
+      setDisplayScore(score);
+      return;
+    }
+
     setIsAnimating(true);
-    const duration = 1000; // 1 second
-    const steps = 60;
-    const increment = (score - displayScore) / steps;
-    let currentStep = 0;
+    const duration = 1200; // Slightly longer for smoother feel
+    const startScore = displayScore;
+    const scoreDifference = score - startScore;
+    let startTime: number;
 
-    const timer = setInterval(() => {
-      currentStep++;
-      setDisplayScore(prev => {
-        const newScore = prev + increment;
-        if (currentStep >= steps) {
-          clearInterval(timer);
-          setIsAnimating(false);
-          return score;
-        }
-        return newScore;
-      });
-    }, duration / steps);
+    // Smooth easing function (ease-out cubic)
+    const easeOutCubic = (t: number): number => {
+      return 1 - Math.pow(1 - t, 3);
+    };
 
-    return () => clearInterval(timer);
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      const easedProgress = easeOutCubic(progress);
+      const newScore = startScore + (scoreDifference * easedProgress);
+      
+      setDisplayScore(newScore);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setDisplayScore(score);
+        setIsAnimating(false);
+      }
+    };
+
+    requestAnimationFrame(animate);
   }, [score, showAnimation]);
 
+  // Level up detection and animation
+  useEffect(() => {
+    if (level > previousLevel) {
+      setShowLevelUp(true);
+      setTimeout(() => setShowLevelUp(false), 3000); // Show for 3 seconds
+    }
+    setPreviousLevel(level);
+  }, [level, previousLevel]);
+
   return (
-    <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 sticky top-4 z-10 border-l-4 border-l-blue-500">
+    <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 sticky top-4 z-10 border-l-4 border-l-blue-500 relative overflow-hidden">
+      {/* Level Up Animation Overlay */}
+      {showLevelUp && (
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 animate-pulse pointer-events-none rounded-lg">
+          <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-bounce">
+            🎉 LEVEL UP!
+          </div>
+        </div>
+      )}
+      
       {/* Mobile Layout - Stacked */}
       <div className="sm:hidden space-y-3">
         <div className="flex items-center justify-between">
@@ -88,9 +124,37 @@ export function ScoreBar({
             </div>
           )}
         </div>
-        <div className={`px-3 py-1 rounded-full text-sm font-medium text-white bg-gradient-to-r ${LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]} w-fit`}>
-          Level {level}: {LEVEL_NAMES[level as keyof typeof LEVEL_NAMES]}
-        </div>
+        <ExplainPopover
+          title="Security Level System"
+          semantics={{
+            version: "2.0.0",
+            behavior: "Progress tracked through point-based scoring with level thresholds",
+            rules: [
+              "Score calculated from visible questions only (any-gate shows, hide > show)",
+              "Last answer wins for duplicate questions",
+              "Non-scoring questions excluded from totals"
+            ],
+            implementation: "Uses DEFAULT_LEVEL_THRESHOLDS for progression"
+          }}
+          debug={{
+            componentState: { 
+              currentLevel: level, 
+              score, 
+              nextLevelProgress: nextLevelProgress.progress,
+              quickWins: `${quickWinsCompleted}/${totalQuickWins}`
+            },
+            dataFlow: [
+              "Questions answered → Score calculated",
+              "Score mapped to level thresholds", 
+              "Progress calculated to next level",
+              "UI updated with animations"
+            ]
+          }}
+        >
+          <div className={`px-3 py-1 rounded-full text-sm font-medium text-white bg-gradient-to-r ${LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]} w-fit`}>
+            Level {level}: {LEVEL_NAMES[level as keyof typeof LEVEL_NAMES]}
+          </div>
+        </ExplainPopover>
       </div>
 
       {/* Desktop Layout - Side by Side */}
@@ -119,14 +183,21 @@ export function ScoreBar({
 
       {/* Main progress bar */}
       <div className="relative">
-        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
           <div 
-            className={`h-full bg-gradient-to-r ${LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]} transition-all duration-1000 ease-out rounded-full relative`}
-            style={{ width: `${Math.min(displayScore, 100)}%` }}
+            className={`h-full bg-gradient-to-r ${LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]} transition-all duration-1200 ease-out rounded-full relative`}
+            style={{ 
+              width: `${Math.min(displayScore, 100)}%`,
+              transition: 'width 1.2s cubic-bezier(0.4, 0, 0.2, 1)' 
+            }}
           >
+            {/* Animated shimmer effect during scoring */}
             {isAnimating && (
-              <div className="absolute inset-0 bg-white opacity-30 animate-pulse rounded-full" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer rounded-full" />
             )}
+            
+            {/* Subtle pulsing effect on active progress */}
+            <div className="absolute inset-0 bg-white/10 animate-pulse rounded-full opacity-50" />
           </div>
         </div>
         

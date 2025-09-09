@@ -309,43 +309,6 @@
               "negativeText": "WiFi network may be vulnerable to unauthorized access"
             },
             {
-              "id": "public_wifi_caution",
-              "text": "How do you handle sensitive activities on public WiFi?",
-              "type": "SCALE", 
-              "weight": 20,
-              "explanation": "Public WiFi is often unsecured, making your data visible to other users and potential attackers.",
-              "options": [
-                {
-                  "id": "no_precautions",
-                  "text": "I use public WiFi normally for everything",
-                  "points": 0,
-                  "target": "needs-improvement",
-                  "impact": "High risk: Sensitive data exposed on public networks"
-                },
-                {
-                  "id": "some_awareness",
-                  "text": "I avoid banking but use it for most things",
-                  "points": 8,
-                  "target": "todo",
-                  "impact": "Some risk reduction, but many activities still exposed"
-                },
-                {
-                  "id": "limited_use",
-                  "text": "I only browse and check email on public WiFi",
-                  "points": 15,
-                  "target": "shields-up",
-                  "impact": "Good practice for most sensitive activities"
-                },
-                {
-                  "id": "vpn_protected",
-                  "text": "I use a VPN on all public WiFi",
-                  "points": 20,
-                  "target": "shields-up",
-                  "impact": "Excellent: All traffic encrypted on public networks"
-                }
-              ]
-            },
-            {
               "id": "data_backup_setup",
               "text": "Set up regular, encrypted backups of your important data",
               "type": "ACTION",

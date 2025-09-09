@@ -1,0 +1,340 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/electricessence/Cyber-Fitness-Advisor/schema/questions.schema.json",
+  "title": "Cyber Fitness Advisor Question Bank Schema",
+  "description": "JSON Schema for validating question bank structure with gates, suites, and conditional logic",
+  "type": "object",
+  "required": ["version", "domains"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Schema version for migration compatibility"
+    },
+    "contentVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version for content changes"
+    },
+    "domains": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/Domain" },
+      "description": "Security domains containing leveled questions"
+    },
+    "suites": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Suite" },
+      "description": "Unlockable question suites with conditional gates"
+    }
+  },
+  "definitions": {
+    "Domain": {
+      "type": "object",
+      "required": ["id", "title", "levels"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+          "description": "Unique domain identifier"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable domain title"
+        },
+        "levels": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/Level" },
+          "description": "Progressive difficulty levels"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Level": {
+      "type": "object",
+      "required": ["level", "questions"],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Numeric level indicator"
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/Question" },
+          "description": "Questions at this difficulty level"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Question": {
+      "type": "object",
+      "required": ["id", "text"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+          "description": "Unique question identifier"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Question text displayed to user"
+        },
+        "type": {
+          "enum": ["YN", "SCALE", "ACTION"],
+          "description": "Question response type"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Point value for scoring calculations"
+        },
+        "nonScoring": {
+          "type": "boolean",
+          "description": "If true, excluded from score calculations"
+        },
+        "quickWin": {
+          "type": "boolean",
+          "description": "Indicates high-impact, easy-to-implement action"
+        },
+        "phase": {
+          "enum": ["onboarding", "assessment"],
+          "description": "Question phase for flow control"
+        },
+        "phaseOrder": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Order within phase"
+        },
+        "timeEstimate": {
+          "type": "string",
+          "description": "Estimated time to complete action"
+        },
+        "explanation": {
+          "type": "string",
+          "description": "Why this security practice matters"
+        },
+        "actionHint": {
+          "type": "string",
+          "description": "How to implement this security practice"
+        },
+        "relatedTopics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Related security topics for grouping"
+        },
+        "deviceFilter": {
+          "$ref": "#/definitions/DeviceFilter",
+          "description": "Device/platform restrictions"
+        },
+        "options": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AnswerOption" },
+          "description": "Possible answer choices"
+        },
+        "gates": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Gate" },
+          "description": "Conditional visibility gates"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AnswerOption": {
+      "type": "object",
+      "required": ["id", "text"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayText": {
+          "type": "string"
+        },
+        "points": {
+          "type": "number"
+        },
+        "target": {
+          "type": "string"
+        },
+        "impact": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DeviceFilter": {
+      "type": "object",
+      "properties": {
+        "os": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["windows", "mac", "linux", "ios", "android"]
+          }
+        },
+        "browsers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["chrome", "firefox", "safari", "edge"]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Gate": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/GateCondition" },
+          "description": "ALL conditions must be true (AND logic)"
+        },
+        "any": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/GateCondition" },
+          "description": "AT LEAST ONE condition must be true (OR logic)"
+        },
+        "none": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/GateCondition" },
+          "description": "NONE of these conditions must be true (NOT logic)"
+        },
+        "show": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Question IDs to show when gate passes"
+        },
+        "hide": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Question IDs to hide when gate passes (overrides show)"
+        },
+        "unlockSuites": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Suite IDs to unlock when gate passes"
+        },
+        "patch": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9_]*$": {
+              "type": "object",
+              "properties": {
+                "text": { "type": "string" },
+                "weight": { "type": "number" },
+                "options": { "type": "array" }
+              },
+              "additionalProperties": true
+            }
+          },
+          "description": "Question patches to apply when gate passes"
+        }
+      },
+      "anyOf": [
+        { "required": ["all"] },
+        { "required": ["any"] },
+        { "required": ["none"] }
+      ],
+      "additionalProperties": false
+    },
+    "GateCondition": {
+      "type": "object",
+      "required": ["questionId", "when"],
+      "properties": {
+        "questionId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+          "description": "ID of question to check"
+        },
+        "when": {
+          "enum": [
+            "equals", "not_equals",
+            "in", "not_in", 
+            "contains", "not_contains",
+            "exists", "not_exists",
+            "greater_than", "less_than", "greater_equal", "less_equal",
+            "truthy", "falsy"
+          ],
+          "description": "Comparison operator"
+        },
+        "value": {
+          "description": "Value to compare against (required for most operators)"
+        },
+        "values": {
+          "type": "array",
+          "description": "Array of values for 'in'/'not_in' operations"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "when": { "enum": ["in", "not_in"] } }
+          },
+          "then": { "required": ["values"] }
+        },
+        {
+          "if": {
+            "properties": { "when": { "enum": ["exists", "not_exists", "truthy", "falsy"] } }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["value"] },
+                { "required": ["values"] }
+              ]
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "Suite": {
+      "type": "object",
+      "required": ["id", "title", "description", "gates", "questions"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+          "description": "Unique suite identifier"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Suite display name"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Suite description"
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Display priority (higher first)"
+        },
+        "gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/Gate" },
+          "description": "Unlock conditions (any gate passing unlocks suite)"
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/Question" },
+          "description": "Questions in this suite"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

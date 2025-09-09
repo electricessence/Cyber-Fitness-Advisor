@@ -3,14 +3,14 @@ import { useState } from 'react';
 export function useAppState() {
   const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
     // Show onboarding if it's a new user (no answers in localStorage)
-    const hasAnswers = localStorage.getItem('cyber-fitness-answers');
-    const hasSeenOnboarding = localStorage.getItem('cyber-fitness-onboarding-completed');
+    const hasAnswers = localStorage.getItem('cfa:v2:answers');
+    const hasSeenOnboarding = localStorage.getItem('cfa:v2:onboardingVersion');
     return !hasAnswers && !hasSeenOnboarding;
   });
 
   const [showPrivacyNotice, setShowPrivacyNotice] = useState<boolean>(() => {
     // Show privacy notice if user hasn't dismissed it permanently
-    return !localStorage.getItem('cyber-fitness-privacy-dismissed');
+    return !localStorage.getItem('cfa:v2:privacy-dismissed');
   });
 
   const [showResetModal, setShowResetModal] = useState(false);

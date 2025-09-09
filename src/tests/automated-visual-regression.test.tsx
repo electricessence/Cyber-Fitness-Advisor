@@ -9,7 +9,7 @@ describe('Automated Visual Regression Testing', () => {
   })
 
   test('UI Layout Consistency - Automated Snapshot Testing', () => {
-    const { container } = render(<App />)
+    render(<App />)
     
     // Test different viewport sizes
     const viewports = [

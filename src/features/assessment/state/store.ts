@@ -10,7 +10,7 @@ import unifiedQuestionBank from '../data/questionBank';
 
 // Smart pre-population from onboarding data
 function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
-  const onboardingAnswers = JSON.parse(localStorage.getItem('cyber-fitness-onboarding-answers') || '{}');
+  const onboardingAnswers = JSON.parse(localStorage.getItem('cfa:v2:onboarding-answers') || '{}');
   const updatedAnswers = { ...existingAnswers };
 
   // Map password practices from onboarding to browser_passwords question
@@ -348,9 +348,14 @@ export const useAssessmentStore = create<AssessmentState>()(
       },
       
       resetAssessment: () => {
-        // Clear persisted data from localStorage
+        // Clear persisted data from localStorage (both old and new formats)
         localStorage.removeItem('cyber-fitness-assessment');
-        localStorage.removeItem('cyber-fitness-onboarding-answers');
+        localStorage.removeItem('cyber-fitness-onboarding-answers'); 
+        localStorage.removeItem('cfa:v2:answers');
+        localStorage.removeItem('cfa:v2:onboarding-answers');
+        localStorage.removeItem('cfa:v2:contentVersion');
+        localStorage.removeItem('cfa:v2:onboardingVersion');
+        localStorage.removeItem('cfa:v2:privacy-dismissed');
         
         // Reset in-memory state
         set({
@@ -686,7 +691,7 @@ export const useAssessmentStore = create<AssessmentState>()(
       },
     }),
     {
-      name: 'cyber-fitness-assessment',
+      name: 'cfa:v2:answers',
       // Only persist answers and earned badges, recompute scores on load
       partialize: (state) => ({ 
         answers: state.answers,

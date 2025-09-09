@@ -1,0 +1,269 @@
+{
+  "contentVersion": "1.0.0",
+  "name": "Cyber Fitness Seed Content Pack v1",
+  "description": "Curated scenarios for essential cybersecurity practices",
+  "domains": [
+    {
+      "id": "password_security",
+      "title": "Password Security",
+      "description": "Master strong password practices and multi-factor authentication",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "password_manager_usage",
+              "type": "YN",
+              "weight": 10,
+              "text": "Do you use a password manager to generate and store unique passwords?",
+              "explanation": "Password managers create strong, unique passwords for each account and remember them for you.",
+              "actionHint": "Try Bitwarden, 1Password, or your browser's built-in manager",
+              "answers": [
+                {"id": "yes", "text": "Yes, I use a password manager", "score": 10},
+                {"id": "no", "text": "No, I manage passwords myself", "score": 0}
+              ]
+            },
+            {
+              "id": "mfa_banking",
+              "type": "YN",
+              "weight": 8,
+              "text": "Do you have multi-factor authentication (MFA) enabled on your banking accounts?",
+              "explanation": "MFA adds an extra security layer, making it much harder for attackers to access your financial accounts.",
+              "actionHint": "Check your bank's security settings - usually found in Account Settings",
+              "answers": [
+                {"id": "yes", "text": "Yes, MFA is enabled", "score": 8},
+                {"id": "no", "text": "No MFA on banking", "score": 0}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "browsing_safety",
+      "title": "Safe Browsing",
+      "description": "Browse the web securely and avoid common online threats",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "https_checking",
+              "type": "YN",
+              "weight": 6,
+              "text": "Do you check for HTTPS (the lock icon) when entering sensitive information?",
+              "explanation": "HTTPS encrypts data between your browser and websites, protecting against eavesdropping.",
+              "actionHint": "Look for the lock icon in your address bar before entering passwords or personal info",
+              "answers": [
+                {"id": "yes", "text": "Yes, I always check for HTTPS", "score": 6},
+                {"id": "no", "text": "No, I don't usually check", "score": 0}
+              ]
+            },
+            {
+              "id": "ad_blocker_usage",
+              "type": "YN",
+              "weight": 4,
+              "text": "Do you use an ad blocker to reduce malicious ads and tracking?",
+              "explanation": "Ad blockers prevent malicious ads and reduce tracking, improving both security and privacy.",
+              "actionHint": "Install uBlock Origin or similar extension in your browser",
+              "answers": [
+                {"id": "yes", "text": "Yes, I use an ad blocker", "score": 4},
+                {"id": "no", "text": "No ad blocker installed", "score": 0}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "device_security",
+      "title": "Device Security",
+      "description": "Lock down your devices with proper security settings",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "screen_lock_enabled",
+              "type": "YN",
+              "weight": 8,
+              "text": "Does your phone/computer automatically lock after a few minutes of inactivity?",
+              "explanation": "Auto-lock prevents unauthorized access if you step away from your device.",
+              "actionHint": "Set screen lock to 5 minutes or less in your device settings",
+              "answers": [
+                {"id": "yes", "text": "Yes, auto-lock is enabled", "score": 8},
+                {"id": "no", "text": "No automatic locking", "score": 0}
+              ]
+            },
+            {
+              "id": "device_encryption",
+              "type": "YN",
+              "weight": 7,
+              "text": "Is full-disk encryption enabled on your devices?",
+              "explanation": "Encryption protects your data if your device is lost or stolen.",
+              "actionHint": "Enable BitLocker (Windows), FileVault (Mac), or device encryption (mobile)",
+              "answers": [
+                {"id": "yes", "text": "Yes, devices are encrypted", "score": 7},
+                {"id": "no", "text": "No encryption enabled", "score": 0}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "network_protection",
+      "title": "Network Protection",
+      "description": "Secure your home network and practice safe WiFi habits",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "home_wifi_security",
+              "type": "YN",
+              "weight": 6,
+              "text": "Is your home WiFi network secured with WPA3 or WPA2 encryption?",
+              "explanation": "Encrypted WiFi prevents neighbors and nearby attackers from accessing your network traffic.",
+              "actionHint": "Check router settings - avoid WEP or open networks",
+              "answers": [
+                {"id": "yes", "text": "Yes, WiFi is encrypted", "score": 6},
+                {"id": "no", "text": "Using open or WEP WiFi", "score": 0}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "data_protection",
+      "title": "Data Protection",
+      "description": "Keep your important data safe with backups and smart sharing practices",
+      "levels": [
+        {
+          "level": 0,
+          "questions": [
+            {
+              "id": "regular_backups",
+              "type": "YN",
+              "weight": 9,
+              "text": "Do you regularly backup your important files and photos?",
+              "explanation": "Backups protect against data loss from hardware failure, ransomware, or accidental deletion.",
+              "actionHint": "Set up automatic cloud backup or external drive backup",
+              "answers": [
+                {"id": "yes", "text": "Yes, I backup regularly", "score": 9},
+                {"id": "no", "text": "No regular backup system", "score": 0}
+              ]
+            },
+            {
+              "id": "email_attachment_caution",
+              "type": "YN",
+              "weight": 4,
+              "text": "Are you cautious about opening email attachments from unknown senders?",
+              "explanation": "Email attachments are a common way malware spreads. Be especially careful with .exe, .zip, and office files.",
+              "actionHint": "When in doubt, don't open it. Verify with the sender through a different communication method",
+              "answers": [
+                {"id": "yes", "text": "Yes, I'm cautious with attachments", "score": 4},
+                {"id": "no", "text": "I open most attachments", "score": 0}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "password_power_up",
+      "title": "Password Power-Up",
+      "description": "Master password security with managers and multi-factor authentication",
+      "domainIds": ["password_security"],
+      "estimatedTime": "15 minutes",
+      "difficulty": "Beginner",
+      "unlock": {
+        "gates": [
+          {
+            "conditions": [
+              {"questionId": "password_manager_usage", "operator": "eq", "value": "no"}
+            ],
+            "logic": "any"
+          }
+        ]
+      }
+    },
+    {
+      "id": "safe_browsing_basics",
+      "title": "Safe Browsing Basics", 
+      "description": "Learn to browse securely and avoid common web threats",
+      "domainIds": ["browsing_safety"],
+      "estimatedTime": "10 minutes",
+      "difficulty": "Beginner",
+      "unlock": {
+        "gates": [
+          {
+            "conditions": [
+              {"questionId": "https_checking", "operator": "eq", "value": "no"},
+              {"questionId": "ad_blocker_usage", "operator": "eq", "value": "no"}
+            ],
+            "logic": "any"
+          }
+        ]
+      }
+    },
+    {
+      "id": "device_lockdown",
+      "title": "Device Lockdown",
+      "description": "Secure your devices with proper locks and encryption",
+      "domainIds": ["device_security"],
+      "estimatedTime": "20 minutes", 
+      "difficulty": "Intermediate",
+      "unlock": {
+        "gates": [
+          {
+            "conditions": [
+              {"questionId": "screen_lock_enabled", "operator": "eq", "value": "no"},
+              {"questionId": "device_encryption", "operator": "eq", "value": "no"}
+            ],
+            "logic": "any"
+          }
+        ]
+      }
+    },
+    {
+      "id": "home_network_shield",
+      "title": "Home Network Shield",
+      "description": "Protect your home network and practice safe WiFi habits",
+      "domainIds": ["network_protection"],
+      "estimatedTime": "25 minutes",
+      "difficulty": "Intermediate",
+      "unlock": {
+        "gates": [
+          {
+            "conditions": [
+              {"questionId": "home_wifi_security", "operator": "eq", "value": "no"}
+            ],
+            "logic": "any"
+          }
+        ]
+      }
+    },
+    {
+      "id": "data_safety_sprint",
+      "title": "Data Safety Sprint", 
+      "description": "Set up backups and learn smart data sharing practices",
+      "domainIds": ["data_protection"],
+      "estimatedTime": "30 minutes",
+      "difficulty": "Beginner",
+      "unlock": {
+        "gates": [
+          {
+            "conditions": [
+              {"questionId": "regular_backups", "operator": "eq", "value": "no"}
+            ],
+            "logic": "any"
+          }
+        ]
+      }
+    }
+  ]
+}

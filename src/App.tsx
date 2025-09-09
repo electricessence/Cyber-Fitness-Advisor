@@ -16,6 +16,10 @@ import { useNavigation } from './hooks/useNavigation';
 import { useAppState } from './hooks/useAppState';
 import { useBrowserDetection } from './hooks/useBrowserDetection';
 import type { DeviceProfile } from './features/assessment/engine/deviceScenarios';
+// Initialize semantic version for global access
+import './features/assessment/engine/semantics';
+import { CFASemantics } from './utils/semantics';
+import AuthoringDiagnostics from './components/development/AuthoringDiagnostics';
 
 function App() {
   const [showDeviceOnboarding, setShowDeviceOnboarding] = useState(false);
@@ -45,6 +49,9 @@ function App() {
   // Initialize store on app load
   useEffect(() => {
     initializeStore();
+    
+    // Expose semantics globally for debugging (Task A: Lock & verify semantics)
+    window.__cfaSemantics = CFASemantics;
     
     // Check if we need device onboarding
     if (!deviceProfile) {
@@ -263,6 +270,9 @@ function App() {
         setShowResetModal={appState.setShowResetModal}
         onReset={handleReset}
       />
+
+      {/* Development Tools (Task C: Diagnostics & transparency) */}
+      <AuthoringDiagnostics />
     </AppLayout>
   );
 }

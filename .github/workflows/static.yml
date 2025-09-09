@@ -66,8 +66,40 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build
+      - name: TypeScript type checking
+        run: pnpm typecheck
+
+      - name: Content authoring lint (Phase 2.5 Task B)
+        run: pnpm author:lint
+
+      - name: Run comprehensive test suite
+        run: pnpm test
+
+      - name: Validate seed content structure
+        run: |
+          # Verify seed content JSON structure
+          node -e "
+            const seedContent = require('./src/data/seed-content/seed-content-v1.json');
+            console.log('Seed content validation:', {
+              questionsCount: seedContent.questions.length,
+              suitesCount: seedContent.suites.length,
+              validStructure: seedContent.questions.length > 0 && seedContent.suites.length > 0
+            });
+            if (seedContent.questions.length === 0 || seedContent.suites.length === 0) {
+              process.exit(1);
+            }
+          "
+
+      - name: Build production bundle
         run: pnpm build
+        
+      - name: Verify build output
+        run: |
+          # Ensure critical files exist in dist
+          test -f dist/index.html || (echo "Missing index.html" && exit 1)
+          test -f dist/assets/index-*.js || (echo "Missing JS bundle" && exit 1)
+          test -f dist/assets/index-*.css || (echo "Missing CSS bundle" && exit 1)
+          echo "Build verification successful"
         
       - name: Setup Pages
         uses: actions/configure-pages@v5
