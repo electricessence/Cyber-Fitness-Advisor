@@ -365,6 +365,40 @@ export class ConditionEngine {
   }
   
   /**
+   * Determines if a question should be filtered out based on phase, device, or runtime logic
+   */
+  private shouldFilterQuestion(question: any, context: EvaluationContext): boolean {
+    // Filter onboarding questions if onboarding is complete
+    if (question.phase === 'onboarding') {
+      // Onboarding questions should be hidden after device profile is set
+      // (indicates onboarding completion)
+      return context.deviceProfile !== null && context.deviceProfile !== undefined;
+    }
+    
+    // Filter by device compatibility
+    if (question.deviceFilter && context.deviceProfile) {
+      const { os } = question.deviceFilter;
+      if (os && !os.includes(context.deviceProfile.currentDevice.os)) {
+        return true; // Filter out - device doesn't match
+      }
+    }
+    
+    // Apply runtime visibility function if present
+    if (question.runtimeVisibleFn && typeof question.runtimeVisibleFn === 'function') {
+      try {
+        const isVisible = question.runtimeVisibleFn(context);
+        return !isVisible; // Filter out if not visible
+      } catch (error) {
+        // If runtime function fails, default to visible
+        console.warn('Runtime visibility function failed for question:', question.id, error);
+        return false;
+      }
+    }
+    
+    return false; // Don't filter - question should be visible
+  }
+
+  /**
    * Evaluates all conditions and returns visible questions, unlocked suites, and patches
    */
   evaluate(context: EvaluationContext): {
@@ -395,15 +429,21 @@ export class ConditionEngine {
     }
     
     // First pass: determine base visibility 
-    // - Non-suite questions with no gates are visible by default
+    // - Non-suite questions with no gates are visible by default, BUT with filtering
     // - Suite questions are hidden by default
+    // - Apply phase, device, and runtime filtering
     for (const question of this.questions) {
       if (suiteQuestionIds.has(question.id)) {
         // Suite questions are hidden by default
         hiddenQuestionIds.add(question.id);
       } else if (!question.gates || question.gates.length === 0) {
-        // Regular questions with no gates are visible
-        visibleQuestionIds.add(question.id);
+        // Check if question should be filtered out by phase, device, or runtime logic
+        if (this.shouldFilterQuestion(question, context)) {
+          hiddenQuestionIds.add(question.id);
+        } else {
+          // Regular questions with no gates are visible
+          visibleQuestionIds.add(question.id);
+        }
       }
     }
     

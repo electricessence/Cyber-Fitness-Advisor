@@ -4,7 +4,6 @@ import type { QuestionBank, Answer, Question } from '../engine/schema';
 import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration } from '../engine/scoring';
-import { createSimpleQuestionBank } from '../../progress/simpleProgress';
 import { ConditionEngine } from '../engine/conditions';
 import unifiedQuestionBank from '../data/questionBank';
 
@@ -335,15 +334,11 @@ export const useAssessmentStore = create<AssessmentState>()(
       },
       
       setDeviceProfile: (profile: DeviceProfile) => {
-        console.log('Setting device profile:', profile);
-        
-        // Create comprehensive question bank with universal + device-specific + onboarding questions
-        const personalizedQuestionBank = createSimpleQuestionBank(profile);
-        console.log('Created personalized question bank:', personalizedQuestionBank);
-        
+        // Don't replace the question bank - the unified question bank already contains
+        // all questions including device-specific ones. The condition engine will
+        // handle filtering based on device profile.
         set({ 
-          deviceProfile: profile,
-          questionBank: personalizedQuestionBank
+          deviceProfile: profile
         });
       },
       
