@@ -4,14 +4,16 @@
  */
 
 import type { DetectedDevice } from '../device/deviceDetection';
+import type { ConditionsConfig } from './conditions';
 
 export interface OnboardingQuestion {
   id: string;
-  question: string;
+  statement?: string;
+  question?: string;
   context: string;
   type: 'confirmation' | 'selection' | 'scale';
   options: OnboardingOption[];
-  showIf?: (device: DetectedDevice, answers: Record<string, string>) => boolean;
+  conditions?: ConditionsConfig;
   category: 'device' | 'security' | 'experience';
 }
 
@@ -35,11 +37,16 @@ export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
   // Step 1: OS Confirmation - Show the specific OS we detected
   {
     id: 'windows_confirmation',
-    question: 'Are you using a Windows computer?',
+    statement: 'It appears you are using the Windows Operating System.',
+    question: 'Is that correct?',
     context: 'We detected Windows. Confirming this helps us provide specific security recommendations.',
     type: 'confirmation',
     category: 'device',
-    showIf: (device) => device.os === 'windows',
+    conditions: {
+      include: {
+        'device.os.detected': 'windows'
+      }
+    },
     options: [
       {
         value: 'yes',
@@ -60,11 +67,16 @@ export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
 
   {
     id: 'mac_confirmation',
-    question: 'Are you using a Mac computer?',
+    statement: 'It appears you are using a Mac computer.',
+    question: 'Is that correct?',
     context: 'We detected macOS. Confirming this helps us provide specific security recommendations.',
     type: 'confirmation',
     category: 'device',
-    showIf: (device) => device.os === 'mac',
+    conditions: {
+      include: {
+        'device.os.detected': 'mac'
+      }
+    },
     options: [
       {
         value: 'yes',
@@ -85,11 +97,16 @@ export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
 
   {
     id: 'linux_confirmation',
-    question: 'Are you using a Linux computer?',
+    statement: 'It appears you are using a Linux computer.',
+    question: 'Is that correct?',
     context: 'We detected Linux. Confirming this helps us provide specific security recommendations.',
     type: 'confirmation',
     category: 'device',
-    showIf: (device) => device.os === 'linux',
+    conditions: {
+      include: {
+        'device.os.detected': 'linux'
+      }
+    },
     options: [
       {
         value: 'yes',
@@ -115,12 +132,11 @@ export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     context: 'Please help us identify your operating system so we can give you relevant advice.',
     type: 'selection',
     category: 'device',
-    showIf: (device, answers) => {
-      // Show if OS detection failed or user denied the detected OS
-      return device.os === 'unknown' || 
-             answers.windows_confirmation === 'no' ||
-             answers.mac_confirmation === 'no' ||
-             answers.linux_confirmation === 'no';
+    conditions: {
+      include: {
+        // Show when OS is unknown OR user denied OS confirmation
+        'device.os.unknown_or_denied': true
+      }
     },
     options: [
       {
@@ -161,16 +177,19 @@ export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
   // Step 3: Browser Confirmation (only show for confirmed computer users)
   {
     id: 'chrome_confirmation',
-    question: 'Are you primarily using Google Chrome as your web browser?',
+    statement: 'It appears you are using Google Chrome as your web browser.',
+    question: 'Is that correct?',
     context: 'We detected Chrome. Knowing your browser helps us recommend specific security settings.',
     type: 'confirmation',
     category: 'device',
-    showIf: (device, answers) => {
-      const hasConfirmedOS = answers.windows_confirmation === 'yes' || 
-                           answers.mac_confirmation === 'yes' || 
-                           answers.linux_confirmation === 'yes' ||
-                           ['windows', 'mac', 'linux'].includes(answers.os_selection);
-      return hasConfirmedOS && device.browser === 'chrome';
+    conditions: {
+      include: {
+        'device.browser.detected': 'chrome',
+        'os.confirmed': true
+      },
+      exclude: {
+        'os.confirmed': 'mobile'
+      }
     },
     options: [
       {
@@ -192,16 +211,19 @@ export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
 
   {
     id: 'firefox_confirmation',
-    question: 'Are you primarily using Mozilla Firefox as your web browser?',
+    statement: 'It appears you are using Mozilla Firefox as your web browser.',
+    question: 'Is that correct?',
     context: 'We detected Firefox. Knowing your browser helps us recommend specific security settings.',
     type: 'confirmation',
     category: 'device',
-    showIf: (device, answers) => {
-      const hasConfirmedOS = answers.windows_confirmation === 'yes' || 
-                           answers.mac_confirmation === 'yes' || 
-                           answers.linux_confirmation === 'yes' ||
-                           ['windows', 'mac', 'linux'].includes(answers.os_selection);
-      return hasConfirmedOS && device.browser === 'firefox';
+    conditions: {
+      include: {
+        'device.browser.detected': 'firefox',
+        'os.confirmed': true
+      },
+      exclude: {
+        'os.confirmed': 'mobile'
+      }
     },
     options: [
       {
@@ -228,16 +250,14 @@ export const UNIFIED_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     context: 'Knowing your primary browser helps us recommend specific security settings.',
     type: 'selection',
     category: 'device',
-    showIf: (device, answers) => {
-      const hasConfirmedOS = answers.windows_confirmation === 'yes' || 
-                           answers.mac_confirmation === 'yes' || 
-                           answers.linux_confirmation === 'yes' ||
-                           ['windows', 'mac', 'linux'].includes(answers.os_selection);
-      const deniedBrowser = answers.chrome_confirmation === 'no' || 
-                          answers.firefox_confirmation === 'no';
-      const unknownBrowser = device.browser === 'unknown';
-      
-      return hasConfirmedOS && (deniedBrowser || unknownBrowser);
+    conditions: {
+      include: {
+        'os.confirmed': true
+      },
+      exclude: {
+        'os.confirmed': 'mobile',
+        'browser.confirmed': true
+      }
     },
     options: [
       {

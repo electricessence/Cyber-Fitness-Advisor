@@ -14,6 +14,10 @@ import {
   UNIFIED_ONBOARDING_QUESTIONS, 
   processOnboardingAnswers
 } from '../features/onboarding/unifiedOnboarding';
+import { 
+  evaluateConditions, 
+  createFactsFromDeviceAndAnswers 
+} from '../features/onboarding/conditions';
 import type { DeviceProfile } from '../features/assessment/engine/deviceScenarios';
 
 interface UnifiedOnboardingProps {
@@ -26,9 +30,11 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   const [currentQuestion, setCurrentQuestion] = useState(() => {
     // Find first question that should be shown based on device detection
     const device = detectCurrentDevice();
+    const initialFacts = createFactsFromDeviceAndAnswers(device, {});
+    
     for (let i = 0; i < UNIFIED_ONBOARDING_QUESTIONS.length; i++) {
       const question = UNIFIED_ONBOARDING_QUESTIONS[i];
-      if (!question.showIf || question.showIf(device, {})) {
+      if (evaluateConditions(question.conditions, initialFacts)) {
         return i;
       }
     }
@@ -63,12 +69,16 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     setTimeout(() => {
       setShowResponse(false);
       
-      // Find next question based on showIf conditions
+      // Find next question based on conditions
       let nextIndex = currentQuestion + 1;
+      
       while (nextIndex < UNIFIED_ONBOARDING_QUESTIONS.length) {
         const nextQ = UNIFIED_ONBOARDING_QUESTIONS[nextIndex];
-        // Show the question if no showIf condition OR if showIf condition is true
-        if (!nextQ.showIf || nextQ.showIf(detectedDevice, newAnswers)) {
+        const currentFacts = createFactsFromDeviceAndAnswers(detectedDevice, newAnswers);
+        const shouldShow = evaluateConditions(nextQ.conditions, currentFacts);
+        
+        // Show the question if conditions are met
+        if (shouldShow) {
           break;
         }
         nextIndex++;
@@ -85,8 +95,6 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   const completeOnboarding = (finalAnswers: Record<string, string>) => {
     // Process answers to create onboarding profile
     processOnboardingAnswers(finalAnswers, detectedDevice);
-    
-    console.log('Onboarding completed with answers:', finalAnswers);
     
     // NOTE: Current onboarding answers are device detection focused (windows_confirmation, etc.)
     // These don't map to assessment questions, so we skip direct storage
@@ -114,11 +122,7 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   };
 
   // Determine which questions are actually visible/applicable given current answers & device
-  const applicableQuestions = UNIFIED_ONBOARDING_QUESTIONS.filter(q => !q.showIf || q.showIf(detectedDevice, answers));
   const currentQ = UNIFIED_ONBOARDING_QUESTIONS[currentQuestion];
-  // Map current question to its position within the visible sequence (fallback to 0)
-  const visibleIndex = Math.max(0, applicableQuestions.findIndex(q => q.id === currentQ.id));
-  const progress = ((visibleIndex + 1) / Math.max(1, applicableQuestions.length)) * 100;
 
   // Response/Feedback Screen (no points popup)
   if (showResponse) {
@@ -151,32 +155,34 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   return (
     <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-[500px]">
       <div className="max-w-2xl mx-auto">
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Setup Progress</span>
-            <span>{visibleIndex + 1} of {applicableQuestions.length}</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
         {/* Question Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Debug: Show detected device info */}
+          <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
+            <strong>Detected:</strong> {detectedDevice.browser} on {detectedDevice.os} ({detectedDevice.type})
+          </div>
+          
           <div className="text-center mb-8">
             <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
               {currentQ.category === 'device' && <Monitor className="w-8 h-8 text-blue-600" />}
               {currentQ.category === 'security' && <Smartphone className="w-8 h-8 text-blue-600" />}
             </div>
             
-            {/* Question display - clean and simple */}
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">
-              {currentQ.question}
-            </h2>
+            {/* Question display - statement and question */}
+            {currentQ.statement ? (
+              <>
+                <div className="text-xl font-medium text-gray-900 mb-2">
+                  {currentQ.statement}
+                </div>
+                <h2 className="text-2xl font-bold text-blue-600 mb-3">
+                  {currentQ.question}
+                </h2>
+              </>
+            ) : (
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                {currentQ.question}
+              </h2>
+            )}
             
             <p className="text-gray-600">
               {currentQ.context}

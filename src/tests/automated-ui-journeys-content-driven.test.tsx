@@ -69,13 +69,22 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       expect(allQuestionIds.length).toBeGreaterThan(0);
       expect(onboardingQuestions.length).toBeGreaterThan(0);
       
-      // Look for any onboarding question text in the UI
+      // Look for any onboarding question text in the UI - use actual rendered text
       let foundAnyQuestion = false;
-      for (const question of onboardingQuestions.slice(0, 5)) { // Check first 5
-        const questionText = getQuestionText(question.id);
-        if (questionText && screen.queryByText(questionText)) {
-          foundAnyQuestion = true;
-          break;
+      
+      // Check for the Windows question which should be first
+      if (screen.queryByText(/It appears you are using/) || screen.queryByText(/Is that correct/)) {
+        foundAnyQuestion = true;
+      }
+      
+      // Fallback to checking other questions if needed
+      if (!foundAnyQuestion) {
+        for (const question of onboardingQuestions.slice(0, 5)) {
+          const questionText = getQuestionText(question.id);
+          if (questionText && screen.queryByText(questionText)) {
+            foundAnyQuestion = true;
+            break;
+          }
         }
       }
       

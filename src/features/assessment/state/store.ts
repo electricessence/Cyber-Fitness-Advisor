@@ -5,6 +5,7 @@ import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration } from '../engine/scoring';
 import { ConditionEngine } from '../engine/conditions';
+import { createFactsStoreSlice, type FactsStoreState } from '../facts/integration';
 import unifiedQuestionBank from '../data/questionBank';
 
 // Smart pre-population from onboarding data
@@ -81,7 +82,7 @@ function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Rec
   return updatedAnswers;
 }
 
-interface AssessmentState {
+interface AssessmentState extends FactsStoreState {
   // Data
   questionBank: QuestionBank;
   answers: Record<string, Answer>;
@@ -201,22 +202,27 @@ const initialState = {
 
 export const useAssessmentStore = create<AssessmentState>()(
   persist(
-    (set, get) => ({
-      ...initialState,
+    (set, get) => {
+      // Create facts system slice
+      const factsSlice = createFactsStoreSlice();
       
-      answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => {
-        console.log('Store answerQuestion called with:', questionId, value);
-        const state = get();
-        const previousScore = state.overallScore;
-        const previousLevel = state.currentLevel;
-        console.log('Previous state:', { 
-          score: previousScore, 
-          level: previousLevel, 
-          answersCount: Object.keys(state.answers).length 
-        });
+      return {
+        ...initialState,
+        ...factsSlice, // Include facts system
         
-        // Find the question to get its details
-        let question = state.questionBank.domains
+        answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => {
+          console.log('Store answerQuestion called with:', questionId, value);
+          const state = get();
+          const previousScore = state.overallScore;
+          const previousLevel = state.currentLevel;
+          console.log('Previous state:', { 
+            score: previousScore, 
+            level: previousLevel, 
+            answersCount: Object.keys(state.answers).length 
+          });
+          
+          // Find the question to get its details
+          let question = state.questionBank.domains
           .flatMap(d => d.levels.flatMap(l => l.questions))
           .find(q => q.id === questionId);
         
@@ -684,7 +690,8 @@ export const useAssessmentStore = create<AssessmentState>()(
         const result = state.conditionEngine.evaluate(context);
         return result.questionPatches;
       },
-    }),
+    };
+  },
     {
       name: 'cfa:v2:answers',
       // Only persist answers and earned badges, recompute scores on load

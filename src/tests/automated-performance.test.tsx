@@ -17,8 +17,8 @@ describe('Automated Performance Testing', () => {
     const renderTime = performance.now() - startTime
     expect(renderTime).toBeLessThan(100) // 100ms budget
     
-    // Verify DOM is ready
-    expect(screen.getByText(/Setup Progress/)).toBeInTheDocument()
+    // Verify DOM is ready with a question
+    expect(screen.getByText(/Is that correct/)).toBeInTheDocument()
   })
 
   test('Question Transitions are Smooth - Automated', async () => {
@@ -43,10 +43,10 @@ describe('Automated Performance Testing', () => {
       await waitFor(() => {
         const newButtons = screen.queryAllByRole('button')
         const confirmationText = screen.queryByText(/Great! We'll provide/i)
-        const setupProgress = screen.queryByText(/Setup Progress/)
+        const questionText = screen.queryByText(/Is that correct/)
         
-        // Should have buttons OR be in confirmation state OR have setup progress
-        expect(newButtons.length > 0 || !!confirmationText || !!setupProgress).toBe(true)
+        // Should have buttons OR be in confirmation state OR have a question
+        expect(newButtons.length > 0 || !!confirmationText || !!questionText).toBe(true)
       })
       
       const transitionTime = performance.now() - startTransition
@@ -110,8 +110,8 @@ describe('Automated Performance Testing', () => {
     // Should handle large datasets efficiently
     expect(totalTime).toBeLessThan(1000) // 1 second budget
     
-    // Verify UI still responsive
-    expect(screen.getByText(/Setup Progress/)).toBeInTheDocument()
+    // Verify UI still responsive with a question
+    expect(screen.getByText(/Is that correct/)).toBeInTheDocument()
   })
 
   test('Rapid User Input Handling - Automated', async () => {
@@ -130,10 +130,10 @@ describe('Automated Performance Testing', () => {
         await waitFor(() => {
           const hasButtons = screen.queryAllByRole('button').length > 0
           const hasConfirmation = !!screen.queryByText(/Great! We'll provide/i)
-          const hasProgress = !!screen.queryByText(/Setup Progress/)
+          const hasQuestion = !!screen.queryByText(/Is that correct/)
           
           // Should have some UI state
-          expect(hasButtons || hasConfirmation || hasProgress).toBe(true)
+          expect(hasButtons || hasConfirmation || hasQuestion).toBe(true)
         })
       } else {
         // If no buttons, we're probably in confirmation state - break the loop
@@ -147,8 +147,8 @@ describe('Automated Performance Testing', () => {
     expect(rapidInputTime).toBeLessThan(500) // 500ms budget
     
     // UI should still be functional  
-    const hasSetupProgress = !!screen.queryByText(/Setup Progress/)
+    const hasQuestion = !!screen.queryByText(/Is that correct/)
     const hasConfirmation = !!screen.queryByText(/Great! We'll provide/i)
-    expect(hasSetupProgress || hasConfirmation).toBeTruthy()
+    expect(hasQuestion || hasConfirmation).toBeTruthy()
   })
 })
