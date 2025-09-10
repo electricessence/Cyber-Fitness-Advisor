@@ -36,6 +36,9 @@ export interface FactsStoreState {
     
     /** Import facts from legacy data */
     importLegacyData: (answers: Record<string, Answer>) => void;
+    
+    /** Directly inject a fact (for device detection, etc.) */
+    injectFact: (factId: string, value: any, metadata?: { source?: string; confidence?: number }) => void;
   };
 }
 
@@ -129,6 +132,22 @@ export function createFactsStoreSlice(): FactsStoreState {
           totalFacts: Object.keys(factsProfile.facts).length,
           categories: [...new Set(Object.values(factsProfile.facts).map(f => f.category))]
         });
+      },
+      
+      injectFact: (factId: string, value: any, metadata = {}) => {
+        const fact: Fact = {
+          id: factId,
+          name: factId.replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          category: factId.includes('device') || factId.includes('os') || factId.includes('browser') ? 'device' : 'behavior',
+          value,
+          establishedAt: new Date(),
+          establishedBy: { questionId: 'device-detection', answerValue: value },
+          confidence: metadata.confidence || 0.95,
+          metadata: { source: metadata.source || 'auto-detection', ...metadata }
+        };
+        
+        factsProfile.facts[factId] = fact;
+        console.log(`Injected fact: ${factId} = ${value}`);
       }
     }
   };

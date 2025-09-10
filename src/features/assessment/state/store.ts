@@ -7,6 +7,7 @@ import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, cal
 import { ConditionEngine } from '../engine/conditions';
 import { createFactsStoreSlice, type FactsStoreState } from '../facts/integration';
 import unifiedQuestionBank from '../data/questionBank';
+import { detectCurrentDevice } from '../../device/deviceDetection';
 
 // Smart pre-population from onboarding data
 function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
@@ -797,11 +798,20 @@ export const useAssessmentStore = create<AssessmentState>()(
 export const initializeStore = () => {
   const store = useAssessmentStore.getState();
   
+  // Initialize device detection facts - these are stable environmental facts
+  const device = detectCurrentDevice();
+  console.log('Detected device:', device);
+  
+  // Inject device detection facts directly
+  store.factsActions.injectFact('os_detected', device.os, { source: 'auto-detection' });
+  store.factsActions.injectFact('browser_detected', device.browser, { source: 'auto-detection' });
+  store.factsActions.injectFact('device_type', device.type, { source: 'auto-detection' });
+  
   // Pre-populate answers from onboarding (always run this, not just when we have existing answers)
   const prePopulatedAnswers = prePopulateFromOnboarding(store.answers);
   
-  // Rebuild facts from persisted answers
-  console.log('Rebuilding facts from persisted answers...');
+  // Rebuild facts from persisted answers + device detection
+  console.log('Rebuilding facts from persisted answers and device detection...');
   store.factsActions.importLegacyData(prePopulatedAnswers);
   
   // If we have any answers (existing or pre-populated), recalculate scores
