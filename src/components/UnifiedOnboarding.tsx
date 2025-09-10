@@ -1,23 +1,16 @@
 /**
  * Unified Onboarding Component
- * Addresses all user feedback:
- * 1. No score accumulation - onboarding is separate from assessment
- * 2. Separate OS/browser confirmation questions
- * 3. No gamification points popup
- * 4. Statement + question format with proper styling
+ * Uses the main assessment system for onboarding questions
+ * - Uses main question bank (phase: 'onboarding')
+ * - Uses main condition engine
+ * - Integrates with main facts system
  */
 
 import { useState, useEffect } from 'react';
-import { Monitor, Smartphone } from 'lucide-react';
+import { Monitor } from 'lucide-react';
 import { detectCurrentDevice } from '../features/device/deviceDetection';
-import { 
-  UNIFIED_ONBOARDING_QUESTIONS, 
-  processOnboardingAnswers
-} from '../features/onboarding/unifiedOnboarding';
-import { 
-  evaluateConditions, 
-  createFactsFromDeviceAndAnswers 
-} from '../features/onboarding/conditions';
+import { useAssessmentStore } from '../features/assessment/state/store';
+import { getOnboardingQuestions } from '../features/assessment/data/contentService';
 import type { DeviceProfile } from '../features/assessment/engine/deviceScenarios';
 
 interface UnifiedOnboardingProps {
@@ -25,42 +18,53 @@ interface UnifiedOnboardingProps {
 }
 
 export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
+  const { 
+    answers,
+    conditionEngine,
+    answerQuestion,
+    setDeviceProfile
+  } = useAssessmentStore();
+  
   const [detectedDevice, setDetectedDevice] = useState(detectCurrentDevice());
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [currentQuestion, setCurrentQuestion] = useState(() => {
-    // Find first question that should be shown based on device detection
-    const device = detectCurrentDevice();
-    const initialFacts = createFactsFromDeviceAndAnswers(device, {});
-    
-    for (let i = 0; i < UNIFIED_ONBOARDING_QUESTIONS.length; i++) {
-      const question = UNIFIED_ONBOARDING_QUESTIONS[i];
-      if (evaluateConditions(question.conditions, initialFacts)) {
-        return i;
-      }
-    }
-    return 0; // fallback
-  });
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showResponse, setShowResponse] = useState(false);
   const [currentResponse, setCurrentResponse] = useState<{ 
     text: string; 
     tip?: string 
   }>({ text: '' });
 
+  // Get onboarding questions from the main question bank
+  const onboardingQuestions = getOnboardingQuestions();
+
+  // Get currently visible onboarding questions based on answers
+  // NOTE: Don't pass deviceProfile during onboarding - that would hide onboarding questions
+  const context = { 
+    answers, 
+    deviceProfile: undefined // Keep undefined during onboarding
+  };
+  const evaluation = conditionEngine.evaluate(context);
+  const visibleOnboardingQuestions = onboardingQuestions.filter(q => 
+    evaluation.visibleQuestionIds.includes(q.id)
+  );
+
+  const currentQuestion = visibleOnboardingQuestions[currentQuestionIndex];
+
   useEffect(() => {
     setDetectedDevice(detectCurrentDevice());
   }, []);
 
   const handleAnswer = (optionValue: string) => {
-    const question = UNIFIED_ONBOARDING_QUESTIONS[currentQuestion];
-    const option = question.options.find(opt => opt.value === optionValue)!;
+    if (!currentQuestion) return;
     
-    // Update local answers
-    const newAnswers = { ...answers, [question.id]: optionValue };
-    setAnswers(newAnswers);
+    const option = currentQuestion.options?.find(opt => opt.id === optionValue);
+    if (!option) return;
     
-    // Show response feedback (no points for onboarding)
+    // Answer the question using the main assessment store
+    answerQuestion(currentQuestion.id, optionValue);
+    
+    // Show response feedback using the option's feedback if available
     setCurrentResponse({
-      text: option.feedback,
+      text: option.feedback || `✅ You selected: ${option.text}`,
       tip: option.tip
     });
     setShowResponse(true);
@@ -69,60 +73,43 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     setTimeout(() => {
       setShowResponse(false);
       
-      // Find next question based on conditions
-      let nextIndex = currentQuestion + 1;
-      
-      while (nextIndex < UNIFIED_ONBOARDING_QUESTIONS.length) {
-        const nextQ = UNIFIED_ONBOARDING_QUESTIONS[nextIndex];
-        const currentFacts = createFactsFromDeviceAndAnswers(detectedDevice, newAnswers);
-        const shouldShow = evaluateConditions(nextQ.conditions, currentFacts);
-        
-        // Show the question if conditions are met
-        if (shouldShow) {
-          break;
-        }
-        nextIndex++;
-      }
-      
-      if (nextIndex >= UNIFIED_ONBOARDING_QUESTIONS.length) {
-        completeOnboarding(newAnswers);
+      // Check if there are more questions to show
+      const nextIndex = currentQuestionIndex + 1;
+      if (nextIndex >= visibleOnboardingQuestions.length) {
+        completeOnboarding();
       } else {
-        setCurrentQuestion(nextIndex);
+        setCurrentQuestionIndex(nextIndex);
       }
     }, 2000);
   };
 
-  const completeOnboarding = (finalAnswers: Record<string, string>) => {
-    // Process answers to create onboarding profile
-    processOnboardingAnswers(finalAnswers, detectedDevice);
-    
-    // NOTE: Current onboarding answers are device detection focused (windows_confirmation, etc.)
-    // These don't map to assessment questions, so we skip direct storage
-    // Future enhancement: Add behavior questions to onboarding that can map to assessment
-    
-    // Convert to DeviceProfile format expected by the app
+  const completeOnboarding = () => {
+    // Create device profile from current answers and detected device
     const deviceProfile: DeviceProfile = {
       currentDevice: detectedDevice,
       otherDevices: {
-        hasWindows: detectedDevice.os === 'windows' || finalAnswers.primary_desktop === 'windows',
-        hasMac: detectedDevice.os === 'mac' || finalAnswers.primary_desktop === 'mac', 
-        hasLinux: finalAnswers.primary_desktop === 'linux',
-        hasIPhone: detectedDevice.os === 'ios' || finalAnswers.primary_mobile === 'iphone',
-        hasAndroid: detectedDevice.os === 'android' || finalAnswers.primary_mobile === 'android',
-        hasIPad: false // Could be enhanced later
+        hasWindows: detectedDevice.os === 'windows' || answers.windows_confirmation?.value === 'yes',
+        hasMac: detectedDevice.os === 'mac' || answers.mac_confirmation?.value === 'yes',
+        hasLinux: answers.linux_confirmation?.value === 'yes',
+        hasIPhone: detectedDevice.os === 'ios' || answers.ios_confirmation?.value === 'yes',
+        hasAndroid: detectedDevice.os === 'android' || answers.android_confirmation?.value === 'yes',
+        hasIPad: false
       },
-      primaryDesktop: detectedDevice.type === 'desktop' ? detectedDevice.os as any : 
-                     finalAnswers.primary_desktop as any || undefined,
-      primaryMobile: finalAnswers.primary_mobile === 'iphone' ? 'ios' :
-                    finalAnswers.primary_mobile === 'android' ? 'android' : 
-                    detectedDevice.type === 'mobile' ? detectedDevice.os as any : undefined
+      primaryDesktop: detectedDevice.type === 'desktop' ? detectedDevice.os as any : undefined,
+      primaryMobile: detectedDevice.type === 'mobile' ? detectedDevice.os as any : undefined
     };
 
+    // Set device profile in the store
+    setDeviceProfile(deviceProfile);
+    
     onComplete(deviceProfile);
   };
 
-  // Determine which questions are actually visible/applicable given current answers & device
-  const currentQ = UNIFIED_ONBOARDING_QUESTIONS[currentQuestion];
+  // If no questions are available, complete immediately
+  if (!currentQuestion) {
+    completeOnboarding();
+    return null;
+  }
 
   // Response/Feedback Screen (no points popup)
   if (showResponse) {
@@ -131,8 +118,7 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
         <div className="max-w-lg mx-auto w-full">
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center space-y-6">
             <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-              {currentQ.category === 'device' && <Monitor className="w-8 h-8 text-blue-600" />}
-              {currentQ.category === 'security' && <Smartphone className="w-8 h-8 text-blue-600" />}
+              <Monitor className="w-8 h-8 text-blue-600" />
             </div>
             
             <div>
@@ -160,41 +146,38 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
           {/* Debug: Show detected device info */}
           <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
             <strong>Detected:</strong> {detectedDevice.browser} on {detectedDevice.os} ({detectedDevice.type})
+            <br />
+            <strong>Current Question:</strong> {currentQuestion.id}
+            <br />
+            <strong>Visible Questions:</strong> {visibleOnboardingQuestions.length}
           </div>
           
           <div className="text-center mb-8">
             <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
-              {currentQ.category === 'device' && <Monitor className="w-8 h-8 text-blue-600" />}
-              {currentQ.category === 'security' && <Smartphone className="w-8 h-8 text-blue-600" />}
+              <Monitor className="w-8 h-8 text-blue-600" />
             </div>
             
-            {/* Question display - statement and question */}
-            {currentQ.statement ? (
-              <>
-                <div className="text-xl font-medium text-gray-900 mb-2">
-                  {currentQ.statement}
-                </div>
-                <h2 className="text-2xl font-bold text-blue-600 mb-3">
-                  {currentQ.question}
-                </h2>
-              </>
-            ) : (
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                {currentQ.question}
-              </h2>
-            )}
+            {/* Question display */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              {currentQuestion.statement && (
+                <>
+                  <div className="text-gray-700 font-normal mb-2">{currentQuestion.statement}</div>
+                  {currentQuestion.text}
+                </>
+              ) || currentQuestion.text}
+            </h2>
             
             <p className="text-gray-600">
-              {currentQ.context}
+              Device and browser detection for personalized recommendations.
             </p>
           </div>
 
           {/* Answer Options */}
           <div className="space-y-3">
-            {currentQ.options.map((option) => (
+            {currentQuestion.options?.map((option) => (
               <button
-                key={option.value}
-                onClick={() => handleAnswer(option.value)}
+                key={option.id}
+                onClick={() => handleAnswer(option.id)}
                 className="w-full p-4 text-left border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
               >
                 <div className="flex items-center justify-between">
@@ -202,11 +185,6 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
                     <div className="font-semibold text-gray-900 group-hover:text-blue-700">
                       {option.text}
                     </div>
-                    {option.description && (
-                      <div className="text-sm text-gray-600 mt-1">
-                        {option.description}
-                      </div>
-                    )}
                   </div>
                   <div className="text-blue-300 group-hover:text-blue-500 font-bold text-xl">
                     →

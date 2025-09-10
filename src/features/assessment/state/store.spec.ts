@@ -44,14 +44,11 @@ describe('Assessment Store', () => {
     })
 
     it('should increment score when answering valid scoring questions', () => {
-      const questionBank = result.current.questionBank
-      // Find first scoring question (skip onboarding domain which is non-scoring)
-      const scoringDomain = questionBank.domains.find((d: any) => d.id !== 'onboarding_phase')
-      const firstScoringQuestion = scoringDomain?.levels[0]?.questions[0]
       const initialScore = result.current.overallScore
       
       act(() => {
-        result.current.answerQuestion(firstScoringQuestion.id, 'yes')
+        // Use password_manager question with stable ID that has points
+        result.current.answerQuestion('password_manager', 'yes')
       })
       
       expect(result.current.overallScore).toBeGreaterThan(initialScore)
@@ -60,14 +57,9 @@ describe('Assessment Store', () => {
 
   describe('when resetting assessment', () => {
     it('should clear all answers and reset scores', () => {
-      const questionBank = result.current.questionBank
-      // Use first scoring question (skip onboarding domain which is non-scoring)
-      const scoringDomain = questionBank.domains.find((d: any) => d.id !== 'onboarding_phase')
-      const firstScoringQuestion = scoringDomain?.levels[0]?.questions[0]
-      
-      // Answer a scoring question first
+      // Answer a scoring question that actually has points
       act(() => {
-        result.current.answerQuestion(firstScoringQuestion.id, 'yes')
+        result.current.answerQuestion('password_manager', 'yes')
       })
       
       expect(Object.keys(result.current.answers).length).toBeGreaterThan(0)
@@ -145,41 +137,37 @@ describe('Assessment Store', () => {
       const initialScore = result.current.overallScore
       
       act(() => {
-        result.current.answerQuestion('phishing_awareness', 'high')
+        result.current.answerQuestion('password_manager', 'yes')
       })
       
-      expect(result.current.answers['phishing_awareness']).toBeDefined()
-      expect(result.current.answers['phishing_awareness'].value).toBe('high')
-      expect(result.current.answers['phishing_awareness'].pointsEarned).toBeGreaterThan(0)
+      expect(result.current.answers['password_manager']).toBeDefined()
+      expect(result.current.answers['password_manager'].value).toBe('yes')
+      expect(result.current.answers['password_manager'].pointsEarned).toBeGreaterThan(0)
       expect(result.current.overallScore).toBeGreaterThan(initialScore)
     })
 
-    it('should handle tech_comfort onboarding question', () => {
+    it('should handle two_factor_auth question', () => {
       const initialScore = result.current.overallScore
       
       act(() => {
-        result.current.answerQuestion('tech_comfort', 'expert')
+        result.current.answerQuestion('two_factor_auth', 'yes')
       })
       
-      expect(result.current.answers['tech_comfort']).toBeDefined()
-      expect(result.current.answers['tech_comfort'].pointsEarned).toBeGreaterThan(0)
+      expect(result.current.answers['two_factor_auth']).toBeDefined()
+      expect(result.current.answers['two_factor_auth'].pointsEarned).toBeGreaterThan(0)
       expect(result.current.overallScore).toBeGreaterThan(initialScore)
     })
 
-    it('should handle all onboarding questions and accumulate score', () => {
+    it('should handle all available questions and accumulate score', () => {
       const initialScore = result.current.overallScore
-      const onboardingQuestions = [
-        { id: 'platform_confirmation', value: 'desktop' },
-        { id: 'virus_scan_recent', value: 'weekly' },
-        { id: 'password_strength', value: 'unique' },
-        { id: 'software_updates', value: 'automatic' },
-        { id: 'phishing_awareness', value: 'high' },
-        { id: 'tech_comfort', value: 'expert' }
+      const testQuestions = [
+        { id: 'password_manager', value: 'yes' },  // Only include scoring questions
+        { id: 'two_factor_auth', value: 'yes' }
       ]
       
       let runningScore = initialScore
       
-      onboardingQuestions.forEach(({ id, value }) => {
+      testQuestions.forEach(({ id, value }) => {
         act(() => {
           result.current.answerQuestion(id, value)
         })
@@ -190,12 +178,12 @@ describe('Assessment Store', () => {
         runningScore = result.current.overallScore
       })
       
-      // All onboarding questions should be stored
-      expect(Object.keys(result.current.answers).length).toBe(onboardingQuestions.length)
-      // Final score should be significantly higher than initial (onboarding gives meaningful points)
-      expect(result.current.overallScore).toBeGreaterThan(initialScore + 8) // Lowered from 10 to 8 to match actual scoring
+      // All test questions should be stored
+      expect(Object.keys(result.current.answers).length).toBe(testQuestions.length)
+      // Final score should be significantly higher than initial
+      expect(result.current.overallScore).toBeGreaterThan(initialScore + 8) 
       // Score should reflect the total points earned from all questions
-      expect(result.current.overallScore).toBeGreaterThan(8) // Lowered from 10 to 8 to match actual behavior
+      expect(result.current.overallScore).toBeGreaterThan(8)
     })
   })
 

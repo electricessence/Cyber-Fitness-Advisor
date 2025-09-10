@@ -1,32 +1,20 @@
-export type QuestionType = 'YN' | 'SCALE' | 'ACTION';
-
 // Import gate types from conditions to avoid duplication
 import type { Gate } from './conditions';
 
 export interface AnswerOption {
-  id: string;
-  text: string; // What the user sees as the choice
-  displayText?: string; // How this choice appears in status/results
-  points: number; // Points awarded for this choice
-  target: 'shields-up' | 'todo' | 'needs-improvement' | 'hidden'; // Where this goes in the UI
-  impact?: string; // Educational message about this choice's security impact
-  advice?: string; // Additional advice/guidance for this choice
-  followUp?: {
-    // Conditions that trigger follow-up questions
-    showQuestions?: string[]; // Question IDs to reveal
-    hideQuestions?: string[]; // Question IDs to hide
-    modifyQuestions?: { [questionId: string]: Partial<Question> }; // Modify other questions
+  id: string; // Stable identifier for tests and logic
+  text: string; // What the user sees as the choice (can change for UI)
+  facts: Record<string, boolean | string>; // Required - every answer establishes facts
+  feedback?: string; // Optional - skip for smooth flow, include for acknowledgment
+  icon?: string; // Optional emoji or icon (e.g. "✅", "❌", "🖥️")
+  points?: number; // Optional gamification points (only if > 0)
+  
+  // Visibility conditions - same pattern as Question conditions
+  // Supports wildcards: "*" means "any non-empty value"
+  conditions?: {
+    include?: Record<string, boolean | string | ArrayLike<boolean | string>>; // Show this option if facts match
+    exclude?: Record<string, boolean | string | ArrayLike<boolean | string>>; // Hide this option if facts match
   };
-}
-
-// Legacy ActionOption for backward compatibility
-export interface ActionOption {
-  id: string;
-  text: string;
-  displayText?: string;
-  points: number;
-  impact: string;
-  advice?: string;
 }
 
 export interface SecurityTopic {
@@ -45,60 +33,29 @@ export interface SecurityTopics {
 export interface Question {
   id: string;
   text: string; // The question text
+  statement?: string; // Optional statement before the question (for onboarding)
   
-  // Legacy fields for backward compatibility
-  type?: QuestionType; // Optional now - if not provided, will use options
-  weight: number; // Base points for this question
-  affirmativeText?: string; // Clean text for positive responses in security status
-  negativeText?: string; // Text for negative responses in security status
-  actionOptions?: ActionOption[]; // For legacy ACTION type questions
+  // Core importance - higher number = more critical/urgent (no ceiling)
+  priority: number; // e.g., 10000 = must happen first, 1000 = critical, 100 = standard
   
-  // Common fields
-  category?: string; // Optional categorization
-  quickWin?: boolean; // High impact, easy to implement
-  timeEstimate?: string; // "2 minutes", "5 minutes"
-  explanation?: string; // Why this matters
-  actionHint?: string; // How to do this
-  relatedTopics?: string[]; // References to security topics this question addresses
+  // Required flexible answer options
+  options: AnswerOption[]; // All possible answers
   
-  // New flexible answer options - optional for backward compatibility
-  options?: AnswerOption[]; // All possible answers - if not provided, will be generated from type
+  // Optional gamification points (separate from importance)
+  points?: number; // Only if > 0, purely for user engagement
   
-  // Phase 2.2: Gates system for conditional visibility
-  gates?: Gate[]; // When this question should appear (OR logic - any gate passes)
+  // Optional metadata
+  tags?: string[]; // Replaces quickWin, category, etc. e.g., ['quickwin', 'password', 'critical']
+  description?: string; // Why this matters
   
-  // Phase 2.2: Onboarding support
-  nonScoring?: boolean; // If true, this question doesn't contribute to score
-  
-  // Legacy conditions (kept for backward compatibility)
+  // Simple conditional visibility
   conditions?: {
-    requireAnswers?: { [questionId: string]: string[] }; // Require specific answers to other questions
-    browserInfo?: { browsers?: string[]; platforms?: string[] }; // Browser/platform requirements
-    userProfile?: { techComfort?: string[]; concerns?: string[] }; // User profile requirements
+    include?: Record<string, boolean | string | ArrayLike<boolean | string>>;
+    exclude?: Record<string, boolean | string | ArrayLike<boolean | string>>;
   };
   
-  // UI hints
-  defaultLayout?: 'buttons' | 'radio' | 'dropdown'; // Suggested UI layout
-  allowMultiple?: boolean; // Allow selecting multiple options
-
-  // Unified model extensions (Phase: onboarding vs assessment)
+  // Phase management
   phase?: 'onboarding' | 'assessment';
-  phaseOrder?: number; // Ordering within its phase (lower first)
-  // Simple prerequisite system (lightweight vs full gates) for onboarding ordering
-  prerequisites?: {
-    // All of these question IDs must be answered (any value)
-    answered?: string[];
-    // At least one of these must be answered (any value)
-    anyAnswered?: string[];
-  };
-  // Device/browser targeting (declarative replacement for imperative showIf in legacy onboarding)
-  deviceFilter?: {
-    os?: string[]; // e.g. ['windows','mac','linux','mobile']
-    browser?: string[]; // e.g. ['chrome','firefox','safari','edge']
-  };
-  // Optional custom predicate (kept narrow in scope and non-persistent). Prefer declarative fields above.
-  // Not persisted; evaluated at runtime only. Avoid heavy logic.
-  runtimeVisibleFn?: (ctx: { answers: Record<string, unknown>; deviceProfile?: any }) => boolean;
 }
 
 export interface Level {
@@ -129,7 +86,7 @@ export interface Suite {
 
 export interface Answer {
   questionId: string;
-  value: boolean | number | string; // string for ACTION type (option ID)
+  value: string; // The answer text (since AnswerOption uses text as ID)
   timestamp?: Date;
   pointsEarned?: number;
   questionText?: string; // Store for historic reference

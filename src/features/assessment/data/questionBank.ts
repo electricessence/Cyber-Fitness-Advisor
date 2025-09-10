@@ -1,216 +1,234 @@
-// Unified Question Bank (Onboarding + Assessment)
-// Phase 1: Introduces onboarding questions into same structure as assessment
-// NOTE: Not yet wired into store selection logic; used for upcoming refactor.
+// Unified Question Bank (Clean Schema)
+// Uses the new simplified schema with priority-based ordering and facts-based state management
 
 import type { Question, QuestionBank } from '../engine/schema';
-import legacyQuestions from './questions.json';
-import type { Domain, Level, Suite } from '../engine/schema';
 
-// Map legacy onboarding confirmation/selection questions into unified Question objects.
-// These are non-scoring (nonScoring: true) and live in a synthetic domain 'onboarding'.
-// We'll keep them separated logically until integration replaces legacy onboarding flow.
-
+// Essential onboarding questions to establish facts for filtering
 const onboardingQuestions: Question[] = [
   {
-    id: 'windows_confirmation',
-    text: 'Are you using a Windows computer?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 1,
-    nonScoring: true,
-    deviceFilter: { os: ['windows'] },
+    id: 'os_detection',
+    statement: 'Detected: Windows Operating System',
+    text: 'Is this correct?',
+    priority: 100, // Highest priority - critical for filtering
+    tags: ['critical', 'onboarding'],
+    conditions: {
+      include: { "detected_os": "windows" }
+    },
     options: [
-      { id: 'yes', text: 'Yes, Windows', points: 0, target: 'hidden' },
-      { id: 'no', text: 'No', points: 0, target: 'hidden' }
-    ]
-  },
-  {
-    id: 'mac_confirmation',
-    text: 'Are you using a Mac computer?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 2,
-    nonScoring: true,
-    deviceFilter: { os: ['mac'] },
-    options: [
-      { id: 'yes', text: 'Yes, macOS', points: 0, target: 'hidden' },
-      { id: 'no', text: 'No', points: 0, target: 'hidden' }
-    ]
-  },
-  {
-    id: 'linux_confirmation',
-    text: 'Are you using a Linux computer?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 3,
-    nonScoring: true,
-    deviceFilter: { os: ['linux'] },
-    options: [
-      { id: 'yes', text: 'Yes, Linux', points: 0, target: 'hidden' },
-      { id: 'no', text: 'No', points: 0, target: 'hidden' }
-    ]
-  },
-  {
-    id: 'ios_confirmation',
-    text: 'Are you using an iPhone or iPad?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 3.5,
-    nonScoring: true,
-    deviceFilter: { os: ['ios'] },
-    options: [
-      { id: 'yes', text: 'Yes, iOS device', points: 0, target: 'hidden' },
-      { id: 'no', text: 'No', points: 0, target: 'hidden' }
-    ]
-  },
-  {
-    id: 'android_confirmation',
-    text: 'Are you using an Android device?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 3.6,
-    nonScoring: true,
-    deviceFilter: { os: ['android'] },
-    options: [
-      { id: 'yes', text: 'Yes, Android device', points: 0, target: 'hidden' },
-      { id: 'no', text: 'No', points: 0, target: 'hidden' }
+      { 
+        id: 'yes',
+        text: '✅ Yes, Windows', 
+        facts: { "os": "windows", "os.confirmed": true },
+        feedback: '✅ Great! We\'ll provide Windows-specific security advice.'
+      },
+      { 
+        id: 'no',
+        text: '❌ No, different OS', 
+        facts: { "os": "not-windows" },
+        feedback: '👍 We\'ll ask what you\'re actually using.'
+      }
     ]
   },
   {
     id: 'os_selection',
-    text: 'What operating system are you using?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 4,
-    nonScoring: true,
-    // Appears if no OS confirmed; runtime predicate for initial phase
-    runtimeVisibleFn: ({ answers, deviceProfile }) => {
-      const denied = ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation']
-        .some(id => answers[id] === 'no');
-      const confirmed = ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation']
-        .some(id => answers[id] === 'yes');
-      
-      // Show if user denied detected OS OR if device is unknown (no OS detected)
-      const unknownDevice = !deviceProfile || deviceProfile.os === 'unknown';
-      return (!confirmed && denied) || unknownDevice;
+    text: 'Which operating system do you use?',
+    priority: 95,
+    tags: ['critical', 'onboarding'],
+    conditions: {
+      exclude: { "os.confirmed": true } // Show when OS is not yet confirmed
     },
     options: [
-      { id: 'windows', text: 'Windows', points: 0, target: 'hidden' },
-      { id: 'mac', text: 'macOS', points: 0, target: 'hidden' },
-      { id: 'linux', text: 'Linux', points: 0, target: 'hidden' },
-      { id: 'mobile', text: 'Mobile (iOS/Android)', points: 0, target: 'hidden' }
+      { 
+        id: 'windows',
+        text: 'Windows', 
+        facts: { "os": "windows", "os.confirmed": true },
+        feedback: 'Thanks! We\'ll provide Windows-specific advice.',
+        conditions: {
+          exclude: { "os": "not-windows" } // Don't show Windows if they said not-windows
+        }
+      },
+      { 
+        id: 'mac',
+        text: 'macOS', 
+        facts: { "os": "mac", "os.confirmed": true },
+        feedback: 'Great! We\'ll provide macOS-specific advice.'
+      },
+      { 
+        id: 'linux',
+        text: 'Linux', 
+        facts: { "os": "linux", "os.confirmed": true },
+        feedback: 'Excellent! We\'ll provide Linux-specific advice.'
+      },
+      { 
+        id: 'other',
+        text: 'Other (BSD, Solaris, etc.)', 
+        facts: { "os": "other", "os.confirmed": true },
+        feedback: 'Thanks! We\'ll provide general security advice.'
+      },
+      { 
+        id: 'none',
+        text: 'I don\'t use a desktop computer', 
+        facts: { "os": "none", "os.confirmed": true },
+        feedback: 'Got it! We\'ll focus on mobile and web security.'
+      }
     ]
   },
   {
-    id: 'chrome_confirmation',
-    text: 'Are you primarily using Google Chrome?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 5,
-    nonScoring: true,
-    deviceFilter: { browser: ['chrome'] },
-    prerequisites: { anyAnswered: ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation','os_selection'] },
-    runtimeVisibleFn: ({ answers }): boolean => {
-      // Don't show browser questions if any OS was denied (user correcting detection)
-      const osDenied = ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation']
-        .some(id => answers[id] === 'no');
-      return !osDenied;
+    id: 'browser_detection',
+    statement: 'Detected: Chrome Browser',
+    text: 'Is this your primary browser?',
+    priority: 90,
+    tags: ['onboarding'],
+    conditions: {
+      include: { "detected_browser": "chrome" }
     },
     options: [
-      { id: 'yes', text: 'Yes, Chrome', points: 0, target: 'hidden' },
-      { id: 'no', text: 'No', points: 0, target: 'hidden' }
-    ]
-  },
-  {
-    id: 'firefox_confirmation',
-    text: 'Are you primarily using Mozilla Firefox?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 6,
-    nonScoring: true,
-    deviceFilter: { browser: ['firefox'] },
-    prerequisites: { anyAnswered: ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation','os_selection'] },
-    runtimeVisibleFn: ({ answers }): boolean => {
-      // Don't show browser questions if any OS was denied (user correcting detection)
-      const osDenied = ['windows_confirmation','mac_confirmation','linux_confirmation','ios_confirmation','android_confirmation']
-        .some(id => answers[id] === 'no');
-      return !osDenied;
-    },
-    options: [
-      { id: 'yes', text: 'Yes, Firefox', points: 0, target: 'hidden' },
-      { id: 'no', text: 'No', points: 0, target: 'hidden' }
-    ]
-  },
-  {
-    id: 'browser_selection',
-    text: 'What web browser do you use most often?',
-    weight: 0,
-    phase: 'onboarding',
-    phaseOrder: 7,
-    nonScoring: true,
-    prerequisites: { anyAnswered: ['chrome_confirmation','firefox_confirmation','os_selection'] },
-    runtimeVisibleFn: ({ answers }): boolean => {
-      // Show if user denied detected browsers OR selected a desktop OS
-      const deniedChrome = answers.chrome_confirmation === 'no';
-      const deniedFirefox = answers.firefox_confirmation === 'no';
-      const selectedDesktopOS = answers.os_selection && ['windows', 'mac', 'linux'].includes(String(answers.os_selection));
-      
-      // Don't show if mobile OS was selected
-      const selectedMobileOS = answers.os_selection === 'mobile';
-      if (selectedMobileOS) return false;
-      
-      return deniedChrome || deniedFirefox || Boolean(selectedDesktopOS);
-    },
-    options: [
-      { id: 'chrome', text: 'Chrome', points: 0, target: 'hidden' },
-      { id: 'firefox', text: 'Firefox', points: 0, target: 'hidden' },
-      { id: 'safari', text: 'Safari', points: 0, target: 'hidden' },
-      { id: 'edge', text: 'Edge', points: 0, target: 'hidden' }
+      { 
+        id: 'yes',
+        text: '✅ Yes, Chrome is primary',
+        facts: { "browser": "chrome" },
+        feedback: 'We\'ll provide Chrome-specific security tips.'
+      },
+      { 
+        id: 'no',
+        text: '❌ No, different browser',
+        facts: { "browser": "needs-prompting" },
+        feedback: 'We\'ll ask which browser you prefer.'
+      }
     ]
   }
 ];
 
-// Build synthetic onboarding domain so legacy scoring ignores them automatically (weight 0 + nonScoring)
-// We'll append existing legacy domains after.
-const legacySuites: Suite[] = ((legacyQuestions as any).suites || []).map((s: any): Suite => ({
-  id: s.id,
-  title: s.title,
-  description: s.description,
-  gates: (s.gates || []).map((g: any) => ({
-    all: (g.all || []).map((c: any) => ({
-      questionId: c.questionId,
-      when: c.when as any,
-      value: c.value
-    }))
-  })),
-  questions: s.questions.map((q: any): Question => ({ ...q, type: q.type as any }))
-}));
+// Core assessment questions with simplified structure
+const assessmentQuestions: Question[] = [
+  {
+    id: 'password_manager',
+    text: 'Do you use a password manager?',
+    priority: 85, // High priority security fundamental
+    tags: ['critical', 'password', 'quickwin'],
+    options: [
+      { 
+        id: 'yes',
+        text: '✅ Yes, I use a password manager',
+        facts: { "password_manager": "yes" },
+        points: 10,
+        feedback: 'Excellent! Password managers are essential for security.'
+      },
+      { 
+        id: 'no',
+        text: '❌ No, I don\'t use one',
+        facts: { "password_manager": "no" },
+        points: 0,
+        feedback: 'Consider using a password manager - it\'s one of the most important security steps.'
+      }
+    ]
+  },
+  {
+    id: 'two_factor_auth',
+    text: 'Do you use two-factor authentication (2FA) on your important accounts?',
+    priority: 80,
+    tags: ['critical', 'authentication'],
+    options: [
+      { 
+        id: 'yes',
+        text: '✅ Yes, on most important accounts',
+        facts: { "two_factor": "yes" },
+        points: 8,
+        feedback: 'Great job! 2FA significantly improves your account security.'
+      },
+      { 
+        id: 'partial',
+        text: '⚠️ Only on some accounts',
+        facts: { "two_factor": "partial" },
+        points: 4,
+        feedback: 'Good start! Consider enabling 2FA on all important accounts.'
+      },
+      { 
+        id: 'no',
+        text: '❌ No, I don\'t use 2FA',
+        facts: { "two_factor": "no" },
+        points: 0,
+        feedback: '2FA is crucial - it prevents most account breaches even if passwords are stolen.'
+      }
+    ]
+  },
+  {
+    id: 'software_updates',
+    text: 'How do you handle software updates on your devices?',
+    priority: 75,
+    tags: ['critical', 'updates'],
+    options: [
+      { 
+        id: 'automatic',
+        text: '✅ Automatic updates enabled',
+        facts: { "updates": "automatic" },
+        points: 8,
+        feedback: 'Perfect! Automatic updates provide the best security coverage.'
+      },
+      { 
+        id: 'manual',
+        text: '⚠️ Manual updates when reminded',
+        facts: { "updates": "manual" },
+        points: 4,
+        feedback: 'Consider enabling automatic updates for better security.'
+      },
+      { 
+        id: 'rarely',
+        text: '❌ I rarely update software',
+        facts: { "updates": "rarely" },
+        points: 0,
+        feedback: 'Outdated software is a major security risk. Enable automatic updates!'
+      }
+    ]
+  },
+  {
+    id: 'virus_scan_recent',
+    text: 'When did you last run a virus scan?',
+    priority: 70,
+    tags: ['security', 'antivirus'],
+    options: [
+      { 
+        id: 'this_week',
+        text: 'This week',
+        facts: { "virus_scan": "recent" },
+        points: 8,
+        feedback: 'Great! Regular scanning is important for security.'
+      },
+      { 
+        id: 'this_month',
+        text: 'This month',
+        facts: { "virus_scan": "monthly" },
+        points: 4,
+        feedback: 'Consider scanning more frequently for better protection.'
+      },
+      { 
+        id: 'rarely',
+        text: 'Rarely or never',
+        facts: { "virus_scan": "never" },
+        points: 0,
+        feedback: 'Regular virus scans help detect threats early.'
+      }
+    ]
+  }
+];
 
-const unifiedQuestionBank: QuestionBank = {
-  version: (legacyQuestions as any).version ? (legacyQuestions as any).version + 1 : 2,
+// Combine all questions into the question bank
+const questionBank: QuestionBank = {
+  version: 2.0, // Numeric version
   domains: [
     {
-      id: 'onboarding_phase',
-      title: 'Onboarding',
+      id: 'unified',
+      title: 'Unified Assessment',
       levels: [
-        { level: 0, questions: onboardingQuestions }
+        {
+          level: 1,
+          questions: [...onboardingQuestions, ...assessmentQuestions]
+        }
       ]
-    },
-    // Normalize legacy question domains to satisfy strict typing (coerce question.type to union)
-    ...(legacyQuestions.domains as any[]).map((d): Domain => ({
-      id: d.id,
-      title: d.title,
-      levels: d.levels.map((lvl: any): Level => ({
-        level: lvl.level,
-        questions: lvl.questions.map((q: any): Question => ({
-          ...q,
-          type: q.type as any // Keep original; assume valid per existing JSON
-        }))
-      }))
-    }))
-  ],
-  suites: legacySuites
+    }
+  ]
 };
 
-export { onboardingQuestions };
-export default unifiedQuestionBank;
+// Export both default and named
+export default questionBank;
+export { questionBank };
