@@ -290,6 +290,48 @@ export const useAssessmentStore = create<AssessmentState>()(
             isExpired: false // Initially not expired
           } as Answer,
         };
+
+        // Process answer to extract facts directly from answer option
+        const allQs: Question[] = [];
+        state.questionBank.domains.forEach(domain => {
+          domain.levels.forEach(level => {
+            level.questions.forEach(q => allQs.push(q));
+          });
+        });
+        
+        const targetQuestion = allQs.find((q: Question) => q.id === questionId);
+        if (targetQuestion) {
+          const selectedOption = targetQuestion.options.find((option: any) => 
+            option.id === newAnswers[questionId].value || option.text === newAnswers[questionId].value
+          );
+          if (selectedOption && selectedOption.facts) {
+            // Directly update facts from answer option
+            const currentFacts = { ...state.factsProfile.facts };
+            for (const [factId, factValue] of Object.entries(selectedOption.facts)) {
+              currentFacts[factId] = {
+                id: factId,
+                name: factId,
+                value: factValue as any,
+                confidence: 1.0,
+                category: 'user_provided' as any,
+                establishedAt: new Date(),
+                establishedBy: { questionId: questionId }
+              };
+            }
+            
+            // Update facts profile
+            set(prev => ({
+              ...prev,
+              factsProfile: {
+                ...prev.factsProfile,
+                facts: currentFacts,
+                lastUpdated: new Date()
+              }
+            }));
+            
+            console.log('Facts updated:', Object.keys(selectedOption.facts));
+          }
+        }
         
         const scoreResult = calculateOverallScore(state.questionBank, newAnswers);
         const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
@@ -656,15 +698,63 @@ export const useAssessmentStore = create<AssessmentState>()(
       // Phase 2.2: Condition engine selectors
       getVisibleQuestionIds: () => {
         const state = get();
-        const context = {
-          answers: Object.fromEntries(
-            Object.entries(state.answers).map(([id, answer]) => [id, answer.value])
-          ),
-          deviceProfile: state.deviceProfile,
-          metadata: {}
-        };
-        const result = state.conditionEngine.evaluate(context);
-        return result.visibleQuestionIds;
+        const allQuestions: Question[] = [];
+        
+        // Collect all questions from all domains and levels
+        state.questionBank.domains.forEach(domain => {
+          domain.levels.forEach(level => {
+            level.questions.forEach(question => {
+              allQuestions.push(question);
+            });
+          });
+        });
+        
+        // Add suite questions
+        state.questionBank.suites?.forEach(suite => {
+          suite.questions.forEach(question => {
+            allQuestions.push(question);
+          });
+        });
+        
+        // Filter questions based on facts-based conditions
+        const facts = state.factsProfile.facts;
+        const visibleQuestionIds: string[] = [];
+        
+        for (const question of allQuestions) {
+          let isVisible = true;
+          
+          // Check include conditions - question is visible if facts match
+          if (question.conditions?.include) {
+            let includeMatches = false;
+            for (const [factId, expectedValue] of Object.entries(question.conditions.include)) {
+              const fact = facts[factId];
+              if (fact && fact.value === expectedValue) {
+                includeMatches = true;
+                break;
+              }
+            }
+            if (!includeMatches) {
+              isVisible = false;
+            }
+          }
+          
+          // Check exclude conditions - question is hidden if facts match
+          if (question.conditions?.exclude && isVisible) {
+            for (const [factId, expectedValue] of Object.entries(question.conditions.exclude)) {
+              const fact = facts[factId];
+              if (fact && fact.value === expectedValue) {
+                isVisible = false;
+                break;
+              }
+            }
+          }
+          
+          if (isVisible) {
+            visibleQuestionIds.push(question.id);
+          }
+        }
+        
+        return visibleQuestionIds;
       },
       
       getUnlockedSuiteIds: () => {
@@ -709,6 +799,10 @@ export const initializeStore = () => {
   
   // Pre-populate answers from onboarding (always run this, not just when we have existing answers)
   const prePopulatedAnswers = prePopulateFromOnboarding(store.answers);
+  
+  // Rebuild facts from persisted answers
+  console.log('Rebuilding facts from persisted answers...');
+  store.factsActions.importLegacyData(prePopulatedAnswers);
   
   // If we have any answers (existing or pre-populated), recalculate scores
   if (Object.keys(prePopulatedAnswers).length > 0) {
