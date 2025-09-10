@@ -306,31 +306,15 @@ export const useAssessmentStore = create<AssessmentState>()(
             option.id === newAnswers[questionId].value || option.text === newAnswers[questionId].value
           );
           if (selectedOption && selectedOption.facts) {
-            // Directly update facts from answer option
-            const currentFacts = { ...state.factsProfile.facts };
+            // Use factsActions to inject facts instead of manually updating state
             for (const [factId, factValue] of Object.entries(selectedOption.facts)) {
-              currentFacts[factId] = {
-                id: factId,
-                name: factId,
-                value: factValue as any,
-                confidence: 1.0,
-                category: 'user_provided' as any,
-                establishedAt: new Date(),
-                establishedBy: { questionId: questionId }
-              };
+              get().factsActions.injectFact(factId, factValue, { 
+                source: `answer:${questionId}`,
+                confidence: 1.0 
+              });
             }
             
-            // Update facts profile
-            set(prev => ({
-              ...prev,
-              factsProfile: {
-                ...prev.factsProfile,
-                facts: currentFacts,
-                lastUpdated: new Date()
-              }
-            }));
-            
-            console.log('Facts updated:', Object.keys(selectedOption.facts));
+            console.log('Facts updated via factsActions:', Object.keys(selectedOption.facts));
           }
         }
         
@@ -349,7 +333,14 @@ export const useAssessmentStore = create<AssessmentState>()(
         
         // Check for new badges (simplified for MVP)
         const newBadges = [...state.earnedBadges];
-        if (scoreResult.quickWinsCompleted >= 3 && !newBadges.includes('quick-starter')) {
+        
+        // Count quick wins completed (questions with quickWin tag that are answered)
+        const quickWinsCompleted = Object.keys(newAnswers).filter(questionId => {
+          const question = allQs.find((q: Question) => q.id === questionId);
+          return question && question.tags?.includes('quickWin');
+        }).length;
+        
+        if (quickWinsCompleted >= 3 && !newBadges.includes('quick-starter')) {
           newBadges.push('quick-starter');
         }
         if (scoreResult.overallScore >= 50 && !newBadges.includes('halfway-hero')) {
@@ -359,25 +350,25 @@ export const useAssessmentStore = create<AssessmentState>()(
         // Recalculate recommendations
         const newRecommendations = getTopRecommendations(state.questionBank, newAnswers);
         
-        console.log('About to update store with:', {
-          answersCount: Object.keys(newAnswers).length,
-          overallScore: scoreResult.overallScore,
-          currentLevel: nextLevelProgress.currentLevel
-        });
-        
-        set({
+        set((prev) => ({
+          ...prev, // Preserve existing state
           answers: newAnswers,
           overallScore: scoreResult.overallScore,
-          domainScores: scoreResult.domainScores,
+          domainScores: Object.entries(scoreResult.domainScores).reduce((acc: Record<string, number>, [domain, scores]) => {
+            acc[domain] = scores.score;
+            return acc;
+          }, {}),
           currentLevel: nextLevelProgress.currentLevel,
           quickWinsCompleted: 0, // Simplified for now
-          totalQuickWins: scoreResult.totalQuickWins,
+          totalQuickWins: Object.values(state.questionBank.domains)
+            .flatMap(d => d.levels.flatMap(l => l.questions))
+            .filter(q => q.priority >= 8000).length, // Quick wins have priority 8000+
           nextLevelProgress,
           recommendations: newRecommendations,
           showCelebration: shouldCelebrate,
           lastScoreIncrease: scoreIncrease,
           earnedBadges: newBadges,
-        });
+        }));
         
         console.log('Store updated! New state should be available to components.');
       },
@@ -450,8 +441,8 @@ export const useAssessmentStore = create<AssessmentState>()(
       getOrderedAvailableQuestions: () => {
         const raw = get().getAvailableQuestions();
         return [...raw].sort((a, b) => {
-          const ao = a.phaseOrder ?? 9999;
-          const bo = b.phaseOrder ?? 9999;
+          const ao = (a as any).phaseOrder ?? 9999;
+          const bo = (b as any).phaseOrder ?? 9999;
           if (ao !== bo) return ao - bo;
           return a.id.localeCompare(b.id);
         });
@@ -710,11 +701,14 @@ export const useAssessmentStore = create<AssessmentState>()(
           });
         });
         
-        // Add suite questions
+        // Add suite questions (only from unlocked suites)
+        const unlockedSuiteIds = state.getUnlockedSuiteIds();
         state.questionBank.suites?.forEach(suite => {
-          suite.questions.forEach(question => {
-            allQuestions.push(question);
-          });
+          if (unlockedSuiteIds.includes(suite.id)) {
+            suite.questions.forEach(question => {
+              allQuestions.push(question);
+            });
+          }
         });
         
         // Filter questions based on facts-based conditions
@@ -800,7 +794,6 @@ export const initializeStore = () => {
   
   // Initialize device detection facts - these are stable environmental facts
   const device = detectCurrentDevice();
-  console.log('Detected device:', device);
   
   // Inject device detection facts directly
   store.factsActions.injectFact('os_detected', device.os, { source: 'auto-detection' });
@@ -811,7 +804,6 @@ export const initializeStore = () => {
   const prePopulatedAnswers = prePopulateFromOnboarding(store.answers);
   
   // Rebuild facts from persisted answers + device detection
-  console.log('Rebuilding facts from persisted answers and device detection...');
   store.factsActions.importLegacyData(prePopulatedAnswers);
   
   // If we have any answers (existing or pre-populated), recalculate scores
@@ -819,14 +811,29 @@ export const initializeStore = () => {
     const scoreResult = calculateOverallScore(store.questionBank, prePopulatedAnswers);
     const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
     
-    useAssessmentStore.setState({
-      answers: prePopulatedAnswers,
-      overallScore: scoreResult.overallScore,
-      domainScores: scoreResult.domainScores,
-      currentLevel: scoreResult.level,
-      quickWinsCompleted: scoreResult.quickWinsCompleted,
-      totalQuickWins: scoreResult.totalQuickWins,
-      nextLevelProgress,
+    // Calculate quickWins count - simplified for initialization
+    const quickWinsCompleted = 0;
+    const totalQuickWins = Object.values(store.questionBank.domains)
+      .flatMap(d => d.levels.flatMap(l => l.questions))
+      .filter(q => q.priority >= 8000).length; // Quick wins have priority 8000+
+    
+    // Convert domain scores to the expected format
+    const domainScoresSimplified: Record<string, number> = {};
+    Object.entries(scoreResult.domainScores).forEach(([domain, scores]) => {
+      domainScoresSimplified[domain] = scores.score;
     });
+    
+    // Use setTimeout to ensure state updates happen after current render cycle
+    setTimeout(() => {
+      useAssessmentStore.setState({
+        answers: prePopulatedAnswers,
+        overallScore: scoreResult.overallScore,
+        domainScores: domainScoresSimplified,
+        currentLevel: nextLevelProgress.currentLevel,
+        quickWinsCompleted,
+        totalQuickWins,
+        nextLevelProgress,
+      });
+    }, 0);
   }
 };

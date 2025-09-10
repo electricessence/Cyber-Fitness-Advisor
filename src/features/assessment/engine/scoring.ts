@@ -1,13 +1,29 @@
 import type { Question, QuestionBank, Answer, AnswerOption } from './schema';
 
 // Calculate points for a single question based on selected answer
-export function calculateQuestionPoints(question: Question, value: string): number {
-  // Find the selected option by ID (preferred) or fallback to text
-  const selectedOption = question.options?.find(opt => opt.id === value || opt.text === value);
-  if (!selectedOption) return 0;
+export function calculateQuestionPoints(question: Question, value: string | boolean): number {
+  // Handle YN (Yes/No) questions - legacy compatibility
+  if ((question as any).type === 'YN') {
+    const weight = (question as any).weight || 0;
+    // For YN questions: full weight if true/yes, 0 if false/no
+    if (value === true || value === 'yes' || value === 'true') {
+      return weight;
+    }
+    return 0;
+  }
 
-  // Return the points for this option
-  return selectedOption.points || 0;
+  // Handle new format with options array
+  if (question.options) {
+    // Find the selected option by ID (preferred) or fallback to text
+    const selectedOption = question.options.find(opt => opt.id === value || opt.text === value);
+    if (!selectedOption) return 0;
+
+    // Return the points for this option
+    return selectedOption.points || 0;
+  }
+
+  // Fallback: if no options and no type, return 0
+  return 0;
 }
 
 // Calculate domain score for legacy compatibility 
@@ -26,7 +42,14 @@ export function calculateDomainScore(
       totalQuestions++;
       
       // Calculate max possible points for this question
-      const maxQuestionPoints = Math.max(...question.options.map(opt => opt.points || 0));
+      let maxQuestionPoints = 0;
+      if ((question as any).type === 'YN') {
+        // YN questions: max points is the weight
+        maxQuestionPoints = (question as any).weight || 0;
+      } else if (question.options) {
+        // New format: max of all option points
+        maxQuestionPoints = Math.max(...question.options.map(opt => opt.points || 0));
+      }
       maxPoints += maxQuestionPoints;
       
       // Check if answered
@@ -64,7 +87,14 @@ export function calculateOverallScore(questionBank: QuestionBank, answers: Recor
         totalScore += points;
 
         // Calculate max possible score for this question
-        const maxPoints = Math.max(...question.options.map((opt: AnswerOption) => opt.points || 0));
+        let maxPoints = 0;
+        if ((question as any).type === 'YN') {
+          // YN questions: max points is the weight
+          maxPoints = (question as any).weight || 0;
+        } else if (question.options) {
+          // New format: max of all option points
+          maxPoints = Math.max(...question.options.map((opt: AnswerOption) => opt.points || 0));
+        }
         maxPossibleScore += maxPoints;
 
         // Track domain scores
@@ -140,7 +170,7 @@ export function getTopRecommendations(questionBank: QuestionBank, answers: Recor
 }
 
 export function calculateAnswerExpiration(
-  question: Question, 
+  question: any, // Allow any type for legacy compatibility
   value: string | boolean | number
 ): { expiresAt: Date; expirationReason: string } | null {
   if (!value) return null; // Handle undefined/null values

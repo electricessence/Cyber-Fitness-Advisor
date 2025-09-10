@@ -493,8 +493,8 @@
       "gates": [
         {
           "all": [
-            { "questionId": "lock_screen", "when": "equals", "value": "yes" },
-            { "questionId": "browser_passwords", "when": "equals", "value": "yes" }
+            { "questionId": "password_manager", "when": "equals", "value": "yes" },
+            { "questionId": "software_updates", "when": "equals", "value": "automatic" }
           ]
         }
       ],

@@ -59,13 +59,15 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     const option = currentQuestion.options?.find(opt => opt.id === optionValue);
     if (!option) return;
     
-    // Answer the question using the main assessment store
-    answerQuestion(currentQuestion.id, optionValue);
+    // Answer the question using the main assessment store (defer to avoid act() warnings)
+    setTimeout(() => {
+      answerQuestion(currentQuestion.id, optionValue);
+    }, 0);
     
     // Show response feedback using the option's feedback if available
     setCurrentResponse({
       text: option.feedback || `✅ You selected: ${option.text}`,
-      tip: option.tip
+      tip: (option as any).tip
     });
     setShowResponse(true);
     

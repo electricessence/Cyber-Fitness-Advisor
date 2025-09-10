@@ -20,13 +20,13 @@ describe('Suite Unlocking Integration', () => {
     expect(initialSuites).toEqual([]);
     
     // Answer first question - should not unlock suite yet
-    store.answerQuestion('lock_screen', 'yes');
+    store.answerQuestion('password_manager', 'yes');
     
     const afterFirstAnswer = store.getUnlockedSuiteIds();
     expect(afterFirstAnswer).toEqual([]);
     
     // Answer second question - should unlock the suite
-    store.answerQuestion('browser_passwords', 'yes');
+    store.answerQuestion('software_updates', 'automatic');
     
     const afterSecondAnswer = store.getUnlockedSuiteIds();
     expect(afterSecondAnswer).toContain('advanced_security');
@@ -36,7 +36,7 @@ describe('Suite Unlocking Integration', () => {
     const store = useAssessmentStore.getState();
     
     // Answer only one of the required questions
-    store.answerQuestion('lock_screen', 'yes');
+    store.answerQuestion('password_manager', 'yes');
     
     const unlockedSuites = store.getUnlockedSuiteIds();
     expect(unlockedSuites).toEqual([]);
@@ -46,8 +46,8 @@ describe('Suite Unlocking Integration', () => {
     const store = useAssessmentStore.getState();
     
     // Answer questions with values that don't meet the gate conditions
-    store.answerQuestion('lock_screen', 'no');
-    store.answerQuestion('browser_passwords', 'no');
+    store.answerQuestion('password_manager', 'no');
+    store.answerQuestion('software_updates', 'manual');
     
     const unlockedSuites = store.getUnlockedSuiteIds();
     expect(unlockedSuites).toEqual([]);
@@ -61,8 +61,8 @@ describe('Suite Unlocking Integration', () => {
     expect(initialVisible).not.toContain('advanced_2fa');
     
     // Unlock the suite
-    store.answerQuestion('lock_screen', 'yes');
-    store.answerQuestion('browser_passwords', 'yes');
+    store.answerQuestion('password_manager', 'yes');
+    store.answerQuestion('software_updates', 'automatic');
     
     // Now the suite question should be visible
     const afterUnlock = store.getVisibleQuestionIds();

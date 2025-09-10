@@ -23,15 +23,15 @@ describe('🎯 Facts-Based Architecture: User Journeys', () => {
     
     // WHEN: User confirms they use Windows
     act(() => {
-      store.answerQuestion('windows_confirmation', 'yes');
+      store.answerQuestion('windows_detection_confirm', 'yes');
     });
     
     // THEN: Facts should be established in the store
     const updatedStore = useAssessmentStore.getState();
     
     // Verify traditional answer was stored
-    expect(updatedStore.answers['windows_confirmation']).toBeDefined();
-    expect(updatedStore.answers['windows_confirmation'].value).toBe('yes');
+    expect(updatedStore.answers['windows_detection_confirm']).toBeDefined();
+    expect(updatedStore.answers['windows_detection_confirm'].value).toBe('yes');
     
     // Verify facts were extracted and stored (when integrated)
     // TODO: Uncomment once store integration is complete
@@ -45,16 +45,16 @@ describe('🎯 Facts-Based Architecture: User Journeys', () => {
     const store = useAssessmentStore.getState();
     
     act(() => {
-      store.answerQuestion('windows_confirmation', 'yes');
-      store.answerQuestion('browser_passwords', true);
+      store.answerQuestion('windows_detection_confirm', 'yes');
+      store.answerQuestion('password_manager', 'yes');
     });
     
     // THEN: Both legacy and facts should be available
     const updatedStore = useAssessmentStore.getState();
     
     // Verify traditional answer
-    expect(updatedStore.answers['browser_passwords']).toBeDefined();
-    expect(updatedStore.answers['browser_passwords'].value).toBe(true);
+    expect(updatedStore.answers['password_manager']).toBeDefined();
+    expect(updatedStore.answers['password_manager'].value).toBe('yes');
     expect(updatedStore.overallScore).toBeGreaterThan(0);
     
     // TODO: Verify behavior facts once integration is complete
@@ -68,10 +68,10 @@ describe('🎯 Facts-Based Architecture: User Journeys', () => {
     
     // WHEN: User answers various questions
     act(() => {
-      store.answerQuestion('windows_confirmation', 'yes');
-      store.answerQuestion('browser_passwords', true);
-      store.answerQuestion('antivirus', 'yes'); 
-      store.answerQuestion('windows_updates', 'yes');
+      store.answerQuestion('windows_detection_confirm', 'yes');
+      store.answerQuestion('password_manager', 'yes');
+      store.answerQuestion('virus_scan_recent', 'this_week'); 
+      store.answerQuestion('software_updates', 'automatic');
     });
     
     // THEN: Should maintain data integrity in both systems
@@ -82,10 +82,10 @@ describe('🎯 Facts-Based Architecture: User Journeys', () => {
     expect(updatedStore.overallScore).toBeGreaterThan(0);
     
     // Each answer should be properly stored
-    expect(updatedStore.answers['windows_confirmation']).toBeDefined();
-    expect(updatedStore.answers['browser_passwords']).toBeDefined();
-    expect(updatedStore.answers['antivirus']).toBeDefined();
-    expect(updatedStore.answers['windows_updates']).toBeDefined();
+    expect(updatedStore.answers['windows_detection_confirm']).toBeDefined();
+    expect(updatedStore.answers['password_manager']).toBeDefined();
+    expect(updatedStore.answers['virus_scan_recent']).toBeDefined();
+    expect(updatedStore.answers['software_updates']).toBeDefined();
   });
 });
 
@@ -105,8 +105,8 @@ describe('🔧 Facts System: Architecture Validation', () => {
     
     // WHEN: User interacts with assessment
     act(() => {
-      store.answerQuestion('windows_confirmation', 'yes');
-      store.answerQuestion('browser_passwords', true);
+      store.answerQuestion('windows_detection_confirm', 'yes');
+      store.answerQuestion('password_manager', 'yes');
     });
     
     // THEN: Legacy functionality should continue working
@@ -131,7 +131,7 @@ describe('🔧 Facts System: Architecture Validation', () => {
     
     // WHEN: User completes onboarding
     act(() => {
-      store.answerQuestion('windows_confirmation', 'yes');
+      store.answerQuestion('windows_detection_confirm', 'yes');
     });
     
     // THEN: Question flow should continue working
@@ -139,6 +139,6 @@ describe('🔧 Facts System: Architecture Validation', () => {
     const questionsAfterOnboarding = updatedStore.getAvailableQuestions();
     
     expect(questionsAfterOnboarding.length).toBeGreaterThan(0);
-    expect(updatedStore.answers['windows_confirmation']).toBeDefined();
+    expect(updatedStore.answers['windows_detection_confirm']).toBeDefined();
   });
 });
