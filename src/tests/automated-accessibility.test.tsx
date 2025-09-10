@@ -1,88 +1,85 @@
 import { describe, test, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-// import { axe, toHaveNoViolations } from 'jest-axe'
 import { useAssessmentStore } from '../features/assessment/state/store'
 import App from '../App'
 
-// Extend Jest matchers for accessibility testing
-// expect.extend(toHaveNoViolations)
-
-describe.skip('Automated Accessibility Testing', () => {
+describe('Automated Accessibility Testing', () => {
   beforeEach(() => {
     useAssessmentStore.getState().resetAssessment()
   })
 
-  test('App has no accessibility violations - Automated A11y Audit', async () => {
+  test('App has basic accessibility features - Automated A11y Check', async () => {
     const { container } = render(<App />)
     
-    // Run automated accessibility audit
-    // const results = await axe(container)
-    // expect(results).toHaveNoViolations()
-    
-    // TODO: Implement with vitest-compatible accessibility testing
-    expect(container).toBeInTheDocument()
-  })
-
-  test('Keyboard Navigation - Fully Automated', async () => {
-    render(<App />)
-    
-    // Get first interactive element
-    const firstButton = screen.getAllByRole('button')[0]
-    firstButton.focus()
-    
-    // Verify focus is visible
-    expect(firstButton).toHaveFocus()
-    
-    // Simulate Tab navigation through all interactive elements
-    const interactiveElements = screen.getAllByRole('button')
-    
-    for (let i = 0; i < interactiveElements.length - 1; i++) {
-      fireEvent.keyDown(interactiveElements[i], { key: 'Tab' })
-      // In real browser, next element would be focused
-      // In test environment, we simulate this
-    }
-  })
-
-  test('Screen Reader Compatibility - Automated', () => {
-    render(<App />)
-    
-    // Verify ARIA labels exist
-    const elements = screen.getAllByRole('button')
-    elements.forEach(element => {
-      // Each button should have accessible text
-      expect(element).toHaveAccessibleName()
-    })
-    
-    // Verify heading structure
+    // Check for proper heading structure (more flexible than requiring main)
     const headings = screen.getAllByRole('heading')
     expect(headings.length).toBeGreaterThan(0)
     
-    // Verify form labels
-    const questions = screen.queryAllByRole('group')
-    questions.forEach(question => {
-      expect(question).toHaveAccessibleName()
+    // Check for interactive elements being properly labeled
+    const buttons = screen.getAllByRole('button')
+    buttons.forEach(button => {
+      expect(button).toHaveAccessibleName() // Must have accessible name
     })
+    
+    // Check that interactive elements are keyboard accessible
+    buttons.forEach(button => {
+      expect(button).not.toHaveAttribute('tabindex', '-1')
+    })
+    
+    expect(container).toBeInTheDocument()
   })
 
-  test('High Contrast Mode - Automated Visual Testing', () => {
-    // Simulate high contrast mode
-    Object.defineProperty(window, 'matchMedia', {
-      value: (query: string) => ({
-        matches: query === '(prefers-contrast: high)',
-        addEventListener: () => {},
-        removeEventListener: () => {}
-      })
-    })
+  test('Keyboard Navigation - Basic Support', async () => {
+    render(<App />)
     
+    // Get first interactive element
+    const buttons = screen.getAllByRole('button')
+    if (buttons.length > 0) {
+      const firstButton = buttons[0]
+      
+      // Ensure button is focusable
+      firstButton.focus()
+      expect(firstButton).toHaveFocus()
+      
+      // Test keyboard interaction
+      fireEvent.keyDown(firstButton, { key: 'Enter', code: 'Enter' })
+      
+      // Should not crash and should maintain focus management
+      expect(document.activeElement).toBeDefined()
+    }
+  })
+
+  test('Color Contrast and Visual Accessibility', () => {
     const { container } = render(<App />)
     
-    // Verify contrast ratios meet WCAG standards
-    const buttons = container.querySelectorAll('button')
-    buttons.forEach(button => {
-      const styles = window.getComputedStyle(button)
-      // In a real implementation, you'd calculate contrast ratios
-      expect(styles.color).toBeDefined()
-      expect(styles.backgroundColor).toBeDefined()
+    // Check for text content visibility
+    const textElements = container.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div')
+    
+    textElements.forEach(element => {
+      const computedStyle = window.getComputedStyle(element)
+      const color = computedStyle.color
+      
+      // Basic check that text has color (not transparent)
+      expect(color).not.toBe('rgba(0, 0, 0, 0)')
+      expect(color).not.toBe('transparent')
+    })
+    
+    expect(container).toBeInTheDocument()
+  })
+
+  test('Screen Reader Compatibility - ARIA Labels', () => {
+    render(<App />)
+    
+    // Check for proper ARIA labeling on interactive elements
+    const interactiveElements = screen.getAllByRole('button')
+    
+    interactiveElements.forEach(element => {
+      // Should have either aria-label, aria-labelledby, or visible text
+      const hasAriaLabel = element.hasAttribute('aria-label')
+      const hasAriaLabelledBy = element.hasAttribute('aria-labelledby') 
+      const hasVisibleText = element.textContent && element.textContent.trim().length > 0
+      
+      expect(hasAriaLabel || hasAriaLabelledBy || hasVisibleText).toBe(true)
     })
   })
 })

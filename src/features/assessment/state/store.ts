@@ -823,17 +823,15 @@ export const initializeStore = () => {
       domainScoresSimplified[domain] = scores.score;
     });
     
-    // Use setTimeout to ensure state updates happen after current render cycle
-    setTimeout(() => {
-      useAssessmentStore.setState({
-        answers: prePopulatedAnswers,
-        overallScore: scoreResult.overallScore,
-        domainScores: domainScoresSimplified,
-        currentLevel: nextLevelProgress.currentLevel,
-        quickWinsCompleted,
-        totalQuickWins,
-        nextLevelProgress,
-      });
-    }, 0);
+    // Apply state updates directly
+    useAssessmentStore.setState({
+      answers: prePopulatedAnswers,
+      overallScore: scoreResult.overallScore,
+      domainScores: domainScoresSimplified,
+      currentLevel: nextLevelProgress.currentLevel,
+      quickWinsCompleted,
+      totalQuickWins,
+      nextLevelProgress,
+    });
   }
 };
