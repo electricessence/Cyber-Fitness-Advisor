@@ -3,97 +3,425 @@
 
 import type { Question, QuestionBank } from '../engine/schema';
 
-// Essential onboarding questions to establish facts for filtering
+// Priority Constants for Onboarding Flow
+const PRIORITY = {
+  PRIVACY_NOTICE: 10000,
+  OS_DETECTION: 9500,
+  OS_SELECTION: 9400,
+  BROWSER_DETECTION: 9300,
+  BROWSER_SELECTION: 9250,
+  TECH_COMFORT: 9200,
+  MOBILE_CONTEXT: 9100,
+  USAGE_CONTEXT: 9000
+} as const;
+
+// Level 0 Onboarding Questions - Complete privacy-first flow
 const onboardingQuestions: Question[] = [
+  // Privacy Notice - Highest Priority (must be first)
   {
-    id: 'os_detection',
-    statement: 'Detected: Windows Operating System',
+    id: 'privacy_notice',
+    phase: 'onboarding',
+    priority: PRIORITY.PRIVACY_NOTICE, // Highest priority - must be first
+    statement: '🔒 Privacy First',
+    text: 'Your data stays on your device. No tracking, no cloud storage.',
+    tags: ['critical', 'onboarding', 'privacy'],
+    options: [
+      {
+        id: 'understood',
+        text: '✅ I understand',
+        facts: { "privacy_acknowledged": true },
+        feedback: '🔒 Perfect! Your security assessment begins now.'
+      }
+    ]
+  },
+
+  // OS Confirmation - Windows (when detected)
+  {
+    id: 'windows_detection_confirm',
+    phase: 'onboarding',
+    priority: PRIORITY.OS_DETECTION,
+    statement: '🖥️ Detected: Windows Operating System',
     text: 'Is this correct?',
-    priority: 100, // Highest priority - critical for filtering
     tags: ['critical', 'onboarding'],
     conditions: {
-      include: { "detected_os": "windows" }
+      include: { "os_detected": "windows" }
     },
     options: [
       { 
         id: 'yes',
-        text: '✅ Yes, Windows', 
-        facts: { "os": "windows", "os.confirmed": true },
-        feedback: '✅ Great! We\'ll provide Windows-specific security advice.'
+        text: '✅ Yes, I use Windows', 
+        facts: { "os": "windows", "os_confirmed": true },
+        feedback: 'Great! We\'ll provide Windows-specific security advice.'
       },
       { 
         id: 'no',
-        text: '❌ No, different OS', 
-        facts: { "os": "not-windows" },
-        feedback: '👍 We\'ll ask what you\'re actually using.'
+        text: '❌ No, that\'s wrong', 
+        facts: { "os_confirmed": false },
+        feedback: 'No problem! We\'ll ask you to select your actual OS.'
       }
     ]
   },
+
+  // OS Confirmation - macOS (when detected)
   {
-    id: 'os_selection',
-    text: 'Which operating system do you use?',
-    priority: 95,
+    id: 'mac_detection_confirm',
+    phase: 'onboarding',
+    priority: PRIORITY.OS_DETECTION,
+    statement: '🍎 Detected: macOS',
+    text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
     conditions: {
-      exclude: { "os.confirmed": true } // Show when OS is not yet confirmed
+      include: { "os_detected": "mac" }
+    },
+    options: [
+      { 
+        id: 'yes',
+        text: '✅ Yes, I use macOS', 
+        facts: { "os": "mac", "os_confirmed": true },
+        feedback: 'Great! We\'ll provide macOS-specific security advice.'
+      },
+      { 
+        id: 'no',
+        text: '❌ No, that\'s wrong', 
+        facts: { "os_confirmed": false },
+        feedback: 'No problem! We\'ll ask you to select your actual OS.'
+      }
+    ]
+  },
+
+  // OS Confirmation - Linux (when detected)
+  {
+    id: 'linux_detection_confirm',
+    phase: 'onboarding',
+    priority: PRIORITY.OS_DETECTION,
+    statement: '🐧 Detected: Linux',
+    text: 'Is this correct?',
+    tags: ['critical', 'onboarding'],
+    conditions: {
+      include: { "os_detected": "linux" }
+    },
+    options: [
+      { 
+        id: 'yes',
+        text: '✅ Yes, I use Linux', 
+        facts: { "os": "linux", "os_confirmed": true },
+        feedback: 'Excellent! We\'ll provide Linux-specific security advice.'
+      },
+      { 
+        id: 'no',
+        text: '❌ No, that\'s wrong', 
+        facts: { "os_confirmed": false },
+        feedback: 'No problem! We\'ll ask you to select your actual OS.'
+      }
+    ]
+  },
+
+  // OS Selection (when not confirmed or not detected)
+  {
+    id: 'os_selection',
+    phase: 'onboarding',
+    priority: PRIORITY.OS_SELECTION,
+    text: 'Which operating system do you primarily use?',
+    tags: ['critical', 'onboarding'],
+    conditions: {
+      exclude: { "os_confirmed": true }
     },
     options: [
       { 
         id: 'windows',
-        text: 'Windows', 
-        facts: { "os": "windows", "os.confirmed": true },
-        feedback: 'Thanks! We\'ll provide Windows-specific advice.',
-        conditions: {
-          exclude: { "os": "not-windows" } // Don't show Windows if they said not-windows
-        }
+        text: '🖥️ Windows', 
+        facts: { "os": "windows", "os_confirmed": true },
+        feedback: 'Thanks! We\'ll provide Windows-specific advice.'
       },
       { 
         id: 'mac',
-        text: 'macOS', 
-        facts: { "os": "mac", "os.confirmed": true },
+        text: '🍎 macOS', 
+        facts: { "os": "mac", "os_confirmed": true },
         feedback: 'Great! We\'ll provide macOS-specific advice.'
       },
       { 
         id: 'linux',
-        text: 'Linux', 
-        facts: { "os": "linux", "os.confirmed": true },
+        text: '🐧 Linux', 
+        facts: { "os": "linux", "os_confirmed": true },
         feedback: 'Excellent! We\'ll provide Linux-specific advice.'
       },
       { 
-        id: 'other',
-        text: 'Other (BSD, Solaris, etc.)', 
-        facts: { "os": "other", "os.confirmed": true },
-        feedback: 'Thanks! We\'ll provide general security advice.'
+        id: 'mobile_only',
+        text: '📱 I only use mobile devices', 
+        facts: { "os": "mobile_only", "os_confirmed": true },
+        feedback: 'Got it! We\'ll focus on mobile security.'
       },
       { 
-        id: 'none',
-        text: 'I don\'t use a desktop computer', 
-        facts: { "os": "none", "os.confirmed": true },
-        feedback: 'Got it! We\'ll focus on mobile and web security.'
+        id: 'other',
+        text: '🔧 Other/Multiple systems', 
+        facts: { "os": "other", "os_confirmed": true },
+        feedback: 'Thanks! We\'ll provide general security advice.'
       }
     ]
   },
+
+  // Browser Confirmation - Chrome (when detected)
   {
-    id: 'browser_detection',
-    statement: 'Detected: Chrome Browser',
+    id: 'chrome_detection_confirm',
+    phase: 'onboarding',
+    priority: PRIORITY.BROWSER_DETECTION,
+    statement: '🌐 Detected: Chrome Browser',
     text: 'Is this your primary browser?',
-    priority: 90,
     tags: ['onboarding'],
     conditions: {
-      include: { "detected_browser": "chrome" }
+      include: { "os_confirmed": true, "browser_detected": "chrome" }
     },
     options: [
       { 
         id: 'yes',
-        text: '✅ Yes, Chrome is primary',
-        facts: { "browser": "chrome" },
-        feedback: 'We\'ll provide Chrome-specific security tips.'
+        text: '✅ Yes, Chrome is my main browser',
+        facts: { "browser": "chrome", "browser_confirmed": true }
       },
       { 
         id: 'no',
-        text: '❌ No, different browser',
-        facts: { "browser": "needs-prompting" },
-        feedback: 'We\'ll ask which browser you prefer.'
+        text: '❌ No, I use a different browser',
+        facts: { "browser_confirmed": false }
+      }
+    ]
+  },
+
+  // Browser Confirmation - Firefox (when detected)
+  {
+    id: 'firefox_detection_confirm',
+    phase: 'onboarding',
+    priority: PRIORITY.BROWSER_DETECTION,
+    statement: '🦊 Detected: Firefox Browser',
+    text: 'Is this your primary browser?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "os_confirmed": true, "browser_detected": "firefox" }
+    },
+    options: [
+      { 
+        id: 'yes',
+        text: '✅ Yes, Firefox is my main browser',
+        facts: { "browser": "firefox", "browser_confirmed": true }
+      },
+      { 
+        id: 'no',
+        text: '❌ No, I use a different browser',
+        facts: { "browser_confirmed": false }
+      }
+    ]
+  },
+
+  // Browser Confirmation - Edge (when detected)
+  {
+    id: 'edge_detection_confirm',
+    phase: 'onboarding',
+    priority: PRIORITY.BROWSER_DETECTION,
+    statement: '🔵 Detected: Microsoft Edge',
+    text: 'Is this your primary browser?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "os_confirmed": true, "browser_detected": "edge" }
+    },
+    options: [
+      { 
+        id: 'yes',
+        text: '✅ Yes, Edge is my main browser',
+        facts: { "browser": "edge", "browser_confirmed": true }
+      },
+      { 
+        id: 'no',
+        text: '❌ No, I use a different browser',
+        facts: { "browser_confirmed": false }
+      }
+    ]
+  },
+
+  // Browser Confirmation - Safari (when detected)
+  {
+    id: 'safari_detection_confirm',
+    phase: 'onboarding',
+    priority: PRIORITY.BROWSER_DETECTION,
+    statement: '🧭 Detected: Safari Browser',
+    text: 'Is this your primary browser?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "os_confirmed": true, "browser_detected": "safari" }
+    },
+    options: [
+      { 
+        id: 'yes',
+        text: '✅ Yes, Safari is my main browser',
+        facts: { "browser": "safari", "browser_confirmed": true }
+      },
+      { 
+        id: 'no',
+        text: '❌ No, I use a different browser',
+        facts: { "browser_confirmed": false }
+      }
+    ]
+  },
+
+  // Browser Selection (when detection failed or not detected)
+  {
+    id: 'browser_selection',
+    phase: 'onboarding',
+    priority: PRIORITY.BROWSER_SELECTION,
+    text: 'Which browser do you primarily use?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "os_confirmed": true },
+      exclude: { "browser_confirmed": true }
+    },
+    options: [
+      { 
+        id: 'chrome',
+        text: '🌐 Chrome', 
+        facts: { "browser": "chrome", "browser_confirmed": true },
+        feedback: 'Thanks! We\'ll provide Chrome-specific security tips.'
+      },
+      { 
+        id: 'firefox',
+        text: '🦊 Firefox', 
+        facts: { "browser": "firefox", "browser_confirmed": true },
+        feedback: 'Great! We\'ll provide Firefox-specific security tips.'
+      },
+      { 
+        id: 'edge',
+        text: '🔵 Microsoft Edge', 
+        facts: { "browser": "edge", "browser_confirmed": true },
+        feedback: 'Perfect! We\'ll provide Edge-specific security tips.'
+      },
+      { 
+        id: 'safari',
+        text: '🧭 Safari', 
+        facts: { "browser": "safari", "browser_confirmed": true },
+        feedback: 'Excellent! We\'ll provide Safari-specific security tips.'
+      },
+      { 
+        id: 'other',
+        text: '🔧 Other browser', 
+        facts: { "browser": "other", "browser_confirmed": true },
+        feedback: 'Thanks! We\'ll provide general browser security advice.'
+      }
+    ]
+  },
+
+  // Technology Comfort Assessment
+  {
+    id: 'tech_comfort',
+    phase: 'onboarding',
+    priority: PRIORITY.TECH_COMFORT,
+    text: 'How would you describe your comfort with technology?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "os_confirmed": true }
+    },
+    options: [
+      {
+        id: 'beginner',
+        text: '👶 Beginner - I stick to basics',
+        facts: { "tech_comfort": "beginner" },
+        feedback: 'Perfect! We\'ll focus on simple, high-impact security steps.'
+      },
+      {
+        id: 'comfortable',
+        text: '👍 Comfortable - I can follow instructions',
+        facts: { "tech_comfort": "comfortable" },
+        feedback: 'Great! We\'ll give you clear steps for important security measures.'
+      },
+      {
+        id: 'advanced',
+        text: '🛠️ Advanced - I enjoy tweaking settings',
+        facts: { "tech_comfort": "advanced" },
+        feedback: 'Excellent! We can recommend more comprehensive security configurations.'
+      }
+    ]
+  },
+
+  // Mobile Device Context (for desktop users)
+  {
+    id: 'mobile_context',
+    phase: 'onboarding',
+    priority: PRIORITY.MOBILE_CONTEXT,
+    text: 'Do you also use a smartphone or tablet for important activities like email, banking, or work?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "tech_comfort": "*" },
+      exclude: { "os": "mobile_only" }
+    },
+    options: [
+      {
+        id: 'iphone',
+        text: '� Yes - iPhone (iOS)',
+        facts: { "has_mobile": true, "mobile_os": "ios" },
+        feedback: 'Great! We\'ll include iPhone security recommendations.'
+      },
+      {
+        id: 'android',
+        text: '📱 Yes - Android phone',
+        facts: { "has_mobile": true, "mobile_os": "android" },
+        feedback: 'Perfect! We\'ll include Android security recommendations.'
+      },
+      {
+        id: 'both',
+        text: '📱 Yes - Both iPhone and Android',
+        facts: { "has_mobile": true, "mobile_os": "both" },
+        feedback: 'We\'ll provide security advice for both platforms.'
+      },
+      {
+        id: 'tablet_only',
+        text: '📱 Yes - iPad/tablet only',
+        facts: { "has_mobile": true, "mobile_os": "tablet" },
+        feedback: 'Good! We\'ll include tablet-specific security advice.'
+      },
+      {
+        id: 'no_mobile',
+        text: '❌ No - Just this computer',
+        facts: { "has_mobile": false },
+        feedback: 'Got it! We\'ll focus on desktop security.'
+      }
+    ]
+  },
+
+  // Usage Context
+  {
+    id: 'usage_context',
+    phase: 'onboarding',
+    priority: PRIORITY.USAGE_CONTEXT,
+    text: 'What\'s your main concern about digital security?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "tech_comfort": "*" }
+    },
+    options: [
+      {
+        id: 'personal_data',
+        text: '🔐 Protecting personal information',
+        facts: { "priority_concern": "privacy" },
+        feedback: 'Smart focus! We\'ll prioritize privacy and data protection.'
+      },
+      {
+        id: 'financial',
+        text: '💳 Financial security',
+        facts: { "priority_concern": "financial" },
+        feedback: 'Critical area! We\'ll emphasize financial security practices.'
+      },
+      {
+        id: 'family_safety',
+        text: '👨‍👩‍👧‍👦 Family/children\'s safety online',
+        facts: { "priority_concern": "family" },
+        feedback: 'Important! We\'ll include family-focused security advice.'
+      },
+      {
+        id: 'work_security',
+        text: '💼 Work/professional security',
+        facts: { "priority_concern": "work" },
+        feedback: 'Great! We\'ll include professional security considerations.'
+      },
+      {
+        id: 'general',
+        text: '🌐 General security best practices',
+        facts: { "priority_concern": "general" },
+        feedback: 'Excellent approach! We\'ll cover comprehensive security fundamentals.'
       }
     ]
   }

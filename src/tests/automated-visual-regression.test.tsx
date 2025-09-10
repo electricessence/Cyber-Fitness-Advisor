@@ -26,8 +26,8 @@ describe('Automated Visual Regression Testing', () => {
       // Trigger resize event
       fireEvent(window, new Event('resize'))
       
-      // Verify layout elements are present with a question
-      expect(screen.getByText(/Is that correct/)).toBeInTheDocument()
+      // Verify layout elements are present with privacy notice
+      expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
       
       // Check if mobile vs desktop elements are correctly shown/hidden
       if (width < 768) {
@@ -83,8 +83,8 @@ describe('Automated Visual Regression Testing', () => {
     for (const state of states) {
       switch (state) {
         case 'initial':
-          // Verify initial state with a question
-          expect(screen.getByText(/Is that correct/)).toBeInTheDocument()
+          // Verify initial state with privacy notice
+          expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
           break
           
         case 'first_question_answered':
@@ -147,8 +147,8 @@ describe('Automated Visual Regression Testing', () => {
     // Try invalid operations that should be handled gracefully
     store.answerQuestion('non_existent_question', 'invalid_answer')
     
-    // Verify UI remains stable with a question
-    expect(screen.getByText(/Is that correct/)).toBeInTheDocument()
+    // Verify UI remains stable with privacy notice
+    expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
     
     // Test with malformed data
     try {
@@ -214,8 +214,8 @@ describe('Automated Visual Regression Testing', () => {
         expect(styles.display).not.toBe('none')
       })
       
-      // Verify core functionality remains with a question
-      expect(screen.getByText(/Is that correct/)).toBeInTheDocument()
+      // Verify core functionality remains with privacy notice
+      expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
       
       // Clean up
       container.remove()

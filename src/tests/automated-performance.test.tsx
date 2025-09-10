@@ -17,8 +17,8 @@ describe('Automated Performance Testing', () => {
     const renderTime = performance.now() - startTime
     expect(renderTime).toBeLessThan(100) // 100ms budget
     
-    // Verify DOM is ready with a question
-    expect(screen.getByText(/Is that correct/)).toBeInTheDocument()
+    // Verify DOM is ready with privacy notice
+    expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
   })
 
   test('Question Transitions are Smooth - Automated', async () => {
@@ -43,7 +43,7 @@ describe('Automated Performance Testing', () => {
       await waitFor(() => {
         const newButtons = screen.queryAllByRole('button')
         const confirmationText = screen.queryByText(/Great! We'll provide/i)
-        const questionText = screen.queryByText(/Is that correct/)
+        const questionText = screen.queryByText('🔒 Privacy First')
         
         // Should have buttons OR be in confirmation state OR have a question
         expect(newButtons.length > 0 || !!confirmationText || !!questionText).toBe(true)
@@ -110,8 +110,8 @@ describe('Automated Performance Testing', () => {
     // Should handle large datasets efficiently
     expect(totalTime).toBeLessThan(1000) // 1 second budget
     
-    // Verify UI still responsive with a question
-    expect(screen.getByText(/Is that correct/)).toBeInTheDocument()
+    // Verify UI still responsive with privacy notice
+    expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
   })
 
   test('Rapid User Input Handling - Automated', async () => {
@@ -130,7 +130,7 @@ describe('Automated Performance Testing', () => {
         await waitFor(() => {
           const hasButtons = screen.queryAllByRole('button').length > 0
           const hasConfirmation = !!screen.queryByText(/Great! We'll provide/i)
-          const hasQuestion = !!screen.queryByText(/Is that correct/)
+          const hasQuestion = !!screen.queryByText('🔒 Privacy First')
           
           // Should have some UI state
           expect(hasButtons || hasConfirmation || hasQuestion).toBe(true)
@@ -147,7 +147,7 @@ describe('Automated Performance Testing', () => {
     expect(rapidInputTime).toBeLessThan(500) // 500ms budget
     
     // UI should still be functional  
-    const hasQuestion = !!screen.queryByText(/Is that correct/)
+    const hasQuestion = !!screen.queryByText('🔒 Privacy First')
     const hasConfirmation = !!screen.queryByText(/Great! We'll provide/i)
     expect(hasQuestion || hasConfirmation).toBeTruthy()
   })

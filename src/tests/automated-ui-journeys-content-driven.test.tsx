@@ -73,7 +73,7 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       let foundAnyQuestion = false;
       
       // Check for the Windows question which should be first
-      if (screen.queryByText(/It appears you are using/) || screen.queryByText(/Is that correct/)) {
+      if (screen.queryByText(/It appears you are using/) || screen.queryByText('🔒 Privacy First')) {
         foundAnyQuestion = true;
       }
       

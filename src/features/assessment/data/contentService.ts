@@ -33,7 +33,7 @@ export class QuestionContentService {
    */
   getOnboardingQuestions(): Question[] {
     return this.getQuestionsByPhase('onboarding')
-      .sort((a, b) => (a.phaseOrder || 0) - (b.phaseOrder || 0));
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0)); // Higher priority first
   }
 
   /**
@@ -69,22 +69,11 @@ export class QuestionContentService {
   }
 
   /**
-   * Get questions by device filter
+   * Get questions by device filter (deprecated - use condition engine instead)
    */
-  getQuestionsForDevice(os?: string[], browsers?: string[]): Question[] {
-    return this.getAllQuestions().filter(question => {
-      if (!question.deviceFilter) return true;
-      
-      if (os && question.deviceFilter.os) {
-        return os.some(userOS => question.deviceFilter!.os!.includes(userOS));
-      }
-      
-      if (browsers && question.deviceFilter.browser) {
-        return browsers.some(userBrowser => question.deviceFilter!.browser!.includes(userBrowser));
-      }
-      
-      return true;
-    });
+  getQuestionsForDevice(_os?: string[], _browsers?: string[]): Question[] {
+    // Device-specific filtering is now handled by the condition engine
+    return this.getAllQuestions();
   }
 
   /**
