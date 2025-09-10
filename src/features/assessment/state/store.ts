@@ -296,13 +296,13 @@ export const useAssessmentStore = create<AssessmentState>()(
         
         console.log('New calculated state:', {
           newScore: scoreResult.overallScore,
-          newLevel: nextLevelProgress.level,
+          newLevel: nextLevelProgress.currentLevel,
           newAnswersCount: Object.keys(newAnswers).length
         });
         
         const scoreIncrease = scoreResult.overallScore - previousScore;
         const shouldCelebrate = scoreIncrease > 5 || 
-          (nextLevelProgress.level > state.currentLevel && nextLevelProgress.level <= 2); // Celebrate early levels
+          (nextLevelProgress.currentLevel > state.currentLevel && nextLevelProgress.currentLevel <= 2); // Celebrate early levels
         
         // Check for new badges (simplified for MVP)
         const newBadges = [...state.earnedBadges];
@@ -319,14 +319,14 @@ export const useAssessmentStore = create<AssessmentState>()(
         console.log('About to update store with:', {
           answersCount: Object.keys(newAnswers).length,
           overallScore: scoreResult.overallScore,
-          currentLevel: nextLevelProgress.level
+          currentLevel: nextLevelProgress.currentLevel
         });
         
         set({
           answers: newAnswers,
           overallScore: scoreResult.overallScore,
           domainScores: scoreResult.domainScores,
-          currentLevel: nextLevelProgress.level,
+          currentLevel: nextLevelProgress.currentLevel,
           quickWinsCompleted: 0, // Simplified for now
           totalQuickWins: scoreResult.totalQuickWins,
           nextLevelProgress,

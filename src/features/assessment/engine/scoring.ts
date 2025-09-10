@@ -96,10 +96,10 @@ export function getNextLevelProgress(currentScore: number) {
   const pointsToNextLevel = pointsPerLevel - pointsInCurrentLevel;
   
   return {
-    level: currentLevel,
-    pointsInCurrentLevel,
-    pointsToNextLevel,
-    progressPercentage: Math.round((pointsInCurrentLevel / pointsPerLevel) * 100)
+    currentLevel,
+    nextLevel: currentLevel + 1,
+    pointsNeeded: pointsToNextLevel,
+    progress: Math.round((pointsInCurrentLevel / pointsPerLevel) * 100)
   };
 }
 
