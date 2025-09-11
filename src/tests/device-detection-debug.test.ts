@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useAssessmentStore, initializeStore } from '../features/assessment/state/store';
 

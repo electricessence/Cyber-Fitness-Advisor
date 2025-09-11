@@ -197,7 +197,7 @@ export function UniversalCard({
                            }`}
                 >
                   <span>{option.text}</span>
-                  {mode !== 'question' && option.points > 0 && (
+                  {mode !== 'question' && (option.points || 0) > 0 && (
                     <span className="text-sm opacity-75">+{option.points} pts</span>
                   )}
                 </button>
@@ -220,7 +220,7 @@ export function UniversalCard({
                     className="text-blue-600 focus:ring-blue-500"
                   />
                   <span className="flex-1">{option.text}</span>
-                  {option.points > 0 && (
+                  {(option.points || 0) > 0 && (
                     <span className="text-sm text-gray-500">+{option.points} pts</span>
                   )}
                 </label>
@@ -236,7 +236,7 @@ export function UniversalCard({
               <option value="">Select an option...</option>
               {options.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.text} {option.points > 0 ? `(+${option.points} pts)` : ''}
+                  {option.text} {(option.points || 0) > 0 ? `(+${option.points} pts)` : ''}
                 </option>
               ))}
             </select>

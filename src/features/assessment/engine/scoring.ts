@@ -1,7 +1,7 @@
 import type { Question, QuestionBank, Answer, AnswerOption } from './schema';
 
 // Calculate points for a single question based on selected answer
-export function calculateQuestionPoints(question: Question, value: string | boolean): number {
+export function calculateQuestionPoints(question: Question, value: string | boolean | number): number {
   // Handle YN (Yes/No) questions - legacy compatibility
   if ((question as any).type === 'YN') {
     const weight = (question as any).weight || 0;
@@ -74,12 +74,22 @@ export function calculateDomainScore(
 export function calculateOverallScore(questionBank: QuestionBank, answers: Record<string, Answer>) {
   let totalScore = 0;
   let maxPossibleScore = 0;
+  let quickWinsCompleted = 0;
+  let totalQuickWins = 0;
   const domainScores: Record<string, { score: number; maxScore: number; }> = {};
 
   // Navigate through domains -> levels -> questions
   for (const domain of questionBank.domains) {
     for (const level of domain.levels) {
       for (const question of level.questions) {
+        // Count quick wins
+        if (question.quickWin) {
+          totalQuickWins++;
+          if (answers[question.id]) {
+            quickWinsCompleted++;
+          }
+        }
+
         const answer = answers[question.id];
         if (!answer) continue;
 
@@ -109,11 +119,17 @@ export function calculateOverallScore(questionBank: QuestionBank, answers: Recor
     }
   }
 
+  const percentage = maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0;
+  const levelData = getNextLevelProgress(totalScore);
+
   return {
     overallScore: totalScore,
     maxPossibleScore,
     domainScores,
-    percentage: maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0
+    percentage,
+    level: levelData.currentLevel,
+    quickWinsCompleted,
+    totalQuickWins
   };
 }
 
@@ -170,7 +186,7 @@ export function getTopRecommendations(questionBank: QuestionBank, answers: Recor
 }
 
 export function calculateAnswerExpiration(
-  question: any, // Allow any type for legacy compatibility
+  _question: any, // Allow any type for legacy compatibility
   value: string | boolean | number
 ): { expiresAt: Date; expirationReason: string } | null {
   if (!value) return null; // Handle undefined/null values

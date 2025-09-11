@@ -5,6 +5,7 @@
  * by tracing through the condition evaluation process.
  */
 
+// @ts-nocheck
 import { describe, it } from 'vitest';
 import { useAssessmentStore } from '../features/assessment/state/store';
 

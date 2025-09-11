@@ -63,10 +63,10 @@ export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
                 id={question.id}
                 title={question.text}
                 category="Assessment"
-                priority={question.weight}
+                priority={question.weight || question.priority}
                 isQuickWin={question.quickWin}
                 timeEstimate={question.timeEstimate}
-                impact={question.weight >= 8 ? 'high' : question.weight >= 5 ? 'medium' : 'low'}
+                impact={(question.weight || 0) >= 8 ? 'high' : (question.weight || 0) >= 5 ? 'medium' : 'low'}
                 currentAnswer={answers[question.id]?.value as string}
                 detailedGuidance={question.explanation}
                 actionHint={question.actionHint}
@@ -84,7 +84,7 @@ export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
                     id: 'unsure',
                     text: '🤔 Not sure',
                     displayText: 'Check this setting',
-                    points: Math.floor(question.weight * 0.3),
+                    points: Math.floor((question.weight || 0) * 0.3),
                     target: 'todo' as const,
                   },
                   {

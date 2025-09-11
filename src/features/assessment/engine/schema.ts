@@ -4,7 +4,7 @@ import type { Gate } from './conditions';
 export interface AnswerOption {
   id: string; // Stable identifier for tests and logic
   text: string; // What the user sees as the choice (can change for UI)
-  facts: Record<string, boolean | string>; // Required - every answer establishes facts
+  facts?: Record<string, boolean | string>; // Optional for backward compatibility - every answer should establish facts
   feedback?: string; // Optional - skip for smooth flow, include for acknowledgment
   icon?: string; // Optional emoji or icon (e.g. "✅", "❌", "🖥️")
   points?: number; // Optional gamification points (only if > 0)
@@ -15,6 +15,13 @@ export interface AnswerOption {
     include?: Record<string, boolean | string | ArrayLike<boolean | string>>; // Show this option if facts match
     exclude?: Record<string, boolean | string | ArrayLike<boolean | string>>; // Hide this option if facts match
   };
+  
+  // Legacy properties for backward compatibility
+  displayText?: string; // Alternative display text
+  target?: string; // Target outcome for recommendations
+  advice?: string; // Advice text for this option
+  impact?: string; // Impact level for recommendations
+  followUp?: string | any; // Follow-up information - flexible type
 }
 
 export interface SecurityTopic {
@@ -52,10 +59,28 @@ export interface Question {
   conditions?: {
     include?: Record<string, boolean | string | ArrayLike<boolean | string>>;
     exclude?: Record<string, boolean | string | ArrayLike<boolean | string>>;
+    browserInfo?: any; // Flexible browser information for conditions
   };
   
   // Phase management
   phase?: 'onboarding' | 'assessment';
+  
+  // Legacy properties for backward compatibility
+  type?: string; // Question type for component logic
+  explanation?: string; // Educational information about the question
+  actionHint?: string; // Hint for action-type questions
+  actionOptions?: any[]; // Action-specific options for ActionQuestionCard
+  weight?: number; // Question weight (maps to priority)
+  relatedTopics?: string[]; // Related educational topics
+  quickWin?: boolean; // Quick win flag for UI
+  timeEstimate?: string; // Time estimate for completion
+  affirmativeText?: string; // Text for affirmative responses
+  negativeText?: string; // Text for negative responses
+  deviceFilter?: string | any; // Device filter for availability - string or object
+  prerequisites?: string[] | { answered?: string[]; anyAnswered?: string[]; }; // Prerequisites for this question
+  runtimeVisibleFn?: (state: any) => boolean; // Runtime visibility function
+  category?: string; // Question category
+  phaseOrder?: number; // Phase ordering
 }
 
 export interface Level {
@@ -86,7 +111,7 @@ export interface Suite {
 
 export interface Answer {
   questionId: string;
-  value: string; // The answer text (since AnswerOption uses text as ID)
+  value: string | boolean | number; // The answer value - flexible for different question types
   timestamp?: Date;
   pointsEarned?: number;
   questionText?: string; // Store for historic reference

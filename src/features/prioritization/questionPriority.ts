@@ -2,7 +2,7 @@ import type { Question } from '../assessment/engine/schema';
 import type { DeviceProfile } from '../assessment/engine/deviceScenarios';
 
 export interface PrioritizedQuestion extends Question {
-  priority: QuestionPriority;
+  priorityLevel: QuestionPriority;
   impactScore: number;
   difficultyScore: number; // 1-5, where 1 is easiest
   estimatedMinutes: number;
@@ -38,7 +38,7 @@ export function calculateQuestionPriority(
   let isEasyWin = false;
 
   // Base scoring from question weight
-  urgencyScore = question.weight * 2;
+  urgencyScore = (question.weight || question.priority) * 2;
 
   // Device-specific urgency boosts
   if (question.id.includes('windows') && deviceProfile.otherDevices.hasWindows) {
@@ -121,7 +121,7 @@ export function prioritizeQuestions(
   currentAnswers: Record<string, any>
 ): PrioritizedQuestion[] {
   return questions.map(question => {
-    const priority = calculateQuestionPriority(question, deviceProfile, currentAnswers);
+    const priorityLevel = calculateQuestionPriority(question, deviceProfile, currentAnswers);
     
     // Calculate difficulty score (1 = very easy, 5 = complex)
     let difficultyScore = 1;
@@ -139,17 +139,17 @@ export function prioritizeQuestions(
     }
     
     // Calculate impact score
-    const impactScore = priority.urgencyScore + (priority.isEasyWin ? 20 : 0);
+    const impactScore = priorityLevel.urgencyScore + (priorityLevel.isEasyWin ? 20 : 0);
     
     // Determine category
     let category: PrioritizedQuestion['category'];
-    if (priority.isEasyWin && priority.isHighImpact && priority.isRecommended) {
+    if (priorityLevel.isEasyWin && priorityLevel.isHighImpact && priorityLevel.isRecommended) {
       category = 'todays_task';
-    } else if (priority.isHighImpact && priority.isRecommended) {
+    } else if (priorityLevel.isHighImpact && priorityLevel.isRecommended) {
       category = 'high_impact_recommended';
-    } else if (priority.isRecommended) {
+    } else if (priorityLevel.isRecommended) {
       category = 'recommended';
-    } else if (priority.isHighImpact) {
+    } else if (priorityLevel.isHighImpact) {
       category = 'high_impact';
     } else {
       category = 'standard';
@@ -157,7 +157,7 @@ export function prioritizeQuestions(
 
     return {
       ...question,
-      priority,
+      priorityLevel,
       impactScore,
       difficultyScore,
       estimatedMinutes,
@@ -184,7 +184,7 @@ export function getTodaysTask(
   const candidates = todaysTaskCandidates.length > 0 
     ? todaysTaskCandidates 
     : unanswered.filter(q => 
-        q.priority.isEasyWin && 
+        q.priorityLevel.isEasyWin && 
         q.difficultyScore <= 2 && 
         q.estimatedMinutes <= 10
       );
@@ -243,8 +243,8 @@ export function sortQuestionsByPriority(prioritizedQuestions: PrioritizedQuestio
     }
     
     // Within same category, sort by urgency score descending
-    if (b.priority.urgencyScore !== a.priority.urgencyScore) {
-      return b.priority.urgencyScore - a.priority.urgencyScore;
+    if (b.priorityLevel.urgencyScore !== a.priorityLevel.urgencyScore) {
+      return b.priorityLevel.urgencyScore - a.priorityLevel.urgencyScore;
     }
     
     // Finally by difficulty (easier first)

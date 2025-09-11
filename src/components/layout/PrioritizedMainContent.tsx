@@ -226,12 +226,12 @@ export function PrioritizedMainContent({ currentDomain, currentLevel }: Prioriti
             title={question.text}
             category={question.category}
             mode="question"
-            priority={question.priority.urgencyScore}
-            isQuickWin={question.priority.isEasyWin}
+            priority={question.priorityLevel.urgencyScore}
+            isQuickWin={question.priorityLevel.isEasyWin}
             timeEstimate={`${question.estimatedMinutes} min`}
-            impact={question.priority.level === 'critical' ? 'high' : 
-                   question.priority.level === 'high' ? 'high' :
-                   question.priority.level === 'medium' ? 'medium' : 'low'}
+            impact={question.priorityLevel.level === 'critical' ? 'high' : 
+                   question.priorityLevel.level === 'high' ? 'high' :
+                   question.priorityLevel.level === 'medium' ? 'medium' : 'low'}
             actionHint={question.actionHint}
             detailedGuidance={question.explanation}
             options={question.options}

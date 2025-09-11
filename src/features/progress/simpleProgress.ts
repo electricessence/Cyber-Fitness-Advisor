@@ -79,32 +79,40 @@ export function createSimpleQuestionBank(deviceProfile: DeviceProfile | null): Q
                 text: 'Device confirmation completed',
                 type: 'YN',
                 weight: 5,
+                priority: 5,
                 explanation: 'Confirming your device helps us provide relevant security advice.',
-                quickWin: false
+                quickWin: false,
+                options: []
               },
               {
                 id: 'tech_comfort',
                 text: 'Technology comfort level assessed',
                 type: 'YN', 
                 weight: 5,
+                priority: 5,
                 explanation: 'Understanding your tech comfort helps us adjust our recommendations.',
-                quickWin: false
+                quickWin: false,
+                options: []
               },
               {
                 id: 'security_priority',
                 text: 'Security priority identified',
                 type: 'YN',
                 weight: 5,
+                priority: 5,
                 explanation: 'Knowing your main security concerns helps us prioritize recommendations.',
-                quickWin: false
+                quickWin: false,
+                options: []
               },
               {
                 id: 'current_habits',
                 text: 'Current security habits evaluated',
                 type: 'YN',
                 weight: 10,
+                priority: 10,
                 explanation: 'Understanding your current practices helps us build on what you already do.',
-                quickWin: true
+                quickWin: true,
+                options: []
               }
             ]
           }

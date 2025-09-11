@@ -19,7 +19,15 @@ export interface AvailabilityContext {
 export function passesDeviceFilter(question: Question, deviceInfo?: DeviceInfo): boolean {
   if (!question.deviceFilter || !deviceInfo) return true;
   
-  const { os, browser } = question.deviceFilter;
+  // Handle deviceFilter as string (legacy) or object
+  if (typeof question.deviceFilter === 'string') {
+    // Simple string match for backward compatibility
+    return question.deviceFilter.includes(deviceInfo.os) || question.deviceFilter.includes(deviceInfo.browser);
+  }
+  
+  // Handle deviceFilter as object with os/browser properties
+  const filter = question.deviceFilter as any;
+  const { os, browser } = filter;
   
   if (os && !os.includes(deviceInfo.os)) return false;
   if (browser && !browser.includes(deviceInfo.browser)) return false;
@@ -33,6 +41,12 @@ export function passesDeviceFilter(question: Question, deviceInfo?: DeviceInfo):
 export function passesPrerequisites(question: Question, answers: Record<string, unknown>): boolean {
   if (!question.prerequisites) return true;
   
+  // Handle legacy format as string array
+  if (Array.isArray(question.prerequisites)) {
+    return question.prerequisites.every((questionId: string) => questionId in answers);
+  }
+  
+  // Handle new format with answered/anyAnswered
   const { answered, anyAnswered } = question.prerequisites;
   
   // All required questions must be answered (any value)
@@ -44,7 +58,7 @@ export function passesPrerequisites(question: Question, answers: Record<string, 
   
   // At least one of these must be answered
   if (anyAnswered) {
-    const hasAny = anyAnswered.some(questionId => questionId in answers);
+    const hasAny = anyAnswered.some((questionId: string) => questionId in answers);
     if (!hasAny) return false;
   }
   
