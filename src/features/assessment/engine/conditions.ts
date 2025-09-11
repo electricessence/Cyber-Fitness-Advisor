@@ -375,6 +375,29 @@ export class ConditionEngine {
       return context.deviceProfile !== null && context.deviceProfile !== undefined;
     }
     
+    // Check simple include/exclude conditions
+    if (question.conditions) {
+      // Check include conditions - must match ALL to be visible
+      if (question.conditions.include) {
+        for (const [factName, expectedValue] of Object.entries(question.conditions.include)) {
+          const actualValue = this.getFactValue(factName, context);
+          if (actualValue !== expectedValue) {
+            return true; // Filter out - include condition failed
+          }
+        }
+      }
+      
+      // Check exclude conditions - must NOT match ANY to be visible  
+      if (question.conditions.exclude) {
+        for (const [factName, excludeValue] of Object.entries(question.conditions.exclude)) {
+          const actualValue = this.getFactValue(factName, context);
+          if (actualValue === excludeValue) {
+            return true; // Filter out - exclude condition matched
+          }
+        }
+      }
+    }
+    
     // Filter by device compatibility
     if (question.deviceFilter && context.deviceProfile) {
       const { os } = question.deviceFilter;

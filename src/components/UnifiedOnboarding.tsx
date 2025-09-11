@@ -20,7 +20,7 @@ interface UnifiedOnboardingProps {
 export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   const { 
     answers,
-    conditionEngine,
+    factsProfile,
     answerQuestion,
     setDeviceProfile
   } = useAssessmentStore();
@@ -36,16 +36,40 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   // Get onboarding questions from the main question bank
   const onboardingQuestions = getOnboardingQuestions();
 
-  // Get currently visible onboarding questions based on answers
-  // NOTE: Don't pass deviceProfile during onboarding - that would hide onboarding questions
-  const context = { 
-    answers, 
-    deviceProfile: undefined // Keep undefined during onboarding
-  };
-  const evaluation = conditionEngine.evaluate(context);
-  const visibleOnboardingQuestions = onboardingQuestions.filter(q => 
-    evaluation.visibleQuestionIds.includes(q.id)
-  );
+  // Filter onboarding questions using the same facts-based logic as the store
+  // This ensures consistent visibility logic with the main assessment
+  const facts = factsProfile.facts;
+  const visibleOnboardingQuestions = onboardingQuestions.filter(question => {
+    let isVisible = true;
+    
+    // Check include conditions - question is visible if facts match
+    if (question.conditions?.include) {
+      let includeMatches = false;
+      for (const [factId, expectedValue] of Object.entries(question.conditions.include)) {
+        const fact = facts[factId];
+        if (fact && fact.value === expectedValue) {
+          includeMatches = true;
+          break;
+        }
+      }
+      if (!includeMatches) {
+        isVisible = false;
+      }
+    }
+    
+    // Check exclude conditions - question is hidden if facts match
+    if (question.conditions?.exclude && isVisible) {
+      for (const [factId, expectedValue] of Object.entries(question.conditions.exclude)) {
+        const fact = facts[factId];
+        if (fact && fact.value === expectedValue) {
+          isVisible = false;
+          break;
+        }
+      }
+    }
+    
+    return isVisible;
+  });
 
   const currentQuestion = visibleOnboardingQuestions[currentQuestionIndex];
 
