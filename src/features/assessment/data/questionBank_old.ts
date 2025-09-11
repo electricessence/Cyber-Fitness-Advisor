@@ -44,7 +44,8 @@ const onboardingQuestions: Question[] = [
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
     conditions: {
-      include: { "os_detected": "windows" }
+      include: { "os_detected": "windows" },
+      exclude: { "os_confirmed": true }
     },
     options: [
       { 
@@ -71,7 +72,8 @@ const onboardingQuestions: Question[] = [
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
     conditions: {
-      include: { "os_detected": "mac" }
+      include: { "os_detected": "mac" },
+      exclude: { "os_confirmed": true }
     },
     options: [
       { 
@@ -98,7 +100,8 @@ const onboardingQuestions: Question[] = [
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
     conditions: {
-      include: { "os_detected": "linux" }
+      include: { "os_detected": "linux" },
+      exclude: { "os_confirmed": true }
     },
     options: [
       { 

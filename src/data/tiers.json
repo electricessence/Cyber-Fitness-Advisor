@@ -1,0 +1,158 @@
+{
+  "version": "1.0.0",
+  "description": "Tier progression system based on prerequisite facts",
+  "tiers": [
+    {
+      "id": "tier_0",
+      "name": "Onboarding",
+      "description": "Learning the basics and establishing your security foundation",
+      "order": 0,
+      "prerequisites": {
+        "gates": [
+          {
+            "all": [
+              { "fact": "onboarding.started", "operator": "equals", "value": true }
+            ]
+          }
+        ]
+      },
+      "scoring": {
+        "contributesToScore": false,
+        "description": "Foundation setting - not scored"
+      },
+      "unlocks": {
+        "content": ["foundation_questions"],
+        "features": ["device_detection", "basic_recommendations"]
+      }
+    },
+    {
+      "id": "tier_1", 
+      "name": "Shields Up",
+      "description": "Browser safety and easy security wins",
+      "order": 1,
+      "prerequisites": {
+        "gates": [
+          {
+            "all": [
+              { "fact": "device.type", "operator": "exists" },
+              { "fact": "device.os.primary", "operator": "exists" }
+            ]
+          }
+        ]
+      },
+      "unlocks": {
+        "content": ["browser_security", "quick_wins"],
+        "features": ["daily_tasks", "progress_tracking"]
+      },
+      "badgeInfo": {
+        "icon": "🛡️",
+        "title": "Digital Defender"
+      }
+    },
+    {
+      "id": "tier_2",
+      "name": "Password & MFA",
+      "description": "Master password management and multi-factor authentication",
+      "order": 2,
+      "prerequisites": {
+        "gates": [
+          {
+            "any": [
+              {
+                "all": [
+                  { "fact": "browser.ad_blocker", "operator": "equals", "value": true },
+                  { "fact": "browser.https_awareness", "operator": "equals", "value": true }
+                ]
+              },
+              {
+                "all": [
+                  { "fact": "behavior.software_updates", "operator": "in", "values": ["automatic", "prompt"] }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "unlocks": {
+        "content": ["password_management", "mfa_setup"],
+        "features": ["advanced_recommendations", "security_score_visibility"]
+      },
+      "badgeInfo": {
+        "icon": "🔐",
+        "title": "Access Guardian"
+      }
+    },
+    {
+      "id": "tier_3",
+      "name": "Email Security", 
+      "description": "Secure your email and communications",
+      "order": 3,
+      "prerequisites": {
+        "gates": [
+          {
+            "all": [
+              { "fact": "behavior.password_manager.usage", "operator": "equals", "value": true },
+              { "fact": "behavior.mfa.banking", "operator": "equals", "value": true }
+            ]
+          }
+        ]
+      },
+      "unlocks": {
+        "content": ["email_security", "phishing_protection"],
+        "features": ["threat_awareness", "communication_security"]
+      },
+      "badgeInfo": {
+        "icon": "📧",
+        "title": "Communication Sentinel"
+      }
+    },
+    {
+      "id": "tier_4",
+      "name": "Data Safety",
+      "description": "Advanced data protection and privacy controls",
+      "order": 4, 
+      "prerequisites": {
+        "gates": [
+          {
+            "all": [
+              { "fact": "behavior.email.security_awareness", "operator": "equals", "value": true },
+              { "fact": "behavior.phishing.recognition", "operator": "equals", "value": true }
+            ]
+          }
+        ]
+      },
+      "unlocks": {
+        "content": ["data_protection", "privacy_controls", "backup_strategies"],
+        "features": ["expert_mode", "mentorship_capabilities"]
+      },
+      "badgeInfo": {
+        "icon": "🗄️",
+        "title": "Data Guardian"
+      }
+    },
+    {
+      "id": "tier_5",
+      "name": "Network Segmentation",
+      "description": "Master network security and advanced practices", 
+      "order": 5,
+      "prerequisites": {
+        "gates": [
+          {
+            "all": [
+              { "fact": "behavior.backup.strategy", "operator": "in", "values": ["automated", "comprehensive"] },
+              { "fact": "behavior.data_protection.awareness", "operator": "equals", "value": true }
+            ]
+          }
+        ]
+      },
+      "unlocks": {
+        "content": ["network_security", "advanced_privacy", "threat_modeling"],
+        "features": ["expert_diagnostics", "security_audit_tools"]
+      },
+      "badgeInfo": {
+        "icon": "🌐",
+        "title": "Network Architect" 
+      }
+    }
+  ]
+}
