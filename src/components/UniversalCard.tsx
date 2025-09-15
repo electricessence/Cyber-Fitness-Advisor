@@ -179,7 +179,6 @@ export function UniversalCard({
                   key={option.id}
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log('UniversalCard option clicked:', option.id);
                     if (onAnswer) {
                       onAnswer(option.id);
                     }

@@ -3,11 +3,10 @@ import { useAssessmentStore } from '../../features/assessment/state/store';
 import { OnboardingBanner } from '../OnboardingBanner';
 
 interface MainContentProps {
-  currentDomain: string;
-  currentLevel: number;
+  // Props available for future use - currently using store state directly
 }
 
-export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
+export function MainContent(_props: MainContentProps) {
   const { 
     answers, 
     answerQuestion,
@@ -16,15 +15,6 @@ export function MainContent({ currentDomain, currentLevel }: MainContentProps) {
 
   // Get available questions with proper ordering (onboarding first)
   const availableQuestions = getOrderedAvailableQuestions?.() || [];
-  
-  // Debug logging
-  console.log('MainContent Debug:', {
-    currentDomain,
-    currentLevel,
-    availableQuestionsCount: availableQuestions.length,
-    answersCount: Object.keys(answers).length,
-    availableQuestionIds: availableQuestions.map(q => q.id)
-  });
 
   if (availableQuestions.length === 0) {
     return (

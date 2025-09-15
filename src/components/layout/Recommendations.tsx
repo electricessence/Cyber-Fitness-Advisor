@@ -66,8 +66,7 @@ export function Recommendations({
               }
             ]}
             onAnswer={(answer) => {
-              console.log(`Action ${action.id} answered:`, answer);
-              // Actually call the store function to save the answer
+              // Save the answer to store
               answerQuestion(action.id, answer);
             }}
           />

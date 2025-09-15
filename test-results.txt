@@ -1,0 +1,2730 @@
+
+> cyberfitadvisor@1.0.0 test D:\Users\essence\Development\- GitHub\Cyber-Fitness-Advisor
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mD:/Users/essence/Development/- GitHub/Cyber-Fitness-Advisor[39m
+
+[90mstdout[2m | src/components/UniversalCard.spec.tsx[2m > [22m[2mUniversalCard[2m > [22m[2mwhen rendering in question mode[2m > [22m[2mshould call onAnswer when option is clicked
+[22m[39mUniversalCard option clicked: yes
+
+ [32mΓ£ô[39m src/components/UniversalCard.spec.tsx [2m([22m[2m9 tests[22m[2m)[22m[32m 59[2mms[22m[39m
+ [32mΓ£ô[39m src/components/AnswerHistory.spec.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+[90mstdout[2m | src/tests/os-detection-bug-reproduction.test.ts[2m > [22m[2mOS Detection Bug - Exact User Experience[2m > [22m[2mREPRODUCES BUG: Mac detection should NOT appear after Windows confirmation
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+
+[90mstdout[2m | src/tests/os-detection-bug-fix.test.ts[2m > [22m[2mOS Detection Bug Fix - Prevent Multiple OS Questions[2m > [22m[2mCRITICAL: Mac and Linux detection questions must be hidden after Windows confirmation
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+
+[90mstdout[2m | src/features/assessment/facts/journey-simple.test.ts[2m > [22m[2m≡ƒÄ» Facts-Based Architecture: User Journeys[2m > [22m[2m≡ƒô▒ Journey: User onboards Windows device and facts are established
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/os-detection-bug-fix.test.ts[2m > [22m[2mOS Detection Bug Fix - Prevent Multiple OS Questions[2m > [22m[2mCRITICAL: Mac and Linux detection questions must be hidden after Windows confirmation
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/os-detection-flow-debug.test.ts[2m > [22m[2mFull OS Detection Flow Debug[2m > [22m[2mshould hide os_selection after windows confirmation
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+Store answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/facts/journey-simple.test.ts[2m > [22m[2m≡ƒÄ» Facts-Based Architecture: User Journeys[2m > [22m[2m≡ƒöÉ Journey: Password manager usage establishes behavior facts
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/os-detection-bug-reproduction.test.ts[2m > [22m[2mOS Detection Bug - Exact User Experience[2m > [22m[2mREPRODUCES BUG: Mac detection should NOT appear after Windows confirmation
+[22m[39m
+≡ƒöì === INITIAL STATE ===
+Initial visible questions: [
+  [32m'privacy_notice'[39m,
+  [32m'windows_detection_confirm'[39m,
+  [32m'os_selection'[39m,
+  [32m'password_manager'[39m,
+  [32m'two_factor_auth'[39m,
+  [32m'software_updates'[39m,
+  [32m'virus_scan_recent'[39m,
+  [32m'backup_frequency'[39m,
+  [32m'wifi_security'[39m,
+  [32m'email_attachments'[39m,
+  [32m'browser_extensions'[39m
+]
+Initial facts: { [32m'0'[39m: [32m'windows'[39m, [32m'1'[39m: [32m'unknown'[39m, [32m'2'[39m: [32m'desktop'[39m }
+
+≡ƒÄ» === STEP 1: Windows Detection ===
+Windows detection visible: [33mtrue[39m
+Mac detection visible: [33mfalse[39m
+
+Γ£à === STEP 2: User Confirms Windows ===
+Store answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+≡ƒôè === AFTER WINDOWS CONFIRMATION ===
+Visible questions: [
+  [32m'privacy_notice'[39m,
+  [32m'chrome_detection_confirm'[39m,
+  [32m'firefox_detection_confirm'[39m,
+  [32m'edge_detection_confirm'[39m,
+  [32m'safari_detection_confirm'[39m,
+  [32m'browser_selection'[39m,
+  [32m'tech_comfort'[39m,
+  [32m'password_manager'[39m,
+  [32m'two_factor_auth'[39m,
+  [32m'software_updates'[39m,
+  [32m'virus_scan_recent'[39m,
+  [32m'backup_frequency'[39m,
+  [32m'wifi_security'[39m,
+  [32m'email_attachments'[39m,
+  [32m'browser_extensions'[39m
+]
+Updated facts: {
+  [32m'0'[39m: [32m'windows'[39m,
+  [32m'1'[39m: [32m'unknown'[39m,
+  [32m'2'[39m: [32m'desktop'[39m,
+  [32m'3'[39m: [32m'windows'[39m,
+  [32m'4'[39m: [33mtrue[39m
+}
+
+≡ƒöì === CRITICAL FACTS ANALYSIS ===
+os_confirmed: [33mtrue[39m
+os: windows
+os_detected: windows
+
+≡ƒÉ¢ === BUG CHECK ===
+Windows detection after confirmation: [33mfalse[39m
+Mac detection after confirmation: [33mfalse[39m
+Linux detection after confirmation: [33mfalse[39m
+
+[90mstdout[2m | src/features/assessment/facts/journey-simple.test.ts[2m > [22m[2m≡ƒÄ» Facts-Based Architecture: User Journeys[2m > [22m[2m≡ƒÄ» Journey: Complete assessment flow maintains data integrity
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: virus_scan_recent this_week
+Previous state: { score: [33m10[39m, level: [33m0[39m, answersCount: [33m2[39m }
+Found question: virus_scan_recent When did you last run a virus scan?
+Points earned: [33m8[39m
+Injected fact: virus_scan = recent
+Facts updated via factsActions: [ [32m'virus_scan'[39m ]
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m3[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates automatic
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m3[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m8[39m
+Injected fact: updates = automatic
+Facts updated via factsActions: [ [32m'updates'[39m ]
+New calculated state: { newScore: [33m26[39m, newLevel: [33m0[39m, newAnswersCount: [33m4[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/os-detection-bug-reproduction.test.ts[2m > [22m[2mOS Detection Bug - Exact User Experience[2m > [22m[2mDEBUG: Check individual question condition evaluation
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 1 answers: { totalFacts: [33m5[39m, categories: [ [32m'device'[39m ] }
+
+ [32mΓ£ô[39m src/tests/os-detection-bug-fix.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 7[2mms[22m[39m
+[90mstdout[2m | src/features/assessment/facts/journey-simple.test.ts[2m > [22m[2m≡ƒöº Facts System: Architecture Validation[2m > [22m[2mshould maintain backward compatibility with legacy system
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/os-detection-bug-reproduction.test.ts[2m > [22m[2mOS Detection Bug - Exact User Experience[2m > [22m[2mDEBUG: Check individual question condition evaluation
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+≡ƒöì === MAC DETECTION QUESTION ANALYSIS ===
+Mac question found: [33mtrue[39m
+Mac question conditions: { include: { os_detected: [32m'mac'[39m }, exclude: { os_confirmed: [33mtrue[39m } }
+Include condition (os_detected = mac): [33mfalse[39m
+Actual os_detected value: windows
+Exclude condition (os_confirmed = true): [33mtrue[39m
+Actual os_confirmed value: [33mtrue[39m
+Question should be visible: [33mfalse[39m
+Question actually visible: [33mfalse[39m
+
+ [32mΓ£ô[39m src/tests/os-detection-flow-debug.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 7[2mms[22m[39m
+[90mstdout[2m | src/features/assessment/facts/journey-simple.test.ts[2m > [22m[2m≡ƒöº Facts System: Architecture Validation[2m > [22m[2mshould handle question flow correctly
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+ [32mΓ£ô[39m src/tests/os-detection-bug-reproduction.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32mΓ£ô[39m src/features/assessment/facts/journey-simple.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+[90mstdout[2m | src/tests/browser-detection-verification.test.ts[2m > [22m[2mBrowser Detection Fix Verification[2m > [22m[2mbrowser questions should not show when browser_detected is unknown
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+
+[90mstdout[2m | src/tests/browser-detection-verification.test.ts[2m > [22m[2mBrowser Detection Fix Verification[2m > [22m[2mbrowser questions should not show when browser_detected is unknown
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/browser-detection-verification.test.ts[2m > [22m[2mBrowser Detection Fix Verification[2m > [22m[2mbrowser questions should show when browser is properly detected
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 1 answers: { totalFacts: [33m5[39m, categories: [ [32m'device'[39m ] }
+
+ [32mΓ£ô[39m src/tests/browser-detection-verification.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+[90mstdout[2m | src/tests/main-content-render.test.tsx[2m > [22m[2mMainContent Rendering[2m > [22m[2mshould render questions when available
+[22m[39mAvailable questions for rendering: [33m10[39m
+Sample question IDs: [ [32m'privacy_notice'[39m, [32m'os_selection'[39m, [32m'password_manager'[39m ]
+MainContent Debug: {
+  currentDomain: [32m'all'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m10[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Rendered question elements: [33m10[39m
+
+[90mstdout[2m | src/tests/main-content-render.test.tsx[2m > [22m[2mMainContent Rendering[2m > [22m[2mshould show completion message when no questions available
+[22m[39mStore answerQuestion called with: privacy_notice yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: os_selection yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: os_selection Which operating system do you primarily use?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m2[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m3[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: two_factor_auth yes
+Previous state: { score: [33m10[39m, level: [33m0[39m, answersCount: [33m3[39m }
+Found question: two_factor_auth Do you use two-factor authentication (2FA) on your
+Points earned: [33m8[39m
+Injected fact: two_factor = yes
+Facts updated via factsActions: [ [32m'two_factor'[39m ]
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m4[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m4[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m5[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: virus_scan_recent yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m5[39m }
+Found question: virus_scan_recent When did you last run a virus scan?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m6[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: backup_frequency yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m6[39m }
+Found question: backup_frequency How often do you back up your important data?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m7[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: wifi_security yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m7[39m }
+Found question: wifi_security What type of security does your home WiFi network 
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m8[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: email_attachments yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m8[39m }
+Found question: email_attachments How do you handle email attachments from unknown s
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m9[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_extensions yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m9[39m }
+Found question: browser_extensions How careful are you about browser extensions/add-o
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m10[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: advanced_2fa yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m10[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m11[39m }
+Store updated! New state should be available to components.
+MainContent Debug: {
+  currentDomain: [32m'all'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m0[39m,
+  answersCount: [33m11[39m,
+  availableQuestionIds: []
+}
+
+ [32mΓ£ô[39m src/tests/main-content-render.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ErrorBoundary.spec.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 107[2mms[22m[39m
+[90mstdout[2m | src/tests/device-detection-debug.test.ts[2m > [22m[2mDevice Detection Facts Debug[2m > [22m[2mshould properly initialize device detection facts
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+
+[90mstdout[2m | src/tests/device-detection-debug.test.ts[2m > [22m[2mDevice Detection Facts Debug[2m > [22m[2mshould show conditional questions based on device detection
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+
+ [32mΓ£ô[39m src/tests/device-detection-debug.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen answering questions[2m > [22m[2mshould update state for valid question IDs
+[22m[39mStore answerQuestion called with: privacy_notice yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen answering questions[2m > [22m[2mshould handle invalid question IDs gracefully
+[22m[39mStore answerQuestion called with: invalid_question_id yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen answering questions[2m > [22m[2mshould increment score when answering valid scoring questions
+[22m[39mStore answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen resetting assessment[2m > [22m[2mshould clear all answers and reset scores
+[22m[39mStore answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen getting historic answers[2m > [22m[2mshould return answer history with domain info
+[22m[39mStore answerQuestion called with: privacy_notice yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen calculating level progression[2m > [22m[2mshould advance levels based on score
+[22m[39mStore answerQuestion called with: privacy_notice yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: mac_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m2[39m }
+Found question: mac_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = mac
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m3[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen answering onboarding questions[2m > [22m[2mshould handle onboarding questions with proper scoring
+[22m[39mStore answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen answering onboarding questions[2m > [22m[2mshould handle two_factor_auth question
+[22m[39mStore answerQuestion called with: two_factor_auth yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: two_factor_auth Do you use two-factor authentication (2FA) on your
+Points earned: [33m8[39m
+Injected fact: two_factor = yes
+Facts updated via factsActions: [ [32m'two_factor'[39m ]
+New calculated state: { newScore: [33m8[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen answering onboarding questions[2m > [22m[2mshould handle all available questions and accumulate score
+[22m[39mStore answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: two_factor_auth yes
+Previous state: { score: [33m10[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: two_factor_auth Do you use two-factor authentication (2FA) on your
+Points earned: [33m8[39m
+Injected fact: two_factor = yes
+Facts updated via factsActions: [ [32m'two_factor'[39m ]
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen managing answer expiration[2m > [22m[2mshould set expiration for time-sensitive answers
+[22m[39mStore answerQuestion called with: virus_scan_recent this_week
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: virus_scan_recent When did you last run a virus scan?
+Points earned: [33m8[39m
+Injected fact: virus_scan = recent
+Facts updated via factsActions: [ [32m'virus_scan'[39m ]
+New calculated state: { newScore: [33m8[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/features/assessment/state/store.spec.ts[2m > [22m[2mAssessment Store[2m > [22m[2mwhen managing answer expiration[2m > [22m[2mshould not set expiration for automatic/permanent answers
+[22m[39mStore answerQuestion called with: software_updates automatic
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m8[39m
+Injected fact: updates = automatic
+Facts updated via factsActions: [ [32m'updates'[39m ]
+New calculated state: { newScore: [33m8[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+ [32mΓ£ô[39m src/features/assessment/state/store.spec.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32mΓ£ô[39m src/features/assessment/engine/conditions.spec.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+[90mstdout[2m | src/tests/suite-unlock.test.ts[2m > [22m[2mSuite Unlocking Integration[2m > [22m[2mshould unlock advanced_security suite when both gates conditions are met
+[22m[39mStore answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates automatic
+Previous state: { score: [33m10[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m8[39m
+Injected fact: updates = automatic
+Facts updated via factsActions: [ [32m'updates'[39m ]
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/suite-unlock.test.ts[2m > [22m[2mSuite Unlocking Integration[2m > [22m[2mshould not unlock suite if only one condition is met
+[22m[39mStore answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/suite-unlock.test.ts[2m > [22m[2mSuite Unlocking Integration[2m > [22m[2mshould not unlock suite if conditions are not met
+[22m[39mStore answerQuestion called with: password_manager no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m0[39m
+Injected fact: password_manager = no
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates manual
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m4[39m
+Injected fact: updates = manual
+Facts updated via factsActions: [ [32m'updates'[39m ]
+New calculated state: { newScore: [33m4[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+
+[90mstdout[2m | src/tests/suite-unlock.test.ts[2m > [22m[2mSuite Unlocking Integration[2m > [22m[2mshould show suite questions once unlocked
+[22m[39mStore answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates automatic
+Previous state: { score: [33m10[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m8[39m
+Injected fact: updates = automatic
+Facts updated via factsActions: [ [32m'updates'[39m ]
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+
+ [32mΓ£ô[39m src/tests/suite-unlock.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+[90mstdout[2m | src/App.spec.tsx[2m > [22m[2mApp Integration[2m > [22m[2mwhen handling question answers[2m > [22m[2mshould render App component without crashing
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m10[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/App.spec.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 954[2mms[22m[39m
+   [33m[2mΓ£ô[22m[39m App Integration[2m > [22mwhen handling question answers[2m > [22mshould render App component without crashing [33m 948[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-performance.test.tsx[2m > [22m[2mAutomated Performance Testing[2m > [22m[2mApp Renders Within Performance Budget - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m10[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-visual-regression.test.tsx[2m > [22m[2mAutomated Visual Regression Testing[2m > [22m[2mUI Layout Consistency - Automated Snapshot Testing
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m10[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-accessibility.test.tsx[2m > [22m[2mAutomated Accessibility Testing[2m > [22m[2mApp has basic accessibility features - Automated A11y Check
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m10[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-accessibility.test.tsx[2m > [22m[2mAutomated Accessibility Testing[2m > [22m[2mKeyboard Navigation - Basic Support
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-visual-regression.test.tsx[2m > [22m[2mAutomated Visual Regression Testing[2m > [22m[2mTheme Consistency - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+MainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/features/assessment/facts/facts.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-accessibility.test.tsx[2m > [22m[2mAutomated Accessibility Testing[2m > [22m[2mColor Contrast and Visual Accessibility
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys.test.tsx[2m > [22m[2mAutomated UI Journey Testing[2m > [22m[2mComplete Windows User Journey - Fully Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m10[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-accessibility.test.tsx[2m > [22m[2mAutomated Accessibility Testing[2m > [22m[2mScreen Reader Compatibility - ARIA Labels
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys.test.tsx[2m > [22m[2mAutomated UI Journey Testing[2m > [22m[2mComplete Windows User Journey - Fully Automated
+[22m[39mStore answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-visual-regression.test.tsx[2m > [22m[2mAutomated Visual Regression Testing[2m > [22m[2mComponent State Visual Consistency - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: backup_frequency yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: backup_frequency How often do you back up your important data?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_extensions yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m2[39m }
+Found question: browser_extensions How careful are you about browser extensions/add-o
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m3[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: email_attachments yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m3[39m }
+Found question: email_attachments How do you handle email attachments from unknown s
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m4[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: os_selection yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m4[39m }
+Found question: os_selection Which operating system do you primarily use?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m5[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: password_manager yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m5[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m10[39m
+Injected fact: password_manager = yes
+Facts updated via factsActions: [ [32m'password_manager'[39m ]
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m6[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates yes
+Previous state: { score: [33m10[39m, level: [33m0[39m, answersCount: [33m6[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m10[39m, newLevel: [33m0[39m, newAnswersCount: [33m7[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: two_factor_auth yes
+Previous state: { score: [33m10[39m, level: [33m0[39m, answersCount: [33m7[39m }
+Found question: two_factor_auth Do you use two-factor authentication (2FA) on your
+Points earned: [33m8[39m
+Injected fact: two_factor = yes
+Facts updated via factsActions: [ [32m'two_factor'[39m ]
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m8[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: virus_scan_recent yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m8[39m }
+Found question: virus_scan_recent When did you last run a virus scan?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m9[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: wifi_security yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m9[39m }
+Found question: wifi_security What type of security does your home WiFi network 
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m10[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m18[39m, level: [33m0[39m, answersCount: [33m10[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m18[39m, newLevel: [33m0[39m, newAnswersCount: [33m11[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/tests/automated-accessibility.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 278[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-visual-regression.test.tsx[2m > [22m[2mAutomated Visual Regression Testing[2m > [22m[2mError State Visual Handling - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m8[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: non_existent_question invalid_answer
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with:  
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/components/Recommendations.spec.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 107[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-performance.test.tsx[2m > [22m[2mAutomated Performance Testing[2m > [22m[2mQuestion Transitions are Smooth - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-visual-regression.test.tsx[2m > [22m[2mAutomated Visual Regression Testing[2m > [22m[2mLoading State Visual Consistency - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m8[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys.test.tsx[2m > [22m[2mAutomated UI Journey Testing[2m > [22m[2mMobile iOS User Journey - Fully Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m4[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys.test.tsx[2m > [22m[2mAutomated UI Journey Testing[2m > [22m[2mMobile iOS User Journey - Fully Automated
+[22m[39mStore answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒô▒ Device-Aware Onboarding Journey[2m > [22m[2mshould complete onboarding flow using actual content
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m10[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒô▒ Device-Aware Onboarding Journey[2m > [22m[2mshould complete onboarding flow using actual content
+[22m[39mStore answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-visual-regression.test.tsx[2m > [22m[2mAutomated Visual Regression Testing[2m > [22m[2mResponsive Design Breakpoints - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m8[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+MainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m8[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+MainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m8[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+MainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m8[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/tests/automated-visual-regression.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 587[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-ui-journeys.test.tsx[2m > [22m[2mAutomated UI Journey Testing[2m > [22m[2mPoor Security Practices Journey - Automated Remediation Path
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m4[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys.test.tsx[2m > [22m[2mAutomated UI Journey Testing[2m > [22m[2mPoor Security Practices Journey - Automated Remediation Path
+[22m[39mStore answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/components/ActionRecommendations.spec.tsx [2m([22m[2m14 tests[22m[2m)[22m[32m 171[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒô▒ Device-Aware Onboarding Journey[2m > [22m[2mshould show questions based on actual content structure
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m4[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒÄ» Assessment Flow Journey[2m > [22m[2mshould progress through assessment questions using actual content
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m4[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/unified-onboarding-bug.test.ts[2m > [22m[2mUnifiedOnboarding OS Detection Bug[2m > [22m[2mshould match the exact flow of UnifiedOnboarding component
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+
+[90mstdout[2m | src/tests/unified-onboarding-bug.test.ts[2m > [22m[2mUnifiedOnboarding OS Detection Bug[2m > [22m[2mshould match the exact flow of UnifiedOnboarding component
+[22m[39m
+≡ƒöì === SIMULATING UnifiedOnboarding COMPONENT ===
+Total onboarding questions: 13
+Facts available for filtering:
+- os_detected: windows
+- browser_detected: unknown
+- device_type: desktop
+Visible onboarding questions: 3
+Visible question IDs: [ [32m'privacy_notice'[39m, [32m'windows_detection_confirm'[39m, [32m'os_selection'[39m ]
+
+≡ƒÄ» === INITIAL DETECTION QUESTIONS ===
+Windows detection visible: [33mtrue[39m
+Mac detection visible: [33mfalse[39m
+Linux detection visible: [33mfalse[39m
+
+Γ£à === USER CONFIRMS WINDOWS ===
+Store answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+
+After Windows confirmation - new facts:
+- os_detected: windows
+- browser_detected: unknown
+- device_type: desktop
+- os: windows
+- os_confirmed: true
+New visible onboarding questions: 7
+New visible question IDs: [
+  [32m'privacy_notice'[39m,
+  [32m'chrome_detection_confirm'[39m,
+  [32m'firefox_detection_confirm'[39m,
+  [32m'edge_detection_confirm'[39m,
+  [32m'safari_detection_confirm'[39m,
+  [32m'browser_selection'[39m,
+  [32m'tech_comfort'[39m
+]
+
+≡ƒÉ¢ === AFTER WINDOWS CONFIRMATION ===
+Windows detection visible: [33mfalse[39m
+Mac detection visible: [33mfalse[39m
+Linux detection visible: [33mfalse[39m
+
+≡ƒôè === FACTS ANALYSIS ===
+os_confirmed fact: [33mtrue[39m
+os_detected fact: windows
+os fact: windows
+Γ£à BUG NOT REPRODUCED: Fix appears to be working correctly
+
+ [32mΓ£ô[39m src/tests/unified-onboarding-bug.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 8[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒÄ» Assessment Flow Journey[2m > [22m[2mshould progress through assessment questions using actual content
+[22m[39mStore answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys.test.tsx[2m > [22m[2mAutomated UI Journey Testing[2m > [22m[2mAssessment Completion Flow - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m4[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys.test.tsx[2m > [22m[2mAutomated UI Journey Testing[2m > [22m[2mAssessment Completion Flow - Automated
+[22m[39mStore answerQuestion called with: backup_frequency yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: backup_frequency How often do you back up your important data?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_extensions yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: browser_extensions How careful are you about browser extensions/add-o
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: email_attachments yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m2[39m }
+Found question: email_attachments How do you handle email attachments from unknown s
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m3[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/tests/automated-ui-journeys.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 764[2mms[22m[39m
+   [33m[2mΓ£ô[22m[39m Automated UI Journey Testing[2m > [22mComplete Windows User Journey - Fully Automated [33m 373[2mms[22m[39m
+ [32mΓ£ô[39m src/features/assessment/data/data-structure.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒÄ» Assessment Flow Journey[2m > [22m[2mshould display questions with correct content structure
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m4[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒöì Content Validation Journey[2m > [22m[2mshould handle different question types from content
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m4[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒöì Content Validation Journey[2m > [22m[2mshould handle different question types from content
+[22m[39mStore answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/condition-engine-debug.test.ts[2m > [22m[2mCondition Engine Facts Debug[2m > [22m[2mshould properly evaluate conditions based on injected facts
+[22m[39mInjected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m3[39m, categories: [ [32m'device'[39m ] }
+
+ [32mΓ£ô[39m src/tests/condition-engine-debug.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32mΓ£ô[39m src/tests/question-display-debug.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒôè State Management Journey[2m > [22m[2mshould maintain state consistency using actual content flow
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m11[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'email_attachments'[39m,
+    [32m'os_selection'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'software_updates'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m,
+    [32m'windows_detection_confirm'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m4[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/tests/simple-visibility-debug.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-ui-journeys-content-driven.test.tsx[2m > [22m[2m≡ƒñû Automated UI User Journeys - Content-Driven[2m > [22m[2m≡ƒôè State Management Journey[2m > [22m[2mshould maintain state consistency using actual content flow
+[22m[39mStore answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [32mΓ£ô[39m src/tests/automated-ui-journeys-content-driven.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 832[2mms[22m[39m
+ [32mΓ£ô[39m src/features/assessment/architecture.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/tests/condition-engine-source-debug.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32mΓ£ô[39m src/tests/available-questions-debug.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32mΓ£ô[39m src/tests/facts-condition-debug.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+[90mstdout[2m | src/tests/automated-performance.test.tsx[2m > [22m[2mAutomated Performance Testing[2m > [22m[2mQuestion Transitions are Smooth - Automated
+[22m[39mStore answerQuestion called with: windows_detection_confirm yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: windows_detection_confirm Is this correct?
+Points earned: [33m0[39m
+Injected fact: os = windows
+Injected fact: os_confirmed = true
+Facts updated via factsActions: [ [32m'os'[39m, [32m'os_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-performance.test.tsx[2m > [22m[2mAutomated Performance Testing[2m > [22m[2mMemory Usage Stability - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m6[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: test_0 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_0 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_1 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_1 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m2[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_2 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m2[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m3[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_2 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m3[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m3[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_3 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m3[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m4[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_3 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m4[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m4[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_4 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m4[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m5[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_4 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m5[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m5[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_5 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m5[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m6[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_5 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m6[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m6[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_6 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m6[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m7[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_6 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m7[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m7[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_7 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m7[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m8[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_7 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m8[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m8[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_8 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m8[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m9[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_8 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m9[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m9[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_9 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m9[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m10[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_9 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m10[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m10[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_10 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m10[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m11[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_10 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m11[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m11[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_11 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m11[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m12[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_11 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m12[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m12[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_12 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m12[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m13[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_12 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m13[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m13[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_13 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m13[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m14[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_13 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m14[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m14[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_14 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m14[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_14 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_15 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m16[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_15 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m16[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m16[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_16 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m16[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m17[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_16 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m17[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m17[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_17 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m17[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m18[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_17 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m18[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m18[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_18 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m18[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m19[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_18 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m19[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m19[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_19 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m19[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m20[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_19 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m20[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m20[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_20 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m20[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m21[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_20 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m21[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m21[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_21 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m21[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m22[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_21 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m22[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m22[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_22 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m22[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m23[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_22 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m23[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m23[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_23 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m23[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m24[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_23 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m24[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m24[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_24 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m24[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m25[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_24 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m25[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m25[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_25 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m25[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m26[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_25 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m26[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m26[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_26 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m26[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m27[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_26 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m27[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m27[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_27 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m27[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m28[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_27 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m28[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m28[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_28 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m28[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m29[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_28 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m29[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m29[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_29 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m29[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m30[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_29 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m30[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m30[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_30 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m30[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m31[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_30 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m31[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m31[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_31 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m31[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m32[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_31 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m32[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m32[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_32 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m32[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m33[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_32 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m33[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m33[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_33 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m33[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m34[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_33 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m34[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m34[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_34 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m34[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m35[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_34 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m35[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m35[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_35 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m35[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m36[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_35 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m36[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m36[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_36 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m36[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m37[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_36 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m37[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m37[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_37 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m37[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m38[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_37 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m38[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m38[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_38 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m38[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m39[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_38 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m39[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m39[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_39 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m39[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m40[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_39 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m40[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m40[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_40 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m40[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m41[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_40 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m41[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m41[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_41 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m41[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m42[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_41 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m42[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m42[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_42 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m42[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m43[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_42 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m43[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m43[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_43 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m43[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m44[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_43 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m44[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m44[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_44 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m44[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m45[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_44 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m45[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m45[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_45 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m45[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m46[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_45 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m46[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m46[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_46 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m46[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m47[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_46 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m47[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m47[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_47 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m47[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m48[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_47 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m48[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m48[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_48 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m48[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m49[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_48 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m49[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m49[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_49 yes
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m49[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m50[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: test_49 no
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m50[39m }
+Found question: [90mundefined[39m [90mundefined[39m
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m50[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-performance.test.tsx[2m > [22m[2mAutomated Performance Testing[2m > [22m[2mLarge Dataset Handling - Automated Stress Test
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m6[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: backup_frequency answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: backup_frequency How often do you back up your important data?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_extensions answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: browser_extensions How careful are you about browser extensions/add-o
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_selection answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m2[39m }
+Found question: browser_selection Which browser do you primarily use?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m3[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: chrome_detection_confirm answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m3[39m }
+Found question: chrome_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m4[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: edge_detection_confirm answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m4[39m }
+Found question: edge_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m5[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: email_attachments answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m5[39m }
+Found question: email_attachments How do you handle email attachments from unknown s
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m6[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: firefox_detection_confirm answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m6[39m }
+Found question: firefox_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m7[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: password_manager answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m7[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m8[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: privacy_notice answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m8[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m9[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: safari_detection_confirm answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m9[39m }
+Found question: safari_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m10[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m10[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m11[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: tech_comfort answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m11[39m }
+Found question: tech_comfort How would you describe your comfort with technolog
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m12[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: two_factor_auth answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m12[39m }
+Found question: two_factor_auth Do you use two-factor authentication (2FA) on your
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m13[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: virus_scan_recent answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m13[39m }
+Found question: virus_scan_recent When did you last run a virus scan?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m14[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: wifi_security answer_0
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m14[39m }
+Found question: wifi_security What type of security does your home WiFi network 
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: backup_frequency answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: backup_frequency How often do you back up your important data?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_extensions answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: browser_extensions How careful are you about browser extensions/add-o
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_selection answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: browser_selection Which browser do you primarily use?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: chrome_detection_confirm answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: chrome_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: edge_detection_confirm answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: edge_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: email_attachments answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: email_attachments How do you handle email attachments from unknown s
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: firefox_detection_confirm answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: firefox_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: password_manager answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: privacy_notice answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: safari_detection_confirm answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: safari_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: tech_comfort answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: tech_comfort How would you describe your comfort with technolog
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: two_factor_auth answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: two_factor_auth Do you use two-factor authentication (2FA) on your
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: virus_scan_recent answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: virus_scan_recent When did you last run a virus scan?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: wifi_security answer_1
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: wifi_security What type of security does your home WiFi network 
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: backup_frequency answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: backup_frequency How often do you back up your important data?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_extensions answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: browser_extensions How careful are you about browser extensions/add-o
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: browser_selection answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: browser_selection Which browser do you primarily use?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: chrome_detection_confirm answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: chrome_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: edge_detection_confirm answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: edge_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: email_attachments answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: email_attachments How do you handle email attachments from unknown s
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: firefox_detection_confirm answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: firefox_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: password_manager answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: password_manager Do you use a password manager?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: privacy_notice answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: safari_detection_confirm answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: safari_detection_confirm Is this your primary browser?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: software_updates answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: software_updates How do you handle software updates on your devices
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: tech_comfort answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: tech_comfort How would you describe your comfort with technolog
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: two_factor_auth answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: two_factor_auth Do you use two-factor authentication (2FA) on your
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: virus_scan_recent answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: virus_scan_recent When did you last run a virus scan?
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+Store answerQuestion called with: wifi_security answer_2
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m15[39m }
+Found question: wifi_security What type of security does your home WiFi network 
+Points earned: [33m0[39m
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m15[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-performance.test.tsx[2m > [22m[2mAutomated Performance Testing[2m > [22m[2mRapid User Input Handling - Automated
+[22m[39mMainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m15[39m,
+  answersCount: [33m0[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'browser_selection'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'privacy_notice'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 0 answers: { totalFacts: [33m6[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+App.tsx: Store userLevel changed to: [33m0[39m
+Store answerQuestion called with: privacy_notice understood
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m0[39m }
+Found question: privacy_notice Your data stays on your device. No tracking, no cl
+Points earned: [33m0[39m
+Injected fact: privacy_acknowledged = true
+Facts updated via factsActions: [ [32m'privacy_acknowledged'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m1[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-performance.test.tsx[2m > [22m[2mAutomated Performance Testing[2m > [22m[2mRapid User Input Handling - Automated
+[22m[39mStore answerQuestion called with: browser_selection chrome
+Previous state: { score: [33m0[39m, level: [33m0[39m, answersCount: [33m1[39m }
+Found question: browser_selection Which browser do you primarily use?
+Points earned: [33m0[39m
+Injected fact: browser = chrome
+Injected fact: browser_confirmed = true
+Facts updated via factsActions: [ [32m'browser'[39m, [32m'browser_confirmed'[39m ]
+New calculated state: { newScore: [33m0[39m, newLevel: [33m0[39m, newAnswersCount: [33m2[39m }
+Store updated! New state should be available to components.
+App.tsx: Store userLevel changed to: [33m0[39m
+
+[90mstdout[2m | src/tests/automated-performance.test.tsx[2m > [22m[2mAutomated Performance Testing[2m > [22m[2mRapid User Input Handling - Automated
+[22m[39mDevice onboarding complete: {
+  currentDevice: { type: [32m'desktop'[39m, os: [32m'windows'[39m, browser: [32m'unknown'[39m },
+  otherDevices: {
+    hasWindows: [33mtrue[39m,
+    hasMac: [33mfalse[39m,
+    hasLinux: [33mfalse[39m,
+    hasIPhone: [33mfalse[39m,
+    hasAndroid: [33mfalse[39m,
+    hasIPad: [33mfalse[39m
+  },
+  primaryDesktop: [32m'windows'[39m,
+  primaryMobile: [90mundefined[39m
+}
+MainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m13[39m,
+  answersCount: [33m2[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+Injected fact: os_detected = windows
+Injected fact: browser_detected = unknown
+Injected fact: device_type = desktop
+Importing legacy data into facts system...
+Facts imported from 2 answers: { totalFacts: [33m8[39m, categories: [ [32m'device'[39m, [32m'behavior'[39m ] }
+App.tsx: Store userLevel changed to: [33m0[39m
+MainContent Debug: {
+  currentDomain: [32m'quickwins'[39m,
+  currentLevel: [33m0[39m,
+  availableQuestionsCount: [33m13[39m,
+  answersCount: [33m2[39m,
+  availableQuestionIds: [
+    [32m'backup_frequency'[39m,
+    [32m'browser_extensions'[39m,
+    [32m'chrome_detection_confirm'[39m,
+    [32m'edge_detection_confirm'[39m,
+    [32m'email_attachments'[39m,
+    [32m'firefox_detection_confirm'[39m,
+    [32m'password_manager'[39m,
+    [32m'safari_detection_confirm'[39m,
+    [32m'software_updates'[39m,
+    [32m'tech_comfort'[39m,
+    [32m'two_factor_auth'[39m,
+    [32m'virus_scan_recent'[39m,
+    [32m'wifi_security'[39m
+  ]
+}
+App.tsx: Store userLevel changed to: [33m0[39m
+
+ [31mΓ¥»[39m src/tests/automated-performance.test.tsx [2m([22m[2m5 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 6863[2mms[22m[39m
+   [32mΓ£ô[39m Automated Performance Testing[2m > [22mApp Renders Within Performance Budget - Automated[32m 121[2mms[22m[39m
+   [33m[2mΓ£ô[22m[39m Automated Performance Testing[2m > [22mQuestion Transitions are Smooth - Automated [33m 2280[2mms[22m[39m
+   [32mΓ£ô[39m Automated Performance Testing[2m > [22mMemory Usage Stability - Automated[32m 65[2mms[22m[39m
+   [32mΓ£ô[39m Automated Performance Testing[2m > [22mLarge Dataset Handling - Automated Stress Test[32m 50[2mms[22m[39m
+[31m   [31m├ù[31m Automated Performance Testing[2m > [22mRapid User Input Handling - Automated[39m[33m 4346[2mms[22m[39m
+[31m     ΓåÆ expected 4309.4472 to be less than 2500[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m30 passed[39m[22m[90m (31)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m154 passed[39m[22m[90m (155)[39m
+[2m   Start at [22m 09:32:08
+[2m   Duration [22m 10.89s[2m (transform 2.35s, setup 20.82s, collect 8.82s, tests 11.08s, environment 39.02s, prepare 9.99s)[22m
+
+ΓÇëELIFECYCLEΓÇë Test failed. See above for more details.
