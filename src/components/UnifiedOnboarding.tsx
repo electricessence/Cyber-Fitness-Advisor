@@ -42,14 +42,14 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   const visibleOnboardingQuestions = onboardingQuestions.filter(question => {
     let isVisible = true;
     
-    // Check include conditions - question is visible if facts match
+    // Check include conditions - question is visible if ALL facts match (AND logic)
     if (question.conditions?.include) {
-      let includeMatches = false;
+      let includeMatches = true; // Start with true, require ALL to match
       for (const [factId, expectedValue] of Object.entries(question.conditions.include)) {
         const fact = facts[factId];
-        if (fact && fact.value === expectedValue) {
-          includeMatches = true;
-          break;
+        if (!fact || fact.value !== expectedValue) {
+          includeMatches = false;
+          break; // Any mismatch makes question invisible
         }
       }
       if (!includeMatches) {
