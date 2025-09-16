@@ -8,6 +8,9 @@ import { ConditionEngine } from '../engine/conditions';
 import { createFactsStoreSlice, type FactsStoreState } from '../facts/integration';
 import unifiedQuestionBank from '../data/questionBank';
 import { detectCurrentDevice } from '../../device/deviceDetection';
+import { BadgeEngine, type BadgeEvaluationContext, type BadgeUnlockEvent, type StreakData } from '../../badges/badgeEngine';
+import type { Badge, BadgeProgress } from '../../badges/badgeDefinitions';
+import { ACHIEVEMENT_BADGES } from '../../badges/badgeDefinitions';
 
 // Smart pre-population from onboarding data
 function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
@@ -117,11 +120,19 @@ interface AssessmentState extends FactsStoreState {
   lastScoreIncrease: number;
   earnedBadges: string[];
   
+  // Badge system state
+  badgeEngine: BadgeEngine;
+  badgeProgress: BadgeProgress[];
+  recentBadgeUnlocks: BadgeUnlockEvent[];
+  streakData: StreakData;
+  sessionStartTime: Date | null;
+  
   // Actions
   answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => void;
   handleTaskResponse: (questionId: string, taskResponse: TaskResponse) => void;
   setDeviceProfile: (profile: DeviceProfile) => void;
   resetAssessment: () => void;
+  removeAnswer: (questionId: string) => void;
   getAvailableQuestions: () => Question[];
   getRecommendations: () => ReturnType<typeof getTopRecommendations>;
   getHistoricAnswers: () => Array<Answer & { domain: string; level: number; question: Question | null }>;
@@ -145,6 +156,14 @@ interface AssessmentState extends FactsStoreState {
   getExpiredAnswers: () => Answer[];
   updateExpiredAnswers: () => void;
   getExpiringAnswers: (daysAhead?: number) => Answer[];
+  
+  // Badge system actions
+  getBadgeProgress: () => BadgeProgress[];
+  getEarnedBadges: () => Badge[];
+  getNextRecommendedBadges: () => Badge[];
+  updateBadgeProgress: () => void;
+  clearRecentBadgeUnlocks: () => void;
+  updateStreakData: () => void;
 }
 
 // Helper to create the initial condition engine
@@ -199,6 +218,18 @@ const initialState = {
   showCelebration: false,
   lastScoreIncrease: 0,
   earnedBadges: [],
+  
+  // Badge system state
+  badgeEngine: new BadgeEngine(),
+  badgeProgress: [] as BadgeProgress[],
+  recentBadgeUnlocks: [] as BadgeUnlockEvent[],
+  streakData: {
+    currentStreak: 0,
+    longestStreak: 0,
+    lastActivityDate: undefined,
+    streakHistory: []
+  } as StreakData,
+  sessionStartTime: null as Date | null,
 };
 
 export const useAssessmentStore = create<AssessmentState>()(
@@ -370,6 +401,9 @@ export const useAssessmentStore = create<AssessmentState>()(
           earnedBadges: newBadges,
         }));
         
+        // Update badge progress after answering a question
+        get().updateBadgeProgress();
+        
         console.log('Store updated! New state should be available to components.');
       },
       
@@ -397,6 +431,40 @@ export const useAssessmentStore = create<AssessmentState>()(
           ...initialState,
           questionBank: get().questionBank, // Keep the question bank
         });
+      },
+
+      removeAnswer: (questionId: string) => {
+        const state = get();
+        const { [questionId]: removedAnswer, ...remainingAnswers } = state.answers;
+        
+        if (removedAnswer) {
+          // Update answers
+          set({ answers: remainingAnswers });
+          
+          // Recalculate scores using existing scoring function
+          const scoreResult = calculateOverallScore(state.questionBank, remainingAnswers);
+          const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
+          
+          // Convert domain scores to simple number format
+          const simpleDomainScores = Object.entries(scoreResult.domainScores).reduce((acc, [domain, data]) => {
+            acc[domain] = data.score;
+            return acc;
+          }, {} as Record<string, number>);
+          
+          set({
+            overallScore: scoreResult.overallScore,
+            domainScores: simpleDomainScores,
+            currentLevel: nextLevelProgress.currentLevel,
+            quickWinsCompleted: scoreResult.quickWinsCompleted,
+            totalQuickWins: scoreResult.totalQuickWins,
+            nextLevelProgress,
+          });
+          
+          // Update badge progress after removing answer
+          state.updateBadgeProgress();
+          
+          console.log(`Removed answer for question: ${questionId}`);
+        }
       },
       
       getAvailableQuestions: () => {
@@ -775,6 +843,130 @@ export const useAssessmentStore = create<AssessmentState>()(
         const result = state.conditionEngine.evaluate(context);
         return result.questionPatches;
       },
+      
+      // Badge system actions
+      getBadgeProgress: () => {
+        const state = get();
+        return state.badgeProgress;
+      },
+      
+      getEarnedBadges: () => {
+        const state = get();
+        return ACHIEVEMENT_BADGES.filter((badge: Badge) => 
+          state.earnedBadges.includes(badge.id)
+        );
+      },
+      
+      getNextRecommendedBadges: () => {
+        const state = get();
+        const defaultDeviceProfile: DeviceProfile = {
+          currentDevice: detectCurrentDevice(),
+          otherDevices: {
+            hasWindows: false,
+            hasMac: false,
+            hasLinux: false,
+            hasIPhone: false,
+            hasAndroid: false,
+            hasIPad: false
+          }
+        };
+        
+        const context: BadgeEvaluationContext = {
+          answers: state.answers,
+          currentScore: state.overallScore,
+          currentLevel: state.currentLevel,
+          deviceProfile: state.deviceProfile || defaultDeviceProfile,
+          quickWinsCompleted: state.quickWinsCompleted,
+          streakData: state.streakData,
+          sessionStartTime: state.sessionStartTime || undefined,
+          earnedBadges: state.earnedBadges
+        };
+        return state.badgeEngine.getNextRecommendedBadges(context);
+      },
+      
+      updateBadgeProgress: () => {
+        const state = get();
+        const defaultDeviceProfile: DeviceProfile = {
+          currentDevice: detectCurrentDevice(),
+          otherDevices: {
+            hasWindows: false,
+            hasMac: false,
+            hasLinux: false,
+            hasIPhone: false,
+            hasAndroid: false,
+            hasIPad: false
+          }
+        };
+        
+        const context: BadgeEvaluationContext = {
+          answers: state.answers,
+          currentScore: state.overallScore,
+          currentLevel: state.currentLevel,
+          deviceProfile: state.deviceProfile || defaultDeviceProfile,
+          quickWinsCompleted: state.quickWinsCompleted,
+          streakData: state.streakData,
+          sessionStartTime: state.sessionStartTime || undefined,
+          earnedBadges: state.earnedBadges
+        };
+        
+        const result = state.badgeEngine.evaluateAllBadges(context);
+        
+        // Update earned badges if new ones were unlocked
+        const newEarnedBadges = [...state.earnedBadges];
+        let hasNewBadges = false;
+        
+        for (const unlock of result.newlyUnlocked) {
+          if (!newEarnedBadges.includes(unlock.badge.id)) {
+            newEarnedBadges.push(unlock.badge.id);
+            hasNewBadges = true;
+          }
+        }
+        
+        set({
+          badgeProgress: result.allProgress,
+          recentBadgeUnlocks: [...state.recentBadgeUnlocks, ...result.newlyUnlocked],
+          earnedBadges: newEarnedBadges,
+          showCelebration: hasNewBadges || state.showCelebration
+        });
+      },
+      
+      clearRecentBadgeUnlocks: () => {
+        set({ recentBadgeUnlocks: [] });
+      },
+      
+      updateStreakData: () => {
+        const state = get();
+        const today = new Date();
+        const todayStr = today.toDateString();
+        
+        // Check if user was active today
+        const hasActivityToday = Object.values(state.answers).some(answer => {
+          if (!answer.timestamp) return false;
+          const answerDate = answer.timestamp instanceof Date ? answer.timestamp : new Date(answer.timestamp);
+          return answerDate.toDateString() === todayStr;
+        });
+        
+        if (hasActivityToday && (!state.streakData.lastActivityDate || 
+            state.streakData.lastActivityDate.toDateString() !== todayStr)) {
+          
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+          
+          const wasActiveYesterday = state.streakData.lastActivityDate?.toDateString() === yesterday.toDateString();
+          
+          const newStreakData: StreakData = {
+            currentStreak: wasActiveYesterday ? state.streakData.currentStreak + 1 : 1,
+            longestStreak: Math.max(
+              state.streakData.longestStreak, 
+              wasActiveYesterday ? state.streakData.currentStreak + 1 : 1
+            ),
+            lastActivityDate: today,
+            streakHistory: [...state.streakData.streakHistory, today]
+          };
+          
+          set({ streakData: newStreakData });
+        }
+      },
     };
   },
     {
@@ -832,6 +1024,17 @@ export const initializeStore = () => {
       quickWinsCompleted,
       totalQuickWins,
       nextLevelProgress,
+      sessionStartTime: new Date(), // Track session start for speed badges
+    });
+    
+    // Initialize badge progress and streak data
+    const updatedStore = useAssessmentStore.getState();
+    updatedStore.updateBadgeProgress();
+    updatedStore.updateStreakData();
+  } else {
+    // Even if no answers, initialize session start time
+    useAssessmentStore.setState({
+      sessionStartTime: new Date()
     });
   }
 };

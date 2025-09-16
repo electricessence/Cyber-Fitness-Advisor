@@ -1,4 +1,5 @@
 import { useAssessmentStore } from '../../features/assessment/state/store';
+import { BadgeSummary } from '../badges/BadgeSummary';
 
 interface AppSidebarProps {
   currentDomain: string;
@@ -21,6 +22,10 @@ export function AppSidebar({
 
   return (
     <div className={`lg:col-span-1 ${mobileMenuOpen ? 'block' : 'hidden lg:block'}`}>
+      {/* Achievement Badges */}
+      <BadgeSummary />
+      
+      {/* Domain Navigation */}
       <div className="bg-white rounded-lg shadow-md p-4 sticky top-24">
         <h3 className="font-bold text-gray-800 mb-4">Assessment Sections</h3>
         
