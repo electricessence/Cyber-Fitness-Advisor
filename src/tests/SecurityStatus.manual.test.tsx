@@ -70,7 +70,7 @@ const mockAnswers = [
 ];
 
 // Mock the store
-vi.mock('../../features/assessment/state/store', () => ({
+vi.mock('../features/assessment/state/store', () => ({
   useAssessmentStore: vi.fn(() => ({
     getHistoricAnswers: () => mockAnswers,
     removeAnswer: vi.fn(),
