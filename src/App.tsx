@@ -60,7 +60,6 @@ function App() {
   }, [deviceProfile]);
 
   const handleDeviceOnboardingComplete = (profile: DeviceProfile) => {
-    console.log('Device onboarding complete:', profile);
     setDeviceProfile(profile);
     setShowDeviceOnboarding(false);
     
@@ -70,7 +69,6 @@ function App() {
   };
 
   useEffect(() => {
-    console.log('App.tsx: Store userLevel changed to:', userLevel);
     navigation.setCurrentLevel(userLevel);
   }, [userLevel, navigation]);
 
@@ -238,10 +236,7 @@ function App() {
                 )}
 
                 {/* Current Level Questions */}
-                <MainContent
-                  currentDomain={navigation.currentDomain}
-                  currentLevel={navigation.currentLevel}
-                />
+                <MainContent />
               </div>
 
               {/* Security Status Sidebar */}

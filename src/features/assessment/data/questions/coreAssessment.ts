@@ -14,6 +14,8 @@ export const coreAssessmentQuestions: Question[] = [
       { 
         id: 'yes',
         text: '✅ Yes, I use a password manager',
+        statement: 'Password Manager: Enabled',
+        statusCategory: 'shields-up',
         facts: { "password_manager": "yes" },
         points: 10,
         feedback: 'Excellent! Password managers are essential for security.'
@@ -21,6 +23,8 @@ export const coreAssessmentQuestions: Question[] = [
       { 
         id: 'no',
         text: '❌ No, I don\'t use one',
+        statement: 'Password Manager: None',
+        statusCategory: 'room-for-improvement',
         facts: { "password_manager": "no" },
         points: 0,
         feedback: 'Consider using a password manager - it\'s one of the most important security steps.'
@@ -36,6 +40,8 @@ export const coreAssessmentQuestions: Question[] = [
       { 
         id: 'yes',
         text: '✅ Yes, on most important accounts',
+        statement: 'Two-Factor Auth: Enabled everywhere',
+        statusCategory: 'shields-up',
         facts: { "two_factor": "yes" },
         points: 8,
         feedback: 'Great job! 2FA significantly improves your account security.'
@@ -43,6 +49,8 @@ export const coreAssessmentQuestions: Question[] = [
       { 
         id: 'partial',
         text: '⚠️ Only on some accounts',
+        statement: 'Two-Factor Auth: Partial coverage',
+        statusCategory: 'to-do',
         facts: { "two_factor": "partial" },
         points: 4,
         feedback: 'Good start! Consider enabling 2FA on all important accounts.'
@@ -50,6 +58,8 @@ export const coreAssessmentQuestions: Question[] = [
       { 
         id: 'no',
         text: '❌ No, I don\'t use 2FA',
+        statement: 'Two-Factor Auth: Not using',
+        statusCategory: 'room-for-improvement',
         facts: { "two_factor": "no" },
         points: 0,
         feedback: '2FA is crucial - it prevents most account breaches even if passwords are stolen.'

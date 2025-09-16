@@ -9,6 +9,8 @@ interface CategorizedAnswer extends Answer {
   question: Question | null;
   category: 'shields-up' | 'to-do' | 'room-for-improvement';
   visualIndicator: { icon: string; severity: string };
+  statement: string;          // Human-readable statement
+  isResettable: boolean;      // Whether this answer can be reset
 }
 
 export function SecurityStatus() {
@@ -20,36 +22,61 @@ export function SecurityStatus() {
   });
   const [showConfirmClear, setShowConfirmClear] = useState(false);
 
-  // Categorize answers based on points earned
+  // Categorize answers based on answer option properties
   const categorizedAnswers = useMemo(() => {
     const historicAnswers = getHistoricAnswers();
     
     const categorized = historicAnswers.map((answer): CategorizedAnswer => {
+      const question = answer.question;
+      
+      // Find the specific answer option that was chosen
+      const answerOption = question?.options?.find(opt => opt.id === answer.value);
+      
+      // Get statement from answer option or create fallback
+      const statement = answerOption?.statement || 
+        (question ? `${question.text}: ${answer.value}` : `${answer.questionId}: ${answer.value}`);
+      
+      // Get category from answer option or fallback to points-based logic
       let category: 'shields-up' | 'to-do' | 'room-for-improvement';
+      if (answerOption?.statusCategory) {
+        category = answerOption.statusCategory;
+      } else {
+        // Fallback to points-based categorization
+        const points = answer.pointsEarned || 0;
+        if (points >= 8) {
+          category = 'shields-up';
+        } else if (points >= 3) {
+          category = 'to-do';
+        } else {
+          category = 'room-for-improvement';
+        }
+      }
+      
+      // Determine if this answer can be reset
+      const isResettable = question?.resettable !== false && 
+        question?.phase !== 'onboarding' &&
+        !question?.tags?.includes('privacy');
+      
+      // Set visual indicator based on category
       let visualIndicator: { icon: string; severity: string };
-      
-      const points = answer.pointsEarned || 0;
-      
-      // High positive answers (8+ points) = Shields Up
-      if (points >= 8) {
-        category = 'shields-up';
-        visualIndicator = { icon: '✅', severity: 'check' };
-      }
-      // Medium/future answers (3-7 points) = To Do  
-      else if (points >= 3) {
-        category = 'to-do';
-        visualIndicator = { icon: '🟡', severity: 'plan' };
-      }
-      // Low/concerning answers (0-2 points) = Room for Improvement
-      else {
-        category = 'room-for-improvement';
-        visualIndicator = { icon: '🔴', severity: 'warn' };
+      switch (category) {
+        case 'shields-up':
+          visualIndicator = { icon: '✅', severity: 'check' };
+          break;
+        case 'to-do':
+          visualIndicator = { icon: '🟡', severity: 'plan' };
+          break;
+        case 'room-for-improvement':
+          visualIndicator = { icon: '🔴', severity: 'warn' };
+          break;
       }
       
       return {
         ...answer,
         category,
-        visualIndicator
+        visualIndicator,
+        statement,
+        isResettable
       };
     });
 
@@ -255,22 +282,25 @@ function AnswerItem({ answer, onRemove, showHelp }: AnswerItemProps) {
       <span className="text-lg">{answer.visualIndicator.icon}</span>
       
       <div className="flex-1 min-w-0">
-        <div className="font-medium text-gray-800 mb-1">
-          {answer.question?.text || answer.questionText || 'Question text not available'}
-        </div>
-        <div className="text-sm text-gray-600 mb-2">
-          Answer: <span className="font-medium">{formatAnswerValue(answer.value)}</span>
+        <div className="font-medium text-gray-800 mb-2">
+          {answer.statement}
         </div>
         
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleRemove}
-            className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
-          >
-            Change Answer
-          </button>
+          {answer.isResettable ? (
+            <button
+              onClick={handleRemove}
+              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+            >
+              Change Answer
+            </button>
+          ) : (
+            <span className="text-xs text-gray-500 px-2 py-1">
+              Cannot reset
+            </span>
+          )}
           
-          {showHelp && (
+          {showHelp && answer.category === 'room-for-improvement' && (
             <button className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors">
               How to Fix
             </button>
@@ -279,15 +309,4 @@ function AnswerItem({ answer, onRemove, showHelp }: AnswerItemProps) {
       </div>
     </div>
   );
-}
-
-function formatAnswerValue(value: boolean | number | string): string {
-  if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No';
-  }
-  if (typeof value === 'string') {
-    // Convert underscored values to readable format
-    return value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  }
-  return String(value);
 }

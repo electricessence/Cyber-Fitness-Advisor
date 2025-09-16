@@ -37,15 +37,11 @@ export function migrateUserData(
     return userData;
   }
 
-  // Future versions will implement actual migration logic
-  console.log(`Migration stub: ${fromVersion} → ${toVersion}`);
-  
   // Apply any necessary migrations in sequence
   let migratedData = { ...userData };
   
   for (const migration of migrations) {
     if (shouldApplyMigration(migration, fromVersion, toVersion)) {
-      console.log(`Applying migration: ${migration.description}`);
       migratedData = migration.migrate({
         fromVersion,
         toVersion,

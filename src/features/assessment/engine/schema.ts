@@ -9,6 +9,10 @@ export interface AnswerOption {
   icon?: string; // Optional emoji or icon (e.g. "✅", "❌", "🖥️")
   points?: number; // Optional gamification points (only if > 0)
   
+  // Security Status display
+  statement?: string; // Human-readable statement for Security Status (e.g., "Desktop OS: Windows")
+  statusCategory?: 'shields-up' | 'to-do' | 'room-for-improvement'; // Override default categorization
+  
   // Visibility conditions - same pattern as Question conditions
   // Supports wildcards: "*" means "any non-empty value"
   conditions?: {
@@ -64,6 +68,9 @@ export interface Question {
   
   // Phase management
   phase?: 'onboarding' | 'assessment';
+  
+  // Security Status behavior
+  resettable?: boolean; // false for privacy/detection questions that shouldn't be reset
   
   // Legacy properties for backward compatibility
   type?: string; // Question type for component logic

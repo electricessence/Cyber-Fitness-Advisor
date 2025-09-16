@@ -10,6 +10,7 @@ export const onboardingQuestions: Question[] = [
     id: 'privacy_notice',
     phase: 'onboarding',
     priority: ONBOARDING_PRIORITIES.PRIVACY_NOTICE,
+    resettable: false, // Cannot reset privacy acknowledgment
     statement: '🔒 Privacy First',
     text: 'Your data stays on your device. No tracking, no cloud storage.',
     tags: ['critical', 'onboarding', 'privacy'],
@@ -17,6 +18,8 @@ export const onboardingQuestions: Question[] = [
       {
         id: 'understood',
         text: '✅ I understand',
+        statement: 'Privacy: Acknowledged ✓',
+        statusCategory: 'shields-up',
         facts: { "privacy_acknowledged": true },
         feedback: '🔒 Perfect! Your security assessment begins now.'
       }
@@ -28,6 +31,7 @@ export const onboardingQuestions: Question[] = [
     id: 'windows_detection_confirm',
     phase: 'onboarding',
     priority: ONBOARDING_PRIORITIES.OS_DETECTION,
+    resettable: false, // Cannot reset OS detection
     statement: '🖥️ Detected: Windows Operating System',
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
@@ -38,13 +42,17 @@ export const onboardingQuestions: Question[] = [
     options: [
       { 
         id: 'yes',
-        text: '✅ Yes, I use Windows', 
+        text: '✅ Yes, I use Windows',
+        statement: 'Desktop OS: Windows',
+        statusCategory: 'shields-up',
         facts: { "os": "windows", "os_confirmed": true },
         feedback: 'Great! We\'ll provide Windows-specific security advice.'
       },
       { 
         id: 'no',
-        text: '❌ No, that\'s wrong', 
+        text: '❌ No, that\'s wrong',
+        statement: 'Desktop OS: Unconfirmed',
+        statusCategory: 'room-for-improvement',
         facts: { "os_confirmed": false },
         feedback: 'No problem! We\'ll ask you to select your actual OS.'
       }

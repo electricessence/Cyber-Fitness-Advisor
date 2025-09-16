@@ -365,6 +365,33 @@ export class ConditionEngine {
   }
   
   /**
+   * Get a fact value from the context
+   * For now, this accesses device profile and metadata facts
+   * TODO: Integrate with the facts system properly
+   */
+  private getFactValue(factName: string, context: EvaluationContext): any {
+    // Access device facts from deviceProfile
+    if (factName.startsWith('device.') && context.deviceProfile) {
+      const devicePath = factName.replace('device.', '');
+      if (devicePath === 'os') return context.deviceProfile.currentDevice?.os;
+      if (devicePath === 'browser') return context.deviceProfile.currentDevice?.browser;
+      if (devicePath === 'type') return context.deviceProfile.currentDevice?.type;
+    }
+    
+    // Access metadata facts
+    if (context.metadata && factName in context.metadata) {
+      return context.metadata[factName];
+    }
+    
+    // Access answer-based facts (answers stored as facts)
+    if (context.answers && factName in context.answers) {
+      return context.answers[factName];
+    }
+    
+    return undefined;
+  }
+  
+  /**
    * Determines if a question should be filtered out based on phase, device, or runtime logic
    */
   private shouldFilterQuestion(question: any, context: EvaluationContext): boolean {

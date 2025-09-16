@@ -243,15 +243,7 @@ export const useAssessmentStore = create<AssessmentState>()(
         ...factsSlice, // Include facts system
         
         answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => {
-          console.log('Store answerQuestion called with:', questionId, value);
           const state = get();
-          const previousScore = state.overallScore;
-          const previousLevel = state.currentLevel;
-          console.log('Previous state:', { 
-            score: previousScore, 
-            level: previousLevel, 
-            answersCount: Object.keys(state.answers).length 
-          });
           
           // Find the question to get its details
           let question = state.questionBank.domains
@@ -302,10 +294,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           question = onboardingQuestions[questionId];
         }
         
-        console.log('Found question:', question?.id, question?.text?.substring(0, 50));
-        
         const pointsEarned = question ? calculateQuestionPoints(question, value) : 0;
-        console.log('Points earned:', pointsEarned);
         
         // Calculate expiration for time-sensitive answers
         const expirationData = calculateAnswerExpiration(questionId, value);
@@ -344,21 +333,13 @@ export const useAssessmentStore = create<AssessmentState>()(
                 confidence: 1.0 
               });
             }
-            
-            console.log('Facts updated via factsActions:', Object.keys(selectedOption.facts));
           }
         }
         
         const scoreResult = calculateOverallScore(state.questionBank, newAnswers);
         const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
         
-        console.log('New calculated state:', {
-          newScore: scoreResult.overallScore,
-          newLevel: nextLevelProgress.currentLevel,
-          newAnswersCount: Object.keys(newAnswers).length
-        });
-        
-        const scoreIncrease = scoreResult.overallScore - previousScore;
+        const scoreIncrease = scoreResult.overallScore - state.overallScore;
         const shouldCelebrate = scoreIncrease > 5 || 
           (nextLevelProgress.currentLevel > state.currentLevel && nextLevelProgress.currentLevel <= 2); // Celebrate early levels
         
@@ -403,8 +384,6 @@ export const useAssessmentStore = create<AssessmentState>()(
         
         // Update badge progress after answering a question
         get().updateBadgeProgress();
-        
-        console.log('Store updated! New state should be available to components.');
       },
       
       setDeviceProfile: (profile: DeviceProfile) => {
@@ -462,8 +441,6 @@ export const useAssessmentStore = create<AssessmentState>()(
           
           // Update badge progress after removing answer
           state.updateBadgeProgress();
-          
-          console.log(`Removed answer for question: ${questionId}`);
         }
       },
       

@@ -82,10 +82,10 @@ describe('SecurityStatus', () => {
     // Should show answer count
     expect(screen.getByText('3 answers')).toBeInTheDocument();
     
-    // Should categorize correctly
-    expect(screen.getByText('Do you use a password manager?')).toBeInTheDocument(); // Shields Up (10 points)
-    expect(screen.getByText('Do you use basic authentication?')).toBeInTheDocument(); // To Do (5 points)
-    expect(screen.getByText('Do you have antivirus software?')).toBeInTheDocument(); // Room for Improvement (0 points)
+    // Should categorize correctly  
+    expect(screen.getByText('Do you use a password manager?: yes')).toBeInTheDocument(); // Shields Up (10 points)
+    expect(screen.getByText('Do you use basic authentication?: sometimes')).toBeInTheDocument(); // To Do (5 points)
+    expect(screen.getByText('Do you have antivirus software?: no')).toBeInTheDocument(); // Room for Improvement (0 points)
   });
 
   it('should allow removing individual answers', () => {
@@ -221,7 +221,7 @@ describe('SecurityStatus', () => {
     const shieldsUpButton = screen.getByRole('button', { name: /🛡️ Shields Up/ });
     
     // Initially should show content (expanded by default)
-    expect(screen.getByText('Do you use a password manager?')).toBeInTheDocument();
+    expect(screen.getByText('Do you use a password manager?: yes')).toBeInTheDocument();
     
     // Click to collapse
     fireEvent.click(shieldsUpButton);
