@@ -16,7 +16,7 @@ interface CategorizedAnswer extends Answer {
 export function SecurityStatus() {
   const { getHistoricAnswers, removeAnswer, resetAssessment } = useAssessmentStore();
   const [expandedSections, setExpandedSections] = useState({
-    'shields-up': true,
+    'shields-up': false,  // Collapsed by default
     'to-do': true,
     'room-for-improvement': true,
   });
@@ -52,10 +52,8 @@ export function SecurityStatus() {
         }
       }
       
-      // Determine if this answer can be reset
-      const isResettable = question?.resettable !== false && 
-        question?.phase !== 'onboarding' &&
-        !question?.tags?.includes('privacy');
+      // Determine if this answer can be reset (simple rule: if only one option, can't reset)
+      const isResettable = Boolean(question?.options && question.options.length > 1);
       
       // Set visual indicator based on category
       let visualIndicator: { icon: string; severity: string };
@@ -287,17 +285,13 @@ function AnswerItem({ answer, onRemove, showHelp }: AnswerItemProps) {
         </div>
         
         <div className="flex items-center gap-2">
-          {answer.isResettable ? (
+          {answer.isResettable && (
             <button
               onClick={handleRemove}
               className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
             >
               Change Answer
             </button>
-          ) : (
-            <span className="text-xs text-gray-500 px-2 py-1">
-              Cannot reset
-            </span>
           )}
           
           {showHelp && answer.category === 'room-for-improvement' && (

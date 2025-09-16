@@ -10,7 +10,6 @@ export const onboardingQuestions: Question[] = [
     id: 'privacy_notice',
     phase: 'onboarding',
     priority: ONBOARDING_PRIORITIES.PRIVACY_NOTICE,
-    resettable: false, // Cannot reset privacy acknowledgment
     statement: '🔒 Privacy First',
     text: 'Your data stays on your device. No tracking, no cloud storage.',
     tags: ['critical', 'onboarding', 'privacy'],
@@ -31,7 +30,6 @@ export const onboardingQuestions: Question[] = [
     id: 'windows_detection_confirm',
     phase: 'onboarding',
     priority: ONBOARDING_PRIORITIES.OS_DETECTION,
-    resettable: false, // Cannot reset OS detection
     statement: '🖥️ Detected: Windows Operating System',
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
@@ -55,6 +53,53 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "os_confirmed": false },
         feedback: 'No problem! We\'ll ask you to select your actual OS.'
+      },
+      { 
+        id: 'unsure',
+        text: '🤔 I\'m not sure',
+        statement: 'Desktop OS: Needs guidance',
+        statusCategory: 'to-do',
+        facts: { "os_confirmed": false, "tech_comfort": "novice" },
+        feedback: 'No worries! We\'ll help you figure out what you\'re using.'
+      }
+    ]
+  },
+
+  // Novice OS Help - appears when user is unsure about their OS
+  {
+    id: 'os_novice_help',
+    phase: 'onboarding',
+    priority: ONBOARDING_PRIORITIES.OS_DETECTION - 10, // Right after OS detection
+    statement: '🤝 Getting OS Help',
+    text: 'No problem! Do you know which operating system you are using?',
+    tags: ['novice', 'onboarding'],
+    conditions: {
+      include: { "tech_comfort": "novice", "os_confirmed": false }
+    },
+    options: [
+      { 
+        id: 'windows',
+        text: '🖥️ Windows (most common)',
+        statement: 'Desktop OS: Windows (with help)',
+        statusCategory: 'shields-up',
+        facts: { "os": "windows", "os_confirmed": true },
+        feedback: 'Great! Windows is very common. We\'ll give you Windows-specific advice.'
+      },
+      { 
+        id: 'mac',
+        text: '🍎 Mac/Apple computer',
+        statement: 'Desktop OS: macOS (with help)',
+        statusCategory: 'shields-up',
+        facts: { "os": "mac", "os_confirmed": true },
+        feedback: 'Perfect! We\'ll provide Mac-specific security guidance.'
+      },
+      { 
+        id: 'still_unsure',
+        text: '🤔 I really don\'t know',
+        statement: 'Desktop OS: Will provide general advice',
+        statusCategory: 'to-do',
+        facts: { "os": "unknown", "os_confirmed": true, "tech_comfort": "beginner" },
+        feedback: 'That\'s okay! We\'ll give you general advice that works on most computers.'
       }
     ]
   },
@@ -129,30 +174,40 @@ export const onboardingQuestions: Question[] = [
       { 
         id: 'windows',
         text: '🖥️ Windows', 
+        statement: 'Desktop OS: Windows',
+        statusCategory: 'shields-up',
         facts: { "os": "windows", "os_confirmed": true },
         feedback: 'Thanks! We\'ll provide Windows-specific advice.'
       },
       { 
         id: 'mac',
         text: '🍎 macOS', 
+        statement: 'Desktop OS: macOS',
+        statusCategory: 'shields-up',
         facts: { "os": "mac", "os_confirmed": true },
         feedback: 'Great! We\'ll provide macOS-specific advice.'
       },
       { 
         id: 'linux',
         text: '🐧 Linux', 
+        statement: 'Desktop OS: Linux',
+        statusCategory: 'shields-up',
         facts: { "os": "linux", "os_confirmed": true },
         feedback: 'Excellent! We\'ll provide Linux-specific advice.'
       },
       { 
         id: 'mobile_only',
         text: '📱 I only use mobile devices', 
+        statement: 'Primary Device: Mobile Only',
+        statusCategory: 'shields-up',
         facts: { "os": "mobile_only", "os_confirmed": true },
         feedback: 'Got it! We\'ll focus on mobile security.'
       },
       { 
         id: 'other',
         text: '🔧 Other/Multiple systems', 
+        statement: 'Desktop OS: Multiple/Other',
+        statusCategory: 'shields-up',
         facts: { "os": "other", "os_confirmed": true },
         feedback: 'Thanks! We\'ll provide general security advice.'
       }
@@ -168,18 +223,30 @@ export const onboardingQuestions: Question[] = [
     text: 'Is this your primary browser?',
     tags: ['onboarding'],
     conditions: {
-      include: { "os_confirmed": true, "browser_detected": "chrome" }
+      include: { "os_confirmed": true, "browser_detected": "chrome" },
+      exclude: { "browser_confirmed": true }
     },
     options: [
       { 
         id: 'yes',
         text: '✅ Yes, Chrome is my main browser',
+        statement: 'Primary Browser: Chrome',
+        statusCategory: 'shields-up',
         facts: { "browser": "chrome", "browser_confirmed": true }
       },
       { 
         id: 'no',
         text: '❌ No, I use a different browser',
+        statement: 'Primary Browser: Not Chrome',
+        statusCategory: 'to-do',
         facts: { "browser_confirmed": false }
+      },
+      { 
+        id: 'unsure',
+        text: '🤔 I\'m not sure which browser I use',
+        statement: 'Primary Browser: Needs guidance',
+        statusCategory: 'to-do',
+        facts: { "browser_confirmed": false, "tech_comfort": "novice" }
       }
     ]
   },
@@ -193,18 +260,30 @@ export const onboardingQuestions: Question[] = [
     text: 'Is this your primary browser?',
     tags: ['onboarding'],
     conditions: {
-      include: { "os_confirmed": true, "browser_detected": "firefox" }
+      include: { "os_confirmed": true, "browser_detected": "firefox" },
+      exclude: { "browser_confirmed": true }
     },
     options: [
       { 
         id: 'yes',
         text: '✅ Yes, Firefox is my main browser',
+        statement: 'Primary Browser: Firefox',
+        statusCategory: 'shields-up',
         facts: { "browser": "firefox", "browser_confirmed": true }
       },
       { 
         id: 'no',
         text: '❌ No, I use a different browser',
+        statement: 'Primary Browser: Not Firefox',
+        statusCategory: 'to-do',
         facts: { "browser_confirmed": false }
+      },
+      { 
+        id: 'unsure',
+        text: '🤔 I\'m not sure which browser I use',
+        statement: 'Primary Browser: Needs guidance',
+        statusCategory: 'to-do',
+        facts: { "browser_confirmed": false, "tech_comfort": "novice" }
       }
     ]
   },
@@ -215,21 +294,33 @@ export const onboardingQuestions: Question[] = [
     phase: 'onboarding',
     priority: ONBOARDING_PRIORITIES.BROWSER_DETECTION,
     statement: '🔵 Detected: Microsoft Edge',
-    text: 'Is this your primary browser?',
+    text: 'Is this correct?',
     tags: ['onboarding'],
     conditions: {
-      include: { "os_confirmed": true, "browser_detected": "edge" }
+      include: { "os_confirmed": true, "browser_detected": "edge" },
+      exclude: { "browser_confirmed": true }
     },
     options: [
       { 
         id: 'yes',
         text: '✅ Yes, Edge is my main browser',
+        statement: 'Primary Browser: Microsoft Edge',
+        statusCategory: 'shields-up',
         facts: { "browser": "edge", "browser_confirmed": true }
       },
       { 
         id: 'no',
         text: '❌ No, I use a different browser',
+        statement: 'Primary Browser: Not Edge',
+        statusCategory: 'to-do',
         facts: { "browser_confirmed": false }
+      },
+      { 
+        id: 'unsure',
+        text: '🤔 I\'m not sure which browser I use',
+        statement: 'Primary Browser: Needs guidance',
+        statusCategory: 'to-do',
+        facts: { "browser_confirmed": false, "tech_comfort": "novice" }
       }
     ]
   },
@@ -240,21 +331,33 @@ export const onboardingQuestions: Question[] = [
     phase: 'onboarding',
     priority: ONBOARDING_PRIORITIES.BROWSER_DETECTION,
     statement: '🧭 Detected: Safari Browser',
-    text: 'Is this your primary browser?',
+    text: 'Is this correct?',
     tags: ['onboarding'],
     conditions: {
-      include: { "os_confirmed": true, "browser_detected": "safari" }
+      include: { "os_confirmed": true, "browser_detected": "safari" },
+      exclude: { "browser_confirmed": true }
     },
     options: [
       { 
         id: 'yes',
         text: '✅ Yes, Safari is my main browser',
+        statement: 'Primary Browser: Safari',
+        statusCategory: 'shields-up',
         facts: { "browser": "safari", "browser_confirmed": true }
       },
       { 
         id: 'no',
         text: '❌ No, I use a different browser',
+        statement: 'Primary Browser: Not Safari',
+        statusCategory: 'to-do',
         facts: { "browser_confirmed": false }
+      },
+      { 
+        id: 'unsure',
+        text: '🤔 I\'m not sure which browser I use',
+        statement: 'Primary Browser: Needs guidance',
+        statusCategory: 'to-do',
+        facts: { "browser_confirmed": false, "tech_comfort": "novice" }
       }
     ]
   },
@@ -274,30 +377,40 @@ export const onboardingQuestions: Question[] = [
       { 
         id: 'chrome',
         text: '🌐 Chrome', 
+        statement: 'Primary Browser: Chrome',
+        statusCategory: 'shields-up',
         facts: { "browser": "chrome", "browser_confirmed": true },
         feedback: 'Thanks! We\'ll provide Chrome-specific security tips.'
       },
       { 
         id: 'firefox',
         text: '🦊 Firefox', 
+        statement: 'Primary Browser: Firefox',
+        statusCategory: 'shields-up',
         facts: { "browser": "firefox", "browser_confirmed": true },
         feedback: 'Great! We\'ll provide Firefox-specific security tips.'
       },
       { 
         id: 'edge',
         text: '🔵 Microsoft Edge', 
+        statement: 'Primary Browser: Edge',
+        statusCategory: 'shields-up',
         facts: { "browser": "edge", "browser_confirmed": true },
         feedback: 'Perfect! We\'ll provide Edge-specific security tips.'
       },
       { 
         id: 'safari',
         text: '🧭 Safari', 
+        statement: 'Primary Browser: Safari',
+        statusCategory: 'shields-up',
         facts: { "browser": "safari", "browser_confirmed": true },
         feedback: 'Excellent! We\'ll provide Safari-specific security tips.'
       },
       { 
         id: 'other',
         text: '🔧 Other browser', 
+        statement: 'Primary Browser: Other',
+        statusCategory: 'shields-up',
         facts: { "browser": "other", "browser_confirmed": true },
         feedback: 'Thanks! We\'ll provide general browser security advice.'
       }
@@ -318,18 +431,24 @@ export const onboardingQuestions: Question[] = [
       {
         id: 'beginner',
         text: '👶 Beginner - I stick to basics',
+        statement: 'Tech Experience: Beginner',
+        statusCategory: 'shields-up',
         facts: { "tech_comfort": "beginner" },
         feedback: 'Perfect! We\'ll focus on simple, high-impact security steps.'
       },
       {
         id: 'comfortable',
         text: '👍 Comfortable - I can follow instructions',
+        statement: 'Tech Experience: Comfortable',
+        statusCategory: 'shields-up',
         facts: { "tech_comfort": "comfortable" },
         feedback: 'Great! We\'ll give you clear steps for important security measures.'
       },
       {
         id: 'advanced',
         text: '🛠️ Advanced - I enjoy tweaking settings',
+        statement: 'Tech Experience: Advanced',
+        statusCategory: 'shields-up',
         facts: { "tech_comfort": "advanced" },
         feedback: 'Excellent! We can recommend more comprehensive security configurations.'
       }
@@ -351,30 +470,40 @@ export const onboardingQuestions: Question[] = [
       {
         id: 'iphone',
         text: '📱 Yes - iPhone (iOS)',
+        statement: 'Mobile Device: iPhone',
+        statusCategory: 'shields-up',
         facts: { "has_mobile": true, "mobile_os": "ios" },
         feedback: 'Great! We\'ll include iPhone security recommendations.'
       },
       {
         id: 'android',
         text: '📱 Yes - Android phone',
+        statement: 'Mobile Device: Android',
+        statusCategory: 'shields-up',
         facts: { "has_mobile": true, "mobile_os": "android" },
         feedback: 'Perfect! We\'ll include Android security recommendations.'
       },
       {
         id: 'both',
         text: '📱 Yes - Both iPhone and Android',
+        statement: 'Mobile Devices: Both iOS & Android',
+        statusCategory: 'shields-up',
         facts: { "has_mobile": true, "mobile_os": "both" },
         feedback: 'We\'ll provide security advice for both platforms.'
       },
       {
         id: 'tablet_only',
         text: '📱 Yes - iPad/tablet only',
+        statement: 'Mobile Device: Tablet',
+        statusCategory: 'shields-up',
         facts: { "has_mobile": true, "mobile_os": "tablet" },
         feedback: 'Good! We\'ll include tablet-specific security advice.'
       },
       {
         id: 'no_mobile',
         text: '❌ No - Just this computer',
+        statement: 'Mobile Devices: Desktop Only',
+        statusCategory: 'shields-up',
         facts: { "has_mobile": false },
         feedback: 'Got it! We\'ll focus on desktop security.'
       }
@@ -395,30 +524,40 @@ export const onboardingQuestions: Question[] = [
       {
         id: 'personal_data',
         text: '🔐 Protecting personal information',
+        statement: 'Security Focus: Privacy Protection',
+        statusCategory: 'shields-up',
         facts: { "priority_concern": "privacy" },
         feedback: 'Smart focus! We\'ll prioritize privacy and data protection.'
       },
       {
         id: 'financial',
         text: '💳 Financial security',
+        statement: 'Security Focus: Financial Protection',
+        statusCategory: 'shields-up',
         facts: { "priority_concern": "financial" },
         feedback: 'Critical area! We\'ll emphasize financial security practices.'
       },
       {
         id: 'family_safety',
         text: '👨‍👩‍👧‍👦 Family/children\'s safety online',
+        statement: 'Security Focus: Family Safety',
+        statusCategory: 'shields-up',
         facts: { "priority_concern": "family" },
         feedback: 'Important! We\'ll include family-focused security advice.'
       },
       {
         id: 'work_security',
         text: '💼 Work/professional security',
+        statement: 'Security Focus: Professional',
+        statusCategory: 'shields-up',
         facts: { "priority_concern": "work" },
         feedback: 'Great! We\'ll include professional security considerations.'
       },
       {
         id: 'general',
         text: '🌐 General security best practices',
+        statement: 'Security Focus: Comprehensive',
+        statusCategory: 'shields-up',
         facts: { "priority_concern": "general" },
         feedback: 'Excellent approach! We\'ll cover comprehensive security fundamentals.'
       }

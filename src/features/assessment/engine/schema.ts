@@ -69,9 +69,6 @@ export interface Question {
   // Phase management
   phase?: 'onboarding' | 'assessment';
   
-  // Security Status behavior
-  resettable?: boolean; // false for privacy/detection questions that shouldn't be reset
-  
   // Legacy properties for backward compatibility
   type?: string; // Question type for component logic
   explanation?: string; // Educational information about the question

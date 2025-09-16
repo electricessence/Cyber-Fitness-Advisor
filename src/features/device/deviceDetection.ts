@@ -35,12 +35,35 @@ export function detectCurrentDevice(): DetectedDevice {
   if (userAgent.includes('mobile') || userAgent.includes('iphone')) type = 'mobile';
   else if (userAgent.includes('tablet') || userAgent.includes('ipad')) type = 'tablet';
   
-  // Detect browser
+  // Detect browser (more comprehensive detection)
   let browser: DetectedDevice['browser'] = 'unknown';
-  if (userAgent.includes('chrome') && !userAgent.includes('edg')) browser = 'chrome';
-  else if (userAgent.includes('firefox')) browser = 'firefox';
-  else if (userAgent.includes('safari') && !userAgent.includes('chrome')) browser = 'safari';
-  else if (userAgent.includes('edg')) browser = 'edge';
+  
+  // Edge detection (must come before Chrome since Edge includes 'chrome' in UA)
+  if (userAgent.includes('edg/') || userAgent.includes('edga/') || userAgent.includes('edgios/')) {
+    browser = 'edge';
+  }
+  // Chrome detection (includes Chromium-based browsers)
+  else if (userAgent.includes('chrome/') || userAgent.includes('chromium/')) {
+    browser = 'chrome';
+  }
+  // Firefox detection
+  else if (userAgent.includes('firefox/') || userAgent.includes('fxios/')) {
+    browser = 'firefox';
+  }
+  // Safari detection (must come after Chrome check)
+  else if (userAgent.includes('safari/') && !userAgent.includes('chrome')) {
+    browser = 'safari';
+  }
+  // Fallback patterns for less common cases
+  else if (userAgent.includes('chrome') && !userAgent.includes('edg')) {
+    browser = 'chrome';
+  }
+  else if (userAgent.includes('firefox')) {
+    browser = 'firefox';
+  }
+  else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+    browser = 'safari';
+  }
   
   return { type, os, browser };
 }
