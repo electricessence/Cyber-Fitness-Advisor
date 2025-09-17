@@ -110,8 +110,6 @@ export function createFactsStoreSlice(): FactsStoreState {
       },
       
       importLegacyData: (answers: Record<string, Answer>) => {
-        console.log('Importing legacy data into facts system...');
-        
         // Process each answer to extract facts
         for (const answer of Object.values(answers)) {
           try {
@@ -144,7 +142,7 @@ export function createFactsStoreSlice(): FactsStoreState {
           lastUpdated: new Date()
         };
         
-        console.log(`Facts slice: Injected fact ${factId} = ${value}`);
+        // Facts injected successfully
       }
     }
   };

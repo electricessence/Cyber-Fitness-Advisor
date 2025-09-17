@@ -8,6 +8,7 @@
 import type { Question } from '../assessment/engine/schema';
 import type { FactsProfile } from '../assessment/facts/types';
 import { TierEngine, type Tier } from '../progression/tiers';
+import { TIME_CONSTANTS, SCORE_CONSTANTS } from '../../utils/constants';
 import type { DeviceProfile } from '../assessment/engine/deviceScenarios';
 
 export interface DailyTaskCandidate extends Question {
@@ -88,7 +89,7 @@ export class DailyTaskEngine {
         task: null,
         reason: "No eligible tasks available right now. Check back tomorrow!",
         alternatives: [],
-        nextAvailableAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        nextAvailableAt: new Date(Date.now() + TIME_CONSTANTS.ONE_DAY)
       };
     }
 
@@ -156,7 +157,7 @@ export class DailyTaskEngine {
     const isCompleted = !!currentAnswer && !currentAnswer.isExpired;
     const isExpired = !!currentAnswer?.isExpired;
     const daysSinceCompletion = completion 
-      ? Math.floor((Date.now() - completion.completedAt.getTime()) / (24 * 60 * 60 * 1000))
+      ? Math.floor((Date.now() - completion.completedAt.getTime()) / TIME_CONSTANTS.ONE_DAY)
       : undefined;
     const isOnCooldown = daysSinceCompletion !== undefined && daysSinceCompletion < this.config.cooldownDays;
     
@@ -172,7 +173,7 @@ export class DailyTaskEngine {
     }
     
     // Calculate impact score from priority and tags
-    let impactScore = Math.min(100, question.priority / 10);
+    let impactScore = Math.min(SCORE_CONSTANTS.MAX_IMPACT_SCORE, question.priority / 10);
     if (tags.includes('critical')) impactScore += 30;
     if (tags.includes('high-impact')) impactScore += 20;
     if (tags.includes('quickwin')) impactScore += 15;
