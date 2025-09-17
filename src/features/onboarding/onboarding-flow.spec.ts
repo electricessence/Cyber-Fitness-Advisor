@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useAssessmentStore } from '../features/assessment/state/store';
+import { useAssessmentStore } from "../../features/assessment/state/store";
 
 describe('Complete Onboarding Flow Automation', () => {
   let store: ReturnType<typeof useAssessmentStore.getState>;

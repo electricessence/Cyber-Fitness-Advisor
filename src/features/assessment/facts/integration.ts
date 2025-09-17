@@ -82,17 +82,10 @@ export function createFactsStoreSlice(): FactsStoreState {
           lastUpdated: new Date()
         };
         
-        // Log any conflicts for debugging
+        // Log any conflicts for debugging (only warnings)
         if (result.conflicts.length > 0) {
           console.warn('Fact conflicts detected:', result.conflicts);
         }
-        
-        console.log(`Facts updated from answer ${answer.questionId}:`, {
-          established: result.factsEstablished.length,
-          updated: result.factsUpdated.length,
-          conflicts: result.conflicts.length,
-          totalFacts: Object.keys(factsProfile.facts).length
-        });
       },
       
       getFacts: (query = {}) => {
@@ -127,11 +120,6 @@ export function createFactsStoreSlice(): FactsStoreState {
             console.warn(`Failed to import answer ${answer.questionId}:`, error);
           }
         }
-        
-        console.log(`Facts imported from ${Object.keys(answers).length} answers:`, {
-          totalFacts: Object.keys(factsProfile.facts).length,
-          categories: [...new Set(Object.values(factsProfile.facts).map(f => f.category))]
-        });
       },
       
       injectFact: (factId: string, value: any, metadata = {}) => {

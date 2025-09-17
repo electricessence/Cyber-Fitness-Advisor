@@ -1022,12 +1022,8 @@ export const initializeStore = () => {
   const store = useAssessmentStore.getState();
   
   // Initialize device detection facts - these are stable environmental facts
+  // Initialize device detection  
   const device = detectCurrentDevice();
-  
-  console.log('🔧 Store Initialization - Device Detection Results:');
-  console.log('  OS detected:', device.os);
-  console.log('  Browser detected:', device.browser);
-  console.log('  Device type:', device.type);
   
   // Inject device detection facts directly
   store.factsActions.injectFact('os_detected', device.os, { source: 'auto-detection' });
@@ -1037,25 +1033,7 @@ export const initializeStore = () => {
   // Set a general flag that any detection has happened
   store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
   
-  // Debug priority values and question availability
-  setTimeout(() => {
-    console.log('🔍 Current Facts after injection:');
-    console.log('  os_detected:', store.factsActions.getFact('os_detected')?.value);
-    console.log('  os_confirmed:', store.factsActions.getFact('os_confirmed')?.value);
-    console.log('  browser_detected:', store.factsActions.getFact('browser_detected')?.value);
-    console.log('  browser_confirmed:', store.factsActions.getFact('browser_confirmed')?.value);
-    
-    const available = store.getAvailableQuestions();
-    console.log('🎯 Available Questions (first 5):');
-    available.slice(0, 5).forEach((q, i) => {
-      console.log(`  ${i+1}. ${q.id} (priority: ${q.priority})`);
-    });
-    
-    const browserQuestions = available.filter(q => 
-      q.id.includes('browser') || q.id.includes('firefox') || q.id.includes('chrome')
-    );
-    console.log('🌐 Browser Questions Available:', browserQuestions.map(q => `${q.id} (${q.priority})`));
-  }, 100);
+  // Facts and questions are now initialized
   
   
   // Pre-populate answers from onboarding (always run this, not just when we have existing answers)
