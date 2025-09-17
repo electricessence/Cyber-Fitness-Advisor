@@ -10,7 +10,6 @@ import { useState, useEffect } from 'react';
 import { Monitor } from 'lucide-react';
 import { detectCurrentDevice } from '../features/device/deviceDetection';
 import { useAssessmentStore } from '../features/assessment/state/store';
-import { getOnboardingQuestions } from '../features/assessment/data/contentService';
 import type { DeviceProfile } from '../features/assessment/engine/deviceScenarios';
 
 interface UnifiedOnboardingProps {
@@ -20,9 +19,9 @@ interface UnifiedOnboardingProps {
 export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
   const { 
     answers,
-    factsProfile,
     answerQuestion,
-    setDeviceProfile
+    setDeviceProfile,
+    getAvailableQuestions
   } = useAssessmentStore();
   
   const [detectedDevice, setDetectedDevice] = useState(detectCurrentDevice());
@@ -33,43 +32,12 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     tip?: string 
   }>({ text: '' });
 
-  // Get onboarding questions from the main question bank
-  const onboardingQuestions = getOnboardingQuestions();
-
-  // Filter onboarding questions using the same facts-based logic as the store
+  // Use the store's getAvailableQuestions() method with phase filter
   // This ensures consistent visibility logic with the main assessment
-  const facts = factsProfile.facts;
-  const visibleOnboardingQuestions = onboardingQuestions.filter(question => {
-    let isVisible = true;
-    
-    // Check include conditions - question is visible if ALL facts match (AND logic)
-    if (question.conditions?.include) {
-      let includeMatches = true; // Start with true, require ALL to match
-      for (const [factId, expectedValue] of Object.entries(question.conditions.include)) {
-        const fact = facts[factId];
-        if (!fact || fact.value !== expectedValue) {
-          includeMatches = false;
-          break; // Any mismatch makes question invisible
-        }
-      }
-      if (!includeMatches) {
-        isVisible = false;
-      }
-    }
-    
-    // Check exclude conditions - question is hidden if facts match
-    if (question.conditions?.exclude && isVisible) {
-      for (const [factId, expectedValue] of Object.entries(question.conditions.exclude)) {
-        const fact = facts[factId];
-        if (fact && fact.value === expectedValue) {
-          isVisible = false;
-          break;
-        }
-      }
-    }
-    
-    return isVisible;
-  });
+  const allAvailableQuestions = getAvailableQuestions();
+  const visibleOnboardingQuestions = allAvailableQuestions.filter(question => 
+    question.phase === 'onboarding'
+  );
 
   const currentQuestion = visibleOnboardingQuestions[currentQuestionIndex];
 

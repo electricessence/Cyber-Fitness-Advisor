@@ -6,11 +6,13 @@ import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration } from '../engine/scoring';
 import { ConditionEngine } from '../engine/conditions';
 import { createFactsStoreSlice, type FactsStoreState } from '../facts/integration';
+import type { Fact } from '../facts/types';
 import unifiedQuestionBank from '../data/questionBank';
 import { detectCurrentDevice } from '../../device/deviceDetection';
 import { BadgeEngine, type BadgeEvaluationContext, type BadgeUnlockEvent, type StreakData } from '../../badges/badgeEngine';
 import type { Badge, BadgeProgress } from '../../badges/badgeDefinitions';
 import { ACHIEVEMENT_BADGES } from '../../badges/badgeDefinitions';
+import { getVisibleQuestionIds } from '../engine/conditionEvaluation';
 
 // Smart pre-population from onboarding data
 function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
@@ -235,12 +237,58 @@ const initialState = {
 export const useAssessmentStore = create<AssessmentState>()(
   persist(
     (set, get) => {
-      // Create facts system slice
+      // Create facts system slice  
       const factsSlice = createFactsStoreSlice();
+      
+      // Override injectFact to properly update Zustand state
+      const enhancedFactsActions = {
+        ...factsSlice.factsActions,
+        injectFact: (factId: string, value: any, metadata: { source?: string; confidence?: number } = {}) => {
+          // Update only Zustand state, not facts slice internal state
+          const currentState = get();
+          
+          const fact: Fact = {
+            id: factId,
+            name: factId.replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            category: factId.includes('device') || factId.includes('os') || factId.includes('browser') ? 'device' : 'behavior',
+            value,
+            establishedAt: new Date(),
+            establishedBy: { questionId: 'device-detection', answerValue: value },
+            confidence: metadata.confidence || 0.95,
+            metadata: { source: metadata.source || 'auto-detection', ...metadata }
+          };
+          
+          set({
+            factsProfile: {
+              ...currentState.factsProfile,
+              facts: {
+                ...currentState.factsProfile.facts,
+                [factId]: fact
+              },
+              lastUpdated: new Date()
+            }
+          });
+        },
+        
+        // Override getFact to read from Zustand state
+        getFact: (factId: string) => {
+          const currentState = get();
+          return currentState.factsProfile.facts[factId] || null;
+        },
+        
+        // Override hasFactValue to read from Zustand state  
+        hasFactValue: (factId: string, value: any) => {
+          const currentState = get();
+          const fact = currentState.factsProfile.facts[factId];
+          return fact ? fact.value === value : false;
+        }
+      };
       
       return {
         ...initialState,
-        ...factsSlice, // Include facts system
+        factsProfile: factsSlice.factsProfile, // Initialize from facts slice
+        factsEngine: factsSlice.factsEngine, // Include facts engine
+        factsActions: enhancedFactsActions, // Use enhanced version that reads from Zustand
         
         answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => {
           const state = get();
@@ -326,9 +374,9 @@ export const useAssessmentStore = create<AssessmentState>()(
             option.id === newAnswers[questionId].value || option.text === newAnswers[questionId].value
           );
           if (selectedOption && selectedOption.facts) {
-            // Use factsActions to inject facts instead of manually updating state
+            // Use enhanced factsActions to inject facts
             for (const [factId, factValue] of Object.entries(selectedOption.facts)) {
-              get().factsActions.injectFact(factId, factValue, { 
+              enhancedFactsActions.injectFact(factId, factValue, { 
                 source: `answer:${questionId}`,
                 confidence: 1.0 
               });
@@ -405,13 +453,17 @@ export const useAssessmentStore = create<AssessmentState>()(
         localStorage.removeItem('cfa:v2:onboardingVersion');
         localStorage.removeItem('cfa:v2:privacy-dismissed');
         
-        // Reset in-memory state
+        // Create a fresh facts slice to ensure clean state
+        const freshFactsSlice = createFactsStoreSlice();
+        
+        // Reset in-memory state with fresh facts
         set({
           ...initialState,
           questionBank: get().questionBank, // Keep the question bank
+          ...freshFactsSlice, // Fresh facts system
         });
       },
-
+      
       removeAnswer: (questionId: string) => {
         const state = get();
         const { [questionId]: removedAnswer, ...remainingAnswers } = state.answers;
@@ -756,45 +808,8 @@ export const useAssessmentStore = create<AssessmentState>()(
           }
         });
         
-        // Filter questions based on facts-based conditions
-        const facts = state.factsProfile.facts;
-        const visibleQuestionIds: string[] = [];
-        
-        for (const question of allQuestions) {
-          let isVisible = true;
-          
-          // Check include conditions - question is visible if facts match
-          if (question.conditions?.include) {
-            let includeMatches = false;
-            for (const [factId, expectedValue] of Object.entries(question.conditions.include)) {
-              const fact = facts[factId];
-              if (fact && fact.value === expectedValue) {
-                includeMatches = true;
-                break;
-              }
-            }
-            if (!includeMatches) {
-              isVisible = false;
-            }
-          }
-          
-          // Check exclude conditions - question is hidden if facts match
-          if (question.conditions?.exclude && isVisible) {
-            for (const [factId, expectedValue] of Object.entries(question.conditions.exclude)) {
-              const fact = facts[factId];
-              if (fact && fact.value === expectedValue) {
-                isVisible = false;
-                break;
-              }
-            }
-          }
-          
-          if (isVisible) {
-            visibleQuestionIds.push(question.id);
-          }
-        }
-        
-        return visibleQuestionIds;
+        // Use extracted condition evaluation function for testability
+        return getVisibleQuestionIds(allQuestions, state.factsProfile.facts);
       },
       
       getUnlockedSuiteIds: () => {
@@ -964,10 +979,39 @@ export const initializeStore = () => {
   // Initialize device detection facts - these are stable environmental facts
   const device = detectCurrentDevice();
   
+  console.log('🔧 Store Initialization - Device Detection Results:');
+  console.log('  OS detected:', device.os);
+  console.log('  Browser detected:', device.browser);
+  console.log('  Device type:', device.type);
+  
   // Inject device detection facts directly
   store.factsActions.injectFact('os_detected', device.os, { source: 'auto-detection' });
   store.factsActions.injectFact('browser_detected', device.browser, { source: 'auto-detection' });
   store.factsActions.injectFact('device_type', device.type, { source: 'auto-detection' });
+  
+  // Set a general flag that any detection has happened
+  store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
+  
+  // Debug priority values and question availability
+  setTimeout(() => {
+    console.log('🔍 Current Facts after injection:');
+    console.log('  os_detected:', store.factsActions.getFact('os_detected')?.value);
+    console.log('  os_confirmed:', store.factsActions.getFact('os_confirmed')?.value);
+    console.log('  browser_detected:', store.factsActions.getFact('browser_detected')?.value);
+    console.log('  browser_confirmed:', store.factsActions.getFact('browser_confirmed')?.value);
+    
+    const available = store.getAvailableQuestions();
+    console.log('🎯 Available Questions (first 5):');
+    available.slice(0, 5).forEach((q, i) => {
+      console.log(`  ${i+1}. ${q.id} (priority: ${q.priority})`);
+    });
+    
+    const browserQuestions = available.filter(q => 
+      q.id.includes('browser') || q.id.includes('firefox') || q.id.includes('chrome')
+    );
+    console.log('🌐 Browser Questions Available:', browserQuestions.map(q => `${q.id} (${q.priority})`));
+  }, 100);
+  
   
   // Pre-populate answers from onboarding (always run this, not just when we have existing answers)
   const prePopulatedAnswers = prePopulateFromOnboarding(store.answers);

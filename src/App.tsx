@@ -48,15 +48,21 @@ function App() {
 
   // Initialize store on app load
   useEffect(() => {
+    // IMPORTANT: Device detection MUST happen before onboarding
+    console.log('🚀 App startup: Initializing store and device detection...');
     initializeStore();
     
     // Expose semantics globally for debugging (Task A: Lock & verify semantics)
     window.__cfaSemantics = CFASemantics;
     
-    // Check if we need device onboarding
-    if (!deviceProfile) {
-      setShowDeviceOnboarding(true);
-    }
+    // Small delay to ensure device detection facts are injected before onboarding
+    setTimeout(() => {
+      // Check if we need device onboarding AFTER device detection is complete
+      if (!deviceProfile) {
+        console.log('📱 Device profile not found, starting onboarding...');
+        setShowDeviceOnboarding(true);
+      }
+    }, 50); // Small delay to ensure initializeStore() completes
   }, [deviceProfile]);
 
   const handleDeviceOnboardingComplete = (profile: DeviceProfile) => {

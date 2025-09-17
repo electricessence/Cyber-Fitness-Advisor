@@ -64,7 +64,7 @@ export function detectCurrentDevice(): DetectedDevice {
   else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
     browser = 'safari';
   }
-  
+
   return { type, os, browser };
 }
 

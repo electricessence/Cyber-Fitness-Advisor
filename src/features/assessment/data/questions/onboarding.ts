@@ -13,6 +13,9 @@ export const onboardingQuestions: Question[] = [
     statement: '🔒 Privacy First',
     text: 'Your data stays on your device. No tracking, no cloud storage.',
     tags: ['critical', 'onboarding', 'privacy'],
+    conditions: {
+      exclude: { "privacy_acknowledged": true }
+    },
     options: [
       {
         id: 'understood',
@@ -160,7 +163,7 @@ export const onboardingQuestions: Question[] = [
     ]
   },
 
-  // OS Selection (when not confirmed or not detected)
+  // OS Selection (when no OS has been detected and not confirmed)
   {
     id: 'os_selection',
     phase: 'onboarding',
@@ -168,7 +171,11 @@ export const onboardingQuestions: Question[] = [
     text: 'Which operating system do you primarily use?',
     tags: ['critical', 'onboarding'],
     conditions: {
-      exclude: { "os_confirmed": true }
+      include: { "device_detection_completed": true },
+      exclude: { 
+        "os_confirmed": true,
+        "os_detected": "*" // Special syntax meaning "any value"
+      }
     },
     options: [
       { 
@@ -370,8 +377,63 @@ export const onboardingQuestions: Question[] = [
     text: 'Which browser do you primarily use?',
     tags: ['onboarding'],
     conditions: {
-      include: { "os_confirmed": true },
+      include: { "os_confirmed": true, "browser_detected": "unknown" },
       exclude: { "browser_confirmed": true }
+    },
+    options: [
+      { 
+        id: 'chrome',
+        text: '🌐 Chrome', 
+        statement: 'Primary Browser: Chrome',
+        statusCategory: 'shields-up',
+        facts: { "browser": "chrome", "browser_confirmed": true },
+        feedback: 'Thanks! We\'ll provide Chrome-specific security tips.'
+      },
+      { 
+        id: 'firefox',
+        text: '🦊 Firefox', 
+        statement: 'Primary Browser: Firefox',
+        statusCategory: 'shields-up',
+        facts: { "browser": "firefox", "browser_confirmed": true },
+        feedback: 'Great! We\'ll provide Firefox-specific security tips.'
+      },
+      { 
+        id: 'edge',
+        text: '🔵 Microsoft Edge', 
+        statement: 'Primary Browser: Edge',
+        statusCategory: 'shields-up',
+        facts: { "browser": "edge", "browser_confirmed": true },
+        feedback: 'Perfect! We\'ll provide Edge-specific security tips.'
+      },
+      { 
+        id: 'safari',
+        text: '🧭 Safari', 
+        statement: 'Primary Browser: Safari',
+        statusCategory: 'shields-up',
+        facts: { "browser": "safari", "browser_confirmed": true },
+        feedback: 'Excellent! We\'ll provide Safari-specific security tips.'
+      },
+      { 
+        id: 'other',
+        text: '🔧 Other browser', 
+        statement: 'Primary Browser: Other',
+        statusCategory: 'shields-up',
+        facts: { "browser": "other", "browser_confirmed": true },
+        feedback: 'Thanks! We\'ll provide general browser security advice.'
+      }
+    ]
+  },
+
+  // Browser Selection (when detection was rejected)
+  {
+    id: 'browser_selection_fallback',
+    phase: 'onboarding',
+    priority: ONBOARDING_PRIORITIES.BROWSER_SELECTION - 10, // Lower priority than main selection
+    text: 'Which browser do you primarily use?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "os_confirmed": true, "browser_confirmed": false },
+      exclude: { "browser_detected": "unknown" } // Don't show if browser was never detected
     },
     options: [
       { 

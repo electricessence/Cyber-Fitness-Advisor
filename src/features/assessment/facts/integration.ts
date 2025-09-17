@@ -146,8 +146,17 @@ export function createFactsStoreSlice(): FactsStoreState {
           metadata: { source: metadata.source || 'auto-detection', ...metadata }
         };
         
-        factsProfile.facts[factId] = fact;
-        console.log(`Injected fact: ${factId} = ${value}`);
+        // Update facts profile immutably (same pattern as processAnswer)
+        const updatedFacts = { ...factsProfile.facts };
+        updatedFacts[factId] = fact;
+        
+        factsProfile = {
+          ...factsProfile,
+          facts: updatedFacts,
+          lastUpdated: new Date()
+        };
+        
+        console.log(`Facts slice: Injected fact ${factId} = ${value}`);
       }
     }
   };
