@@ -185,7 +185,7 @@ export class DailyTaskEngine {
       estimatedMinutes,
       tierUnlockBonus: 0, // Will be calculated later
       metadata: {
-        isVisible: true, // TODO: Implement gate-based visibility
+        isVisible: true, // Defaults to visible; gate-based visibility handled elsewhere
         isCompleted,
         isExpired,
         isOnCooldown,

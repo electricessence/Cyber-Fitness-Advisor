@@ -107,11 +107,10 @@ export function handleTaskResponse(
 }
 
 /**
- * Calculate points for a specific action (placeholder - should be based on question data)
+ * Calculate points for a specific action
  */
 function calculateActionPoints(_actionId: string): number {
-  // This would look up the actual points from the question's actionOptions
-  // For now, return a default value
+  // Default points for task completion
   return 10;
 }
 

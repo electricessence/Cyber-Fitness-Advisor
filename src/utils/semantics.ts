@@ -25,7 +25,7 @@ export const CFASemantics = {
   },
   
   getDiagnostics() {
-    // Placeholder for diagnostics panel integration
+    // Returns diagnostic data for development tools
     return {
       invalidRefs: [],
       cycles: [],

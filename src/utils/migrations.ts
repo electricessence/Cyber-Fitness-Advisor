@@ -19,9 +19,9 @@ export interface Migration {
 // Current content version
 export const CURRENT_CONTENT_VERSION = '1.0.0';
 
-// Migration registry (placeholder for future migrations)
+// Migration registry for future content version upgrades
 const migrations: Migration[] = [
-  // Future migrations will be added here
+  // Future migrations will be added here as content evolves
 ];
 
 /**
