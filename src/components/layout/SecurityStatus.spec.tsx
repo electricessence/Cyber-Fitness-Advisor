@@ -46,7 +46,18 @@ describe('SecurityStatus', () => {
         timestamp: new Date(),
         domain: 'password',
         level: 1,
-        question: { id: 'password_manager', text: 'Do you use a password manager?' }
+        question: { 
+          id: 'password_manager', 
+          text: 'Do you use a password manager?',
+          options: [
+            {
+              id: 'yes',
+              text: '✅ Yes, I use a password manager',
+              statement: 'Password Manager: Enabled',
+              statusCategory: 'shields-up'
+            }
+          ]
+        }
       },
       {
         questionId: 'basic_auth',
@@ -56,7 +67,18 @@ describe('SecurityStatus', () => {
         timestamp: new Date(),
         domain: 'auth',
         level: 1,
-        question: { id: 'basic_auth', text: 'Do you use basic authentication?' }
+        question: { 
+          id: 'basic_auth', 
+          text: 'Do you use basic authentication?',
+          options: [
+            {
+              id: 'sometimes',
+              text: 'Sometimes',
+              statement: 'Basic Authentication: Sometimes used',
+              statusCategory: 'to-do'
+            }
+          ]
+        }
       },
       {
         questionId: 'no_antivirus',
@@ -66,7 +88,18 @@ describe('SecurityStatus', () => {
         timestamp: new Date(),
         domain: 'protection',
         level: 1,
-        question: { id: 'no_antivirus', text: 'Do you have antivirus software?' }
+        question: { 
+          id: 'no_antivirus', 
+          text: 'Do you have antivirus software?',
+          options: [
+            {
+              id: 'no',
+              text: 'No',
+              statement: 'Antivirus Software: Not installed',
+              statusCategory: 'room-for-improvement'
+            }
+          ]
+        }
       }
     ];
     
@@ -82,10 +115,14 @@ describe('SecurityStatus', () => {
     // Should show answer count
     expect(screen.getByText('3 answers')).toBeInTheDocument();
     
-    // Should categorize correctly  
-    expect(screen.getByText('Do you use a password manager?: yes')).toBeInTheDocument(); // Shields Up (10 points)
-    expect(screen.getByText('Do you use basic authentication?: sometimes')).toBeInTheDocument(); // To Do (5 points)
-    expect(screen.getByText('Do you have antivirus software?: no')).toBeInTheDocument(); // Room for Improvement (0 points)
+    // Should categorize correctly using statements from answer options
+    // Shields Up section is collapsed by default, so expand it first
+    const shieldsUpButton = screen.getByText('🛡️ Shields Up').closest('button');
+    fireEvent.click(shieldsUpButton!);
+    
+    expect(screen.getByText('Password Manager: Enabled')).toBeInTheDocument(); // Shields Up (now expanded)
+    expect(screen.getByText('Basic Authentication: Sometimes used')).toBeInTheDocument(); // To Do (expanded by default)
+    expect(screen.getByText('Antivirus Software: Not installed')).toBeInTheDocument(); // Room for Improvement (expanded by default)
   });
 
   it('should allow removing individual answers', () => {
@@ -98,13 +135,34 @@ describe('SecurityStatus', () => {
         timestamp: new Date(),
         domain: 'password',
         level: 1,
-        question: { id: 'password_manager', text: 'Do you use a password manager?' }
+        question: { 
+          id: 'password_manager', 
+          text: 'Do you use a password manager?',
+          options: [
+            {
+              id: 'yes',
+              text: '✅ Yes, I use a password manager',
+              statement: 'Password Manager: Enabled',
+              statusCategory: 'shields-up'
+            },
+            {
+              id: 'no',
+              text: '❌ No, I don\'t use one',
+              statement: 'Password Manager: Disabled',
+              statusCategory: 'room-for-improvement'
+            }
+          ]
+        }
       }
     ];
     
     mockGetHistoricAnswers.mockReturnValue(mockAnswers);
     
     render(<SecurityStatus />);
+    
+    // Expand the Shields Up section to see the answer
+    const shieldsUpButton = screen.getByText('🛡️ Shields Up').closest('button');
+    fireEvent.click(shieldsUpButton!);
     
     const changeButton = screen.getByText('Change Answer');
     fireEvent.click(changeButton);
@@ -209,7 +267,18 @@ describe('SecurityStatus', () => {
         timestamp: new Date(),
         domain: 'password',
         level: 1,
-        question: { id: 'password_manager', text: 'Do you use a password manager?' }
+        question: { 
+          id: 'password_manager', 
+          text: 'Do you use a password manager?',
+          options: [
+            {
+              id: 'yes',
+              text: '✅ Yes, I use a password manager',
+              statement: 'Password Manager: Enabled',
+              statusCategory: 'shields-up'
+            }
+          ]
+        }
       }
     ];
     
@@ -217,17 +286,22 @@ describe('SecurityStatus', () => {
     
     render(<SecurityStatus />);
     
-    // Find and click the shields up section header
+    // Find the shields up section header
     const shieldsUpButton = screen.getByRole('button', { name: /🛡️ Shields Up/ });
     
-    // Initially should show content (expanded by default)
-    expect(screen.getByText('Do you use a password manager?: yes')).toBeInTheDocument();
+    // Initially collapsed by default, so content should not be visible
+    expect(screen.queryByText('Password Manager: Enabled')).not.toBeInTheDocument();
     
-    // Click to collapse
+    // Click to expand
     fireEvent.click(shieldsUpButton);
     
-    // Content should still be there because it's expanded by default
-    // This test verifies the toggle functionality works
-    expect(shieldsUpButton).toBeInTheDocument();
+    // Content should now be visible
+    expect(screen.getByText('Password Manager: Enabled')).toBeInTheDocument();
+    
+    // Click again to collapse
+    fireEvent.click(shieldsUpButton);
+    
+    // Content should be hidden again
+    expect(screen.queryByText('Password Manager: Enabled')).not.toBeInTheDocument();
   });
 });
