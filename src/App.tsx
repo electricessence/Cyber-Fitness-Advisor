@@ -56,13 +56,16 @@ function App() {
     window.__cfaSemantics = CFASemantics;
     
     // Small delay to ensure device detection facts are injected before onboarding
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       // Check if we need device onboarding AFTER device detection is complete
       if (!deviceProfile) {
         console.log('📱 Device profile not found, starting onboarding...');
         setShowDeviceOnboarding(true);
       }
     }, 50); // Small delay to ensure initializeStore() completes
+    
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timeoutId);
   }, [deviceProfile]);
 
   const handleDeviceOnboardingComplete = (profile: DeviceProfile) => {

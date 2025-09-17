@@ -1,5 +1,5 @@
 // Quick manual test for Security Status implementation
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { expect, test, vi } from 'vitest';
 import { SecurityStatus } from '../components/layout/SecurityStatus';
 
@@ -43,6 +43,12 @@ const mockAnswers = [
           text: '✅ Yes, I use a password manager',
           statement: 'Password Manager: Enabled',
           statusCategory: 'shields-up'
+        },
+        {
+          id: 'no',
+          text: '❌ No, I don\'t use one',
+          statement: 'Password Manager: Disabled',
+          statusCategory: 'room-for-improvement'
         }
       ]
     }
@@ -58,6 +64,12 @@ const mockAnswers = [
       id: 'two_factor_auth',
       text: 'Do you use two-factor authentication?',
       options: [
+        {
+          id: 'yes',
+          text: '✅ Yes, I use 2FA',
+          statement: 'Two-Factor Auth: Enabled',
+          statusCategory: 'shields-up'
+        },
         {
           id: 'no',
           text: '❌ No, I don\'t use 2FA',
@@ -80,6 +92,10 @@ vi.mock('../features/assessment/state/store', () => ({
 
 test('Security Status shows proper statements and categorization', () => {
   render(<SecurityStatus />);
+  
+  // Expand the Shields Up section to see the statements
+  const shieldsUpButton = screen.getByText('🛡️ Shields Up').closest('button');
+  fireEvent.click(shieldsUpButton!);
   
   // Should show proper statements from answer options
   expect(screen.getByText('Privacy: Acknowledged ✓')).toBeInTheDocument();

@@ -285,13 +285,17 @@ function AnswerItem({ answer, onRemove, showHelp }: AnswerItemProps) {
         </div>
         
         <div className="flex items-center gap-2">
-          {answer.isResettable && (
+          {answer.isResettable ? (
             <button
               onClick={handleRemove}
               className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
             >
               Change Answer
             </button>
+          ) : (
+            <span className="text-xs text-gray-500 px-2 py-1">
+              Cannot reset
+            </span>
           )}
           
           {showHelp && answer.category === 'room-for-improvement' && (

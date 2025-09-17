@@ -456,11 +456,56 @@ export const useAssessmentStore = create<AssessmentState>()(
         // Create a fresh facts slice to ensure clean state
         const freshFactsSlice = createFactsStoreSlice();
         
+        // Create fresh enhanced facts actions for the reset state
+        const freshEnhancedFactsActions = {
+          ...freshFactsSlice.factsActions,
+          injectFact: (factId: string, value: any, metadata: { source?: string; confidence?: number } = {}) => {
+            // Update only Zustand state, not facts slice internal state
+            const currentState = get();
+            
+            const fact: Fact = {
+              id: factId,
+              name: factId.replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+              category: factId.includes('device') || factId.includes('os') || factId.includes('browser') ? 'device' : 'behavior',
+              value,
+              establishedAt: new Date(),
+              establishedBy: { questionId: 'device-detection', answerValue: value },
+              confidence: metadata.confidence || 0.95,
+              metadata: { source: metadata.source || 'auto-detection', ...metadata }
+            };
+            
+            set({
+              factsProfile: {
+                ...currentState.factsProfile,
+                facts: {
+                  ...currentState.factsProfile.facts,
+                  [factId]: fact
+                },
+                lastUpdated: new Date()
+              }
+            });
+          },
+          
+          // Override getFact to read from Zustand state
+          getFact: (factId: string) => {
+            const currentState = get();
+            return currentState.factsProfile.facts[factId] || null;
+          },
+          
+          // Override hasFactValue to read from Zustand state  
+          hasFactValue: (factId: string, value: any) => {
+            const currentState = get();
+            const fact = currentState.factsProfile.facts[factId];
+            return fact ? fact.value === value : false;
+          }
+        };
+        
         // Reset in-memory state with fresh facts
         set({
           ...initialState,
           questionBank: get().questionBank, // Keep the question bank
           ...freshFactsSlice, // Fresh facts system
+          factsActions: freshEnhancedFactsActions // Use fresh enhanced actions
         });
       },
       
