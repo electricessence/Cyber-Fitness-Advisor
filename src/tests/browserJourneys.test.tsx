@@ -19,8 +19,8 @@ import {
   macChromeJourney,
   macSafariJourney,
   macFirefoxJourney
-} from './browserJourneys';
-import { JourneyTestRunner } from './journeyFramework';
+} from '../testing/browserJourneys';
+import { JourneyTestRunner } from '../testing/journeyFramework';
 
 describe('🌐 Browser-Specific User Journeys', () => {
   let journeyRunner: JourneyTestRunner;
@@ -261,7 +261,7 @@ describe('🌐 Browser-Specific User Journeys', () => {
       
       // All journeys should succeed
       expect(journeyResults.length).toBe(6);
-      console.log('Browser Journey Results:', journeyResults);
+      // Validation: All browser journeys executed successfully
     });
 
     it('📋 Covers all requested browser combinations', () => {
@@ -315,8 +315,7 @@ describe('🌐 Browser-Specific User Journeys', () => {
       
       expect(browserSpecific.length).toBeGreaterThan(10);
       
-      console.log(`Browser journeys cover ${allAnswers.size} unique questions`);
-      console.log(`Browser-specific questions: ${browserSpecific.length}`);
+      // Validation: Browser journeys provide comprehensive coverage
     });
   });
 });
