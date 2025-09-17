@@ -68,6 +68,7 @@ export function AppHeader({
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="sm:hidden p-2 text-gray-600"
+            aria-label={mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>

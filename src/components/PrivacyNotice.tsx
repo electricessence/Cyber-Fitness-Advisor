@@ -42,6 +42,7 @@ export function PrivacyNotice({ onDismiss, isMinimized = false }: PrivacyNoticeP
                   onClick={() => setIsExpanded(false)}
                   className="p-1 hover:bg-green-100 rounded text-green-600"
                   title="Minimize"
+                  aria-label="Minimize privacy notice"
                 >
                   <Eye className="w-4 h-4" />
                 </button>
@@ -50,6 +51,7 @@ export function PrivacyNotice({ onDismiss, isMinimized = false }: PrivacyNoticeP
                 onClick={onDismiss}
                 className="p-1 hover:bg-green-100 rounded text-green-600"
                 title="Dismiss"
+                aria-label="Dismiss privacy notice"
               >
                 <X className="w-4 h-4" />
               </button>
