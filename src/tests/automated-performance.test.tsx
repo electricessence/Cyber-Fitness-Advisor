@@ -18,7 +18,7 @@ describe('Automated Performance Testing', () => {
     expect(renderTime).toBeLessThan(100) // 100ms budget
     
     // Verify DOM is ready with privacy notice
-    expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
+    expect(screen.getByText('🔒 Your Privacy is Protected')).toBeInTheDocument()
   })
 
   test('Question Transitions are Smooth - Automated', async () => {
@@ -45,7 +45,7 @@ describe('Automated Performance Testing', () => {
       await waitFor(() => {
         const newButtons = screen.queryAllByRole('button')
         const confirmationText = screen.queryByText(/Great! We'll provide/i)
-        const questionText = screen.queryByText('🔒 Privacy First')
+        const questionText = screen.queryByText('🔒 Your Privacy is Protected')
         
         // Should have buttons OR be in confirmation state OR have a question
         expect(newButtons.length > 0 || !!confirmationText || !!questionText).toBe(true)
@@ -113,7 +113,7 @@ describe('Automated Performance Testing', () => {
     expect(totalTime).toBeLessThan(1000) // 1 second budget
     
     // Verify UI still responsive with privacy notice
-    expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
+    expect(screen.getByText('🔒 Your Privacy is Protected')).toBeInTheDocument()
   })
 
   test('Rapid User Input Handling - Automated', async () => {
@@ -134,7 +134,7 @@ describe('Automated Performance Testing', () => {
         await waitFor(() => {
           const hasButtons = screen.queryAllByRole('button').length > 0
           const hasConfirmation = !!screen.queryByText(/Great! We'll provide/i)
-          const hasQuestion = !!screen.queryByText('🔒 Privacy First')
+          const hasQuestion = !!screen.queryByText('🔒 Your Privacy is Protected')
           
           // Should have some UI state
           expect(hasButtons || hasConfirmation || hasQuestion).toBe(true)
@@ -151,7 +151,7 @@ describe('Automated Performance Testing', () => {
     expect(rapidInputTime).toBeLessThan(5000) // 5s budget (onboarding has inherent delays + complexity)
     
     // UI should still be functional  
-    const hasQuestion = !!screen.queryByText('🔒 Privacy First')
+    const hasQuestion = !!screen.queryByText('🔒 Your Privacy is Protected')
     const hasConfirmation = !!screen.queryByText(/Great! We'll provide/i)
     expect(hasQuestion || hasConfirmation).toBeTruthy()
   })
