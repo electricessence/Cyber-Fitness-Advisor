@@ -45,6 +45,13 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     setDetectedDevice(detectCurrentDevice());
   }, []);
 
+  // Handle completion when no questions are available
+  useEffect(() => {
+    if (!currentQuestion && visibleOnboardingQuestions.length === 0) {
+      completeOnboarding();
+    }
+  }, [currentQuestion, visibleOnboardingQuestions.length]);
+
   const handleAnswer = (optionValue: string) => {
     if (!currentQuestion) return;
     
@@ -97,9 +104,8 @@ export function UnifiedOnboarding({ onComplete }: UnifiedOnboardingProps) {
     onComplete(deviceProfile);
   };
 
-  // If no questions are available, complete immediately
+  // If no questions are available, useEffect will handle completion
   if (!currentQuestion) {
-    completeOnboarding();
     return null;
   }
 

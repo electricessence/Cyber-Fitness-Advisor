@@ -319,6 +319,82 @@ Before submitting new questions:
 ❌ "Are you recklessly endangering your data by not using enterprise backup solutions?"
 ✅ "Do you backup important files like photos and documents?"
 
+## Browser Security Questions
+
+### Browser-Specific Security Features
+
+Our assessment includes browser-specific security questions that leverage native security features unique to each browser. These questions are contextually shown based on user's detected browser or manual selection.
+
+#### Edge SmartScreen Questions
+```json
+{
+  "id": "edge_smartscreen",
+  "phase": "assessment", 
+  "priority": 500,
+  "statement": "Edge SmartScreen Protection Enabled",
+  "text": "Is Microsoft Defender SmartScreen enabled in Edge?",
+  "tags": ["browser", "security", "edge", "microsoft"],
+  "options": [
+    {
+      "id": "yes",
+      "text": "✅ Yes, SmartScreen is enabled",
+      "points": 8,
+      "facts": { "edge_smartscreen": true, "browser_security": "high" }
+    }
+  ]
+}
+```
+
+#### Safari Intelligent Tracking Prevention
+```json
+{
+  "id": "safari_itp", 
+  "phase": "assessment",
+  "priority": 500,
+  "statement": "Safari ITP Privacy Protection",
+  "text": "Is Intelligent Tracking Prevention enabled in Safari?",
+  "tags": ["browser", "privacy", "safari", "apple"],
+  "facts": { "safari_itp": true, "privacy_protection": "enhanced" }
+}
+```
+
+#### Firefox Enhanced Tracking Protection
+```json
+{
+  "id": "firefox_tracking_protection",
+  "phase": "assessment", 
+  "priority": 500,
+  "statement": "Firefox Enhanced Tracking Protection",
+  "text": "Is Enhanced Tracking Protection enabled in Firefox?",
+  "tags": ["browser", "privacy", "firefox", "mozilla"],
+  "facts": { "firefox_etp": true, "privacy_protection": "enhanced" }
+}
+```
+
+### Browser Security Tags
+
+**Browser-specific tags:**
+- `edge` - Microsoft Edge specific features
+- `safari` - Safari/WebKit specific features  
+- `firefox` - Firefox/Gecko specific features
+- `chrome` - Chrome/Chromium specific features
+
+**Security feature tags:**
+- `smartscreen` - Microsoft Defender SmartScreen
+- `itp` - Intelligent Tracking Prevention
+- `etp` - Enhanced Tracking Protection
+- `password_manager` - Browser password management
+- `browser_security` - General browser security features
+
+### Browser Detection Integration
+
+Browser security questions use conditional visibility based on:
+1. **Auto-detection** from browser user agent
+2. **Manual confirmation** through onboarding questions
+3. **Cross-platform support** for users with multiple browsers
+
+Questions include appropriate `gates` to show only relevant browser features to users.
+
 ## Contribution Process
 
 ### Adding New Questions
