@@ -13,7 +13,7 @@ export const ONBOARDING_PRIORITIES = {
   USAGE_CONTEXT: 9000
 } as const;
 
-// Assessment Priorities (90-50 range) 
+// Assessment Priorities (90-40 range) 
 export const ASSESSMENT_PRIORITIES = {
   PASSWORD_MANAGER: 85,
   TWO_FACTOR_AUTH: 80,
@@ -22,7 +22,9 @@ export const ASSESSMENT_PRIORITIES = {
   BACKUP_FREQUENCY: 65,
   WIFI_SECURITY: 60,
   EMAIL_ATTACHMENTS: 55,
-  BROWSER_EXTENSIONS: 50
+  BROWSER_EXTENSIONS: 50,
+  BROWSER_SECURITY: 48,
+  BROWSER_PRIVACY: 45
 } as const;
 
 // Suite-specific priorities can be added here as needed
