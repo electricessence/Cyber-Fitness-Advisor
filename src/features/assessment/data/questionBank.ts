@@ -2,7 +2,7 @@
 // Uses the new simplified schema with priority-based ordering and facts-based state management
 
 import type { QuestionBank, Suite, Question } from '../engine/schema';
-import { onboardingQuestions, coreAssessmentQuestions } from './questions/index.js';
+import { onboardingQuestions, coreAssessmentQuestions, browserSecurityQuestions } from './questions/index.js';
 
 // Advanced security suite questions
 const advancedSecurityQuestions: Question[] = [
@@ -60,7 +60,7 @@ const questionBank: QuestionBank = {
       levels: [
         {
           level: 1,
-          questions: [...onboardingQuestions, ...coreAssessmentQuestions]
+          questions: [...onboardingQuestions, ...coreAssessmentQuestions, ...browserSecurityQuestions]
         }
       ]
     }

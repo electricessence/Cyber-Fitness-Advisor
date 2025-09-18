@@ -71,6 +71,16 @@ export const windowsEdgeJourney = JourneyBuilder
     })
     .then()
   
+  .step('User enables Edge SmartScreen protection')
+    .answerQuestion('edge_smartscreen', 'yes')
+    .expectStoreState({ answersCount: 4 })
+    .then()
+  
+  .step('User uses Edge password manager')
+    .answerQuestion('edge_password_manager', 'yes')
+    .expectStoreState({ answersCount: 5 })
+    .then()
+  
   .finalOutcome(
     'Windows + Edge user has Microsoft-ecosystem security setup',
     () => {
@@ -145,6 +155,16 @@ export const windowsFirefoxJourney = JourneyBuilder
     })
     .then()
   
+  .step('User configures Firefox tracking protection')
+    .answerQuestion('firefox_tracking_protection', 'strict')
+    .expectStoreState({ answersCount: 4 })
+    .then()
+  
+  .step('User sets up Firefox privacy configuration')
+    .answerQuestion('firefox_privacy_config', 'strict')
+    .expectStoreState({ answersCount: 5 })
+    .then()
+  
   .finalOutcome(
     'Windows + Firefox user has privacy-focused security setup',
     () => {
@@ -214,6 +234,11 @@ export const windowsChromeJourney = JourneyBuilder
   .step('User confirms Chrome browser detection')
     .answerQuestion('chrome_detection_confirm', 'yes')
     .expectStoreState({ answersCount: 3 })
+    .then()
+  
+  .step('User configures Chrome privacy hardening')
+    .answerQuestion('chrome_privacy_hardening', 'strict')
+    .expectStoreState({ answersCount: 4 })
     .then()
   
   .finalOutcome(
@@ -290,6 +315,11 @@ export const macChromeJourney = JourneyBuilder
     .expectStoreState({ answersCount: 3 })
     .then()
   
+  .step('User configures Chrome privacy hardening')
+    .answerQuestion('chrome_privacy_hardening', 'strict')
+    .expectStoreState({ answersCount: 4 })
+    .then()
+  
   .finalOutcome(
     'Mac + Chrome user has cross-platform security setup',
     () => {
@@ -364,6 +394,21 @@ export const macSafariJourney = JourneyBuilder
     })
     .then()
   
+  .step('User enables Safari Intelligent Tracking Prevention')
+    .answerQuestion('safari_itp', 'yes')
+    .expectStoreState({ answersCount: 4 })
+    .then()
+  
+  .step('User uses iCloud Keychain for passwords')
+    .answerQuestion('safari_icloud_keychain', 'yes')
+    .expectStoreState({ answersCount: 5 })
+    .then()
+  
+  .step('User enables Apple ID 2FA')
+    .answerQuestion('apple_id_2fa', 'yes')
+    .expectStoreState({ answersCount: 6 })
+    .then()
+  
   .finalOutcome(
     'Mac + Safari user has integrated Apple ecosystem security',
     () => {
@@ -433,6 +478,16 @@ export const macFirefoxJourney = JourneyBuilder
   .step('User confirms Firefox browser detection')
     .answerQuestion('firefox_detection_confirm', 'yes')
     .expectStoreState({ answersCount: 3 })
+    .then()
+  
+  .step('User configures Firefox tracking protection')
+    .answerQuestion('firefox_tracking_protection', 'strict')
+    .expectStoreState({ answersCount: 4 })
+    .then()
+  
+  .step('User sets up Firefox privacy configuration')
+    .answerQuestion('firefox_privacy_config', 'strict')
+    .expectStoreState({ answersCount: 5 })
     .then()
   
   .finalOutcome(

@@ -206,7 +206,7 @@ describe('🌐 Browser-Specific User Journeys', () => {
       // Should have Microsoft security stack answers
       expect(answers).toHaveProperty('edge_smartscreen');
       expect(answers).toHaveProperty('edge_password_manager');
-      expect(answers['edge_smartscreen']).toBe('yes');
+      expect(answers['edge_smartscreen'].value).toBe('yes');
     });
 
     it('🟦 Safari ITP and iCloud Keychain integration', async () => {
@@ -219,7 +219,7 @@ describe('🌐 Browser-Specific User Journeys', () => {
       expect(answers).toHaveProperty('safari_itp');
       expect(answers).toHaveProperty('safari_icloud_keychain');
       expect(answers).toHaveProperty('apple_id_2fa');
-      expect(answers['safari_itp']).toBe('yes');
+      expect(answers['safari_itp'].value).toBe('yes');
     });
 
     it('🦊 Firefox Enhanced Tracking Protection on both platforms', async () => {
@@ -236,8 +236,8 @@ describe('🌐 Browser-Specific User Journeys', () => {
       // Both should have strict tracking protection
       expect(winAnswers).toHaveProperty('firefox_tracking_protection');
       expect(macAnswers).toHaveProperty('firefox_tracking_protection');
-      expect(winAnswers['firefox_tracking_protection']).toBe('strict');
-      expect(macAnswers['firefox_tracking_protection']).toBe('strict');
+      expect(winAnswers['firefox_tracking_protection'].value).toBe('strict');
+      expect(macAnswers['firefox_tracking_protection'].value).toBe('strict');
     });
   });
 
