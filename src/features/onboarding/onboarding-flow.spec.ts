@@ -13,6 +13,23 @@ describe('Complete Onboarding Flow Automation', () => {
     store.factsActions.injectFact('browser_detected', 'firefox', { source: 'auto-detection' });
     store.factsActions.injectFact('device_type', 'desktop', { source: 'auto-detection' });
     store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
+    
+    // Set up device profile to simulate complete device detection
+    store.setDeviceProfile({
+      currentDevice: {
+        os: 'windows',
+        browser: 'firefox',
+        type: 'desktop'
+      },
+      otherDevices: {
+        hasWindows: true,
+        hasMac: false,
+        hasLinux: false,
+        hasIPhone: false,
+        hasAndroid: false,
+        hasIPad: false
+      }
+    });
   });
 
   it('should follow correct onboarding sequence with device detection at startup', () => {
@@ -21,7 +38,7 @@ describe('Complete Onboarding Flow Automation', () => {
     expect(firstQuestions[0]?.id).toBe('privacy_notice');
     
     // STEP 2: Answer Privacy Notice
-    store.answerQuestion('privacy_notice', 'acknowledge');
+    store.answerQuestion('privacy_notice', 'understood');
     
     // STEP 3: Second question should be OS DETECTION (not selection)
     const secondQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
@@ -51,10 +68,32 @@ describe('Complete Onboarding Flow Automation', () => {
       freshStore.factsActions.injectFact('device_type', 'desktop', { source: 'auto-detection' });
       freshStore.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
       
-      // Complete privacy notice and OS detection flow
-      freshStore.factsActions.injectFact('privacy_acknowledged', true, { source: 'user-confirmed' });
-      freshStore.factsActions.injectFact('os', 'windows', { source: 'user-confirmed' });
-      freshStore.factsActions.injectFact('os_confirmed', true, { source: 'user-confirmed' });
+      // Set up device profile to simulate complete device detection
+      freshStore.setDeviceProfile({
+        currentDevice: {
+          os: 'windows',
+          browser: browser as any,
+          type: 'desktop'
+        },
+        otherDevices: {
+          hasWindows: true,
+          hasMac: false,
+          hasLinux: false,
+          hasIPhone: false,
+          hasAndroid: false,
+          hasIPad: false
+        }
+      });
+      
+      // First should be privacy notice
+      const privacyQuestions = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');
+      expect(privacyQuestions[0]?.id).toBe('privacy_notice');
+      
+      // Answer privacy notice
+      freshStore.answerQuestion('privacy_notice', 'understood');
+      
+      // Then answer OS detection
+      freshStore.answerQuestion('windows_detection_confirm', 'yes');
       
       // Check browser detection question appears
       const questions = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');

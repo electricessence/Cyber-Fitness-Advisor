@@ -13,6 +13,8 @@ import { BadgeEngine, type BadgeEvaluationContext, type BadgeUnlockEvent, type S
 import type { Badge, BadgeProgress } from '../../badges/badgeDefinitions';
 import { ACHIEVEMENT_BADGES } from '../../badges/badgeDefinitions';
 import { getVisibleQuestionIds } from '../engine/conditionEvaluation';
+import type { Registry } from '../../../utils/Registry';
+import { createZustandRegistry } from '../../../utils/Registry';
 
 // Smart pre-population from onboarding data
 function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
@@ -96,6 +98,15 @@ interface AssessmentState extends FactsStoreState {
   
   // Phase 2.2: Condition engine for contextual Q/A
   conditionEngine: ConditionEngine;
+  
+  // Registry pattern (simplified store integration)
+  factsData: Record<string, any>;
+  facts: Registry<any>;
+  
+  // Registry methods (simplified alternatives to complex facts system)
+  setFact: (key: string, value: any) => void;
+  getFact: (key: string) => any;
+  hasFact: (key: string) => boolean;
   
   // Task Management
   taskResponses: Record<string, TaskResponse>;
@@ -232,6 +243,10 @@ const initialState = {
     streakHistory: []
   } as StreakData,
   sessionStartTime: null as Date | null,
+  
+  // Registry pattern (simplified store integration)
+  factsData: {} as Record<string, any>,
+  facts: null as any, // Will be initialized in store creator
 };
 
 export const useAssessmentStore = create<AssessmentState>()(
@@ -258,16 +273,24 @@ export const useAssessmentStore = create<AssessmentState>()(
             metadata: { source: metadata.source || 'auto-detection', ...metadata }
           };
           
+          const newFactsProfile = {
+            ...currentState.factsProfile,
+            facts: {
+              ...currentState.factsProfile.facts,
+              [factId]: fact
+            },
+            lastUpdated: new Date()
+          };
+          
           set({
-            factsProfile: {
-              ...currentState.factsProfile,
-              facts: {
-                ...currentState.factsProfile.facts,
-                [factId]: fact
-              },
-              lastUpdated: new Date()
-            }
+            factsProfile: newFactsProfile
           });
+        },
+        
+        // Override getFacts to read from Zustand state  
+        getFacts: () => {
+          const currentState = get();
+          return Object.values(currentState.factsProfile.facts);
         },
         
         // Override getFact to read from Zustand state
@@ -284,11 +307,55 @@ export const useAssessmentStore = create<AssessmentState>()(
         }
       };
       
+      const createRegistries = () => {
+        const state = get();
+        return {
+          facts: createZustandRegistry(
+            () => state.factsData || {},
+            (data) => set({ factsData: data })
+          )
+        };
+      };
+
       return {
         ...initialState,
         factsProfile: factsSlice.factsProfile, // Initialize from facts slice
         factsEngine: factsSlice.factsEngine, // Include facts engine
         factsActions: enhancedFactsActions, // Use enhanced version that reads from Zustand
+        
+        // Initialize empty Registry (will be recreated on first use)
+        facts: null as any,
+        
+        // Registry methods (simplified alternatives to complex facts system)
+        setFact: (key: string, value: any) => {
+          const state = get();
+          if (!state.facts) {
+            const registries = createRegistries();
+            set(registries);
+          }
+          const currentState = get(); // Get fresh state after potential update
+          currentState.facts.set(key, value);
+        },
+        
+        getFact: (key: string) => {
+          const state = get();
+          if (!state.facts) {
+            const registries = createRegistries();
+            set(registries);
+          }
+          const currentState = get(); // Get fresh state after potential update
+          return currentState.facts.get(key);
+        },
+        
+        hasFact: (key: string) => {
+          const state = get();
+          if (!state.facts) {
+            const registries = createRegistries();
+            set(registries);
+          }
+          const currentState = get(); // Get fresh state after potential update
+          return currentState.facts.has(key);
+        },
         
         answerQuestion: (questionId: string, value: boolean | number | string | 'yes' | 'no' | 'unsure') => {
           const state = get();
@@ -561,9 +628,9 @@ export const useAssessmentStore = create<AssessmentState>()(
             allQuestions.push(question);
           });
         });
-        
+
         // Filter to only visible questions that aren't already answered
-        return allQuestions.filter(question => {
+        const availableQuestions = allQuestions.filter(question => {
           // Must be visible according to condition engine
           if (!visibleQuestionIds.includes(question.id)) {
             return false;
@@ -577,6 +644,8 @@ export const useAssessmentStore = create<AssessmentState>()(
           
           return true; // Question is available
         });
+        
+        return availableQuestions;
       },
 
       // Unified model ordering (phase aware)
@@ -1011,7 +1080,8 @@ export const useAssessmentStore = create<AssessmentState>()(
       // Only persist answers and earned badges, recompute scores on load
       partialize: (state) => ({ 
         answers: state.answers,
-        earnedBadges: state.earnedBadges 
+        earnedBadges: state.earnedBadges,
+        factsData: state.factsData  // Persist Registry data
       }),
     }
   )
@@ -1025,7 +1095,14 @@ export const initializeStore = () => {
   // Initialize device detection  
   const device = detectCurrentDevice();
   
-  // Inject device detection facts directly
+  // MIGRATION: Use simplified Registry methods alongside complex facts system
+  // This demonstrates the new simple approach while maintaining backwards compatibility
+  store.setFact('os_detected', device.os);
+  store.setFact('browser_detected', device.browser);
+  store.setFact('device_type', device.type);
+  store.setFact('device_detection_completed', true);
+  
+  // Legacy complex approach (keeping for backwards compatibility during migration)
   store.factsActions.injectFact('os_detected', device.os, { source: 'auto-detection' });
   store.factsActions.injectFact('browser_detected', device.browser, { source: 'auto-detection' });
   store.factsActions.injectFact('device_type', device.type, { source: 'auto-detection' });
@@ -1042,6 +1119,19 @@ export const initializeStore = () => {
   // Rebuild facts from persisted answers + device detection
   store.factsActions.importLegacyData(prePopulatedAnswers);
   
+  // Set device profile for backwards compatibility - always set this
+  const deviceProfile = {
+    currentDevice: device,
+    otherDevices: {
+      hasWindows: device.os === 'windows',
+      hasMac: device.os === 'mac', 
+      hasLinux: device.os === 'linux',
+      hasIPhone: device.os === 'ios',
+      hasAndroid: device.os === 'android',
+      hasIPad: device.type === 'tablet'
+    }
+  };
+
   // If we have any answers (existing or pre-populated), recalculate scores
   if (Object.keys(prePopulatedAnswers).length > 0) {
     const scoreResult = calculateOverallScore(store.questionBank, prePopulatedAnswers);
@@ -1068,6 +1158,7 @@ export const initializeStore = () => {
       quickWinsCompleted,
       totalQuickWins,
       nextLevelProgress,
+      deviceProfile,
       sessionStartTime: new Date(), // Track session start for speed badges
     });
     
@@ -1076,8 +1167,9 @@ export const initializeStore = () => {
     updatedStore.updateBadgeProgress();
     updatedStore.updateStreakData();
   } else {
-    // Even if no answers, initialize session start time
+    // Even if no answers, initialize device profile and session start time
     useAssessmentStore.setState({
+      deviceProfile,
       sessionStartTime: new Date()
     });
   }

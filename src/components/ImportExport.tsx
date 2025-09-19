@@ -26,12 +26,17 @@ export function ImportExport({ className = "" }: ImportExportProps) {
   const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [importMessage, setImportMessage] = useState('');
 
-  const { answers, deviceProfile, earnedBadges } = useAssessmentStore();
+  const { answers, deviceProfile, earnedBadges, setFact, getFact, hasFact } = useAssessmentStore();
 
   const handleExport = async () => {
     setIsExporting(true);
     
     try {
+      // MIGRATION DEMO: Track export usage with simple Registry methods
+      setFact('last_export_date', new Date().toISOString());
+      setFact('export_count', (getFact('export_count') || 0) + 1);
+      setFact('user_prefers_backups', true);
+      
       const exportData: ExportData = {
         version: '2.5.0',
         timestamp: new Date().toISOString(),
@@ -98,6 +103,12 @@ export function ImportExport({ className = "" }: ImportExportProps) {
         store.setDeviceProfile(importData.deviceProfile);
       }
       
+      // MIGRATION DEMO: Track import usage with simple Registry methods
+      const { setFact, getFact } = store;
+      setFact('last_import_date', new Date().toISOString());
+      setFact('import_count', (getFact('import_count') || 0) + 1);
+      setFact('has_imported_data', true);
+      
       // Update localStorage items
       if (importData.contentVersion) {
         localStorage.setItem('cfa:v2:contentVersion', importData.contentVersion);
@@ -153,6 +164,26 @@ export function ImportExport({ className = "" }: ImportExportProps) {
               {new Date().toLocaleDateString()}
             </span>
           </div>
+          
+          {/* MIGRATION DEMO: Show Registry-based analytics */}
+          {hasFact('export_count') && (
+            <div>
+              <span className="text-gray-600">Exports:</span>
+              <span className="ml-2 font-medium">{getFact('export_count')}</span>
+            </div>
+          )}
+          {hasFact('import_count') && (
+            <div>
+              <span className="text-gray-600">Imports:</span>
+              <span className="ml-2 font-medium">{getFact('import_count')}</span>
+            </div>
+          )}
+          {getFact('user_prefers_backups') && (
+            <div className="text-green-600">
+              <CheckCircle className="w-4 h-4 inline mr-1" />
+              <span className="text-sm">Backup-savvy user!</span>
+            </div>
+          )}
         </div>
       </div>
 

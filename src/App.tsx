@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAssessmentStore, initializeStore } from './features/assessment/state/store';
-import { UnifiedOnboarding } from './components/UnifiedOnboarding';
 import { ScoreBar } from './components/ScoreBar';
 import { Celebration } from './components/Celebration';
 import { PrivacyNotice } from './components/PrivacyNotice';
@@ -15,16 +14,13 @@ import { ResetModal } from './components/layout/ResetModal';
 import { useNavigation } from './hooks/useNavigation';
 import { useAppState } from './hooks/useAppState';
 import { useBrowserDetection } from './hooks/useBrowserDetection';
-import type { DeviceProfile } from './features/assessment/engine/deviceScenarios';
 // Initialize semantic version for global access
 import './features/assessment/engine/semantics';
 import { CFASemantics } from './utils/semantics';
 import AuthoringDiagnostics from './components/development/AuthoringDiagnostics';
 
 function App() {
-  const [showDeviceOnboarding, setShowDeviceOnboarding] = useState(false);
-  const deviceProfile = useAssessmentStore(state => state.deviceProfile);
-  const setDeviceProfile = useAssessmentStore(state => state.setDeviceProfile);
+  // No device onboarding modal - just use fact-based questions
   
   // Use custom hooks for state management
   const navigation = useNavigation();
@@ -48,52 +44,16 @@ function App() {
 
   // Initialize store on app load
   useEffect(() => {
-    // IMPORTANT: Device detection MUST happen before onboarding
-    console.log('🚀 App startup: Initializing store and device detection...');
+    // Initialize store and device detection facts
     initializeStore();
-    
+
     // Expose semantics globally for debugging (Task A: Lock & verify semantics)
     window.__cfaSemantics = CFASemantics;
-    
-    // Small delay to ensure device detection facts are injected before onboarding
-    const timeoutId = setTimeout(() => {
-      // Check if we need device onboarding AFTER device detection is complete
-      if (!deviceProfile) {
-        console.log('📱 Device profile not found, starting onboarding...');
-        setShowDeviceOnboarding(true);
-      }
-    }, 50); // Small delay to ensure initializeStore() completes
-    
-    // Cleanup timeout on unmount
-    return () => clearTimeout(timeoutId);
-  }, [deviceProfile]);
-
-  const handleDeviceOnboardingComplete = (profile: DeviceProfile) => {
-    setDeviceProfile(profile);
-    setShowDeviceOnboarding(false);
-    
-    // Mark onboarding as completed to prevent modal from showing
-    appState.setShowOnboarding(false);
-    localStorage.setItem('cyber-fitness-onboarding-completed', 'true');
-  };
+  }, []); // Only run once on mount
 
   useEffect(() => {
     navigation.setCurrentLevel(userLevel);
   }, [userLevel, navigation]);
-
-  // Lock body scroll when device onboarding is open
-  useEffect(() => {
-    if (showDeviceOnboarding) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [showDeviceOnboarding]);
   
   const totalQuestions = questionBank.domains.reduce(
     (total, domain) => total + domain.levels.reduce(
@@ -176,10 +136,7 @@ function App() {
     setTimeout(() => window.location.reload(), 100);
   };
 
-  // Show unified onboarding for new users
-  if (showDeviceOnboarding && !deviceProfile) {
-    return <UnifiedOnboarding onComplete={handleDeviceOnboardingComplete} />;
-  }
+  // No device onboarding modal - questions show based on facts
 
   return (
     <AppLayout>
@@ -236,13 +193,11 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
               <div className="lg:col-span-3">
                 {/* Action Recommendations - High-Impact Security Actions */}
-                {!showDeviceOnboarding && (
-                  <Recommendations
-                    answeredQuestions={answeredQuestions}
-                    getBrowserInfo={getBrowserInfo}
-                    getUserProfile={getUserProfile}
-                  />
-                )}
+                <Recommendations
+                  answeredQuestions={answeredQuestions}
+                  getBrowserInfo={getBrowserInfo}
+                  getUserProfile={getUserProfile}
+                />
 
                 {/* Current Level Questions */}
                 <MainContent />
