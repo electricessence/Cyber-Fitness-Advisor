@@ -218,13 +218,13 @@ const initialState = {
   taskReminders: [],
   overallScore: 0,
   domainScores: {},
-  currentLevel: 1, // Start at level 1, not 0
+  currentLevel: 0, // Keep original test expectation for now
   quickWinsCompleted: 0,
   totalQuickWins: 0,
   nextLevelProgress: {
-    currentLevel: 1, // Consistent with currentLevel
-    nextLevel: 2, // Next level should be 2
-    pointsNeeded: 20, // Updated to match expected progression
+    currentLevel: 0,
+    nextLevel: 1,
+    pointsNeeded: 15,
     progress: 0
   },
   recommendations: [] as ReturnType<typeof getTopRecommendations>,
