@@ -63,6 +63,6 @@ export function getVisibleQuestionIds(
       visibleIds.push(question.id);
     }
   }
-  
+
   return visibleIds;
 }

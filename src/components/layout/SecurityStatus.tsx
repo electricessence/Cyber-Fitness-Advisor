@@ -15,6 +15,7 @@ interface CategorizedAnswer extends Answer {
 
 export function SecurityStatus() {
   const { getHistoricAnswers, removeAnswer, resetAssessment } = useAssessmentStore();
+  
   const [expandedSections, setExpandedSections] = useState({
     'shields-up': false,  // Collapsed by default
     'to-do': true,
@@ -83,7 +84,7 @@ export function SecurityStatus() {
       'to-do': categorized.filter(a => a.category === 'to-do'),
       'room-for-improvement': categorized.filter(a => a.category === 'room-for-improvement')
     };
-  }, [getHistoricAnswers]);
+  }, [getHistoricAnswers]); // Remove answers dependency - getHistoricAnswers is already reactive
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({

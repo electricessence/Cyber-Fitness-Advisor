@@ -218,13 +218,13 @@ const initialState = {
   taskReminders: [],
   overallScore: 0,
   domainScores: {},
-  currentLevel: 0,
+  currentLevel: 1, // Start at level 1, not 0
   quickWinsCompleted: 0,
   totalQuickWins: 0,
   nextLevelProgress: {
-    currentLevel: 0,
-    nextLevel: 1,
-    pointsNeeded: 15,
+    currentLevel: 1, // Consistent with currentLevel
+    nextLevel: 2, // Next level should be 2
+    pointsNeeded: 20, // Updated to match expected progression
     progress: 0
   },
   recommendations: [] as ReturnType<typeof getTopRecommendations>,
@@ -572,8 +572,19 @@ export const useAssessmentStore = create<AssessmentState>()(
           ...initialState,
           questionBank: get().questionBank, // Keep the question bank
           ...freshFactsSlice, // Fresh facts system
-          factsActions: freshEnhancedFactsActions // Use fresh enhanced actions
+          factsActions: freshEnhancedFactsActions, // Use fresh enhanced actions
+          overallScore: 0, // Reset score to 0
+          domainScores: {}, // Clear domain scores
+          currentLevel: 1, // Reset to level 1 (consistent with nextLevelProgress)
+          quickWinsCompleted: 0, // Reset quick wins
+          totalQuickWins: 0, // Will be recalculated
+          nextLevelProgress: { currentLevel: 1, nextLevel: 2, pointsNeeded: 20, progress: 0 }
         });
+        
+        // Reinitialize after reset to set up device detection and scoring
+        setTimeout(() => {
+          initializeStore();
+        }, 0);
       },
       
       removeAnswer: (questionId: string) => {
@@ -648,13 +659,24 @@ export const useAssessmentStore = create<AssessmentState>()(
         return availableQuestions;
       },
 
-      // Unified model ordering (phase aware)
+      // Unified model ordering (priority-first with phase fallback)
       getOrderedAvailableQuestions: () => {
         const raw = get().getAvailableQuestions();
         return [...raw].sort((a, b) => {
+          // First: Sort by priority (higher priority first)
+          const aPriority = a.priority || 0;
+          const bPriority = b.priority || 0;
+          
+          if (bPriority !== aPriority) {
+            return bPriority - aPriority; // Higher priority first
+          }
+          
+          // Second: Phase order within same priority
           const ao = (a as any).phaseOrder ?? 9999;
           const bo = (b as any).phaseOrder ?? 9999;
           if (ao !== bo) return ao - bo;
+          
+          // Finally: ID for consistency
           return a.id.localeCompare(b.id);
         });
       },
