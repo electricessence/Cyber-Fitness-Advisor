@@ -7,7 +7,7 @@ import { ASSESSMENT_PRIORITIES } from './priorities.js';
 export const coreAssessmentQuestions: Question[] = [
   {
     id: 'password_manager',
-    text: 'Do you use a password manager?',
+    text: 'Do you use a password manager to store and generate your passwords?',
     priority: ASSESSMENT_PRIORITIES.PASSWORD_MANAGER,
     tags: ['critical', 'password', 'quickwin'],
     options: [
@@ -18,7 +18,7 @@ export const coreAssessmentQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { "password_manager": "yes" },
         points: 10,
-        feedback: 'Excellent! Password managers are essential for security.'
+        feedback: 'Excellent! Password managers are one of the most effective security tools available.'
       },
       { 
         id: 'no',
@@ -27,13 +27,13 @@ export const coreAssessmentQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "password_manager": "no" },
         points: 0,
-        feedback: 'Consider using a password manager - it\'s one of the most important security steps.'
+        feedback: 'Consider using a password manager - it\'s the single most impactful security improvement you can make.'
       }
     ]
   },
   {
     id: 'two_factor_auth',
-    text: 'Do you use two-factor authentication (2FA) on your important accounts?',
+    text: 'Do you use two-factor authentication (2FA) to protect your important accounts?',
     priority: ASSESSMENT_PRIORITIES.TWO_FACTOR_AUTH,
     tags: ['critical', 'authentication'],
     options: [
@@ -44,7 +44,7 @@ export const coreAssessmentQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { "two_factor": "yes" },
         points: 8,
-        feedback: 'Great job! 2FA significantly improves your account security.'
+        feedback: 'Excellent! 2FA makes your accounts dramatically more secure against hackers.'
       },
       { 
         id: 'partial',
@@ -97,7 +97,7 @@ export const coreAssessmentQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "updates": "rarely" },
         points: 0,
-        feedback: 'Outdated software is a major security risk. Enable automatic updates!'
+        feedback: 'Outdated software creates serious security vulnerabilities. Enable automatic updates to stay protected!'
       }
     ]
   },

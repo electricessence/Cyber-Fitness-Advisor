@@ -36,26 +36,26 @@ export function Recommendations({ recommendations, onQuestionClick }: Recommenda
     return (
       <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
         <div className="text-green-600 text-lg font-medium mb-2">
-          🎉 Excellent work!
+          🎉 Outstanding security posture!
         </div>
         <p className="text-green-700">
-          You've addressed all the high-impact security measures. Keep up the great work!
+          You've implemented all the high-impact security measures we recommend. Your digital security is in excellent shape!
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
       <div className="flex items-center gap-2 mb-4">
         <TrendingUp className="w-5 h-5 text-blue-600" />
         <h2 className="text-xl font-bold text-gray-800">
-          Biggest Impact Next Steps
+          Your Next Security Wins
         </h2>
       </div>
       
       <p className="text-gray-600 mb-6">
-        Focus on these high-impact, easy wins to boost your security score quickly!
+        These actions will give you the biggest security improvements for your time investment.
       </p>
 
       <div className="space-y-4">
@@ -113,16 +113,16 @@ export function Recommendations({ recommendations, onQuestionClick }: Recommenda
             </div>
 
             {rec.question.actionHint && (
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
                 <div className="text-sm text-blue-800">
-                  <span className="font-medium">💡 How to do this: </span>
+                  <span className="font-medium">💡 Quick guide: </span>
                   {rec.question.actionHint}
                 </div>
               </div>
             )}
 
             <div className="mt-3 text-xs text-gray-500">
-              Click to jump to this question →
+              Click anywhere to answer this question →
             </div>
           </div>
         ))}
@@ -130,9 +130,9 @@ export function Recommendations({ recommendations, onQuestionClick }: Recommenda
 
       <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
         <div className="text-sm text-blue-800">
-          <span className="font-medium">💪 Pro tip: </span>
-          Start with the <span className="font-medium">Quick Wins</span> - they give you immediate security improvements 
-          and satisfying score boosts to keep you motivated!
+          <span className="font-medium">⚡ Strategy: </span>
+          Start with <span className="font-medium">Quick Wins</span> to build momentum, then tackle the bigger improvements. 
+          Each completed action makes the next one easier!
         </div>
       </div>
     </div>

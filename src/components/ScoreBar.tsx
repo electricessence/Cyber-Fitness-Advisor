@@ -27,11 +27,11 @@ const LEVEL_COLORS = {
 
 const LEVEL_NAMES = {
   0: 'Getting Started',
-  1: 'Basic Protection',
-  2: 'Good Habits',
-  3: 'Security Conscious', 
+  1: 'Foundation Built',
+  2: 'Making Progress',
+  3: 'Security Aware', 
   4: 'Well Protected',
-  5: 'Cyber Ninja',
+  5: 'Security Expert',
 } as const;
 
 export function ScoreBar({ 

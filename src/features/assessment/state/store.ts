@@ -368,12 +368,6 @@ export const useAssessmentStore = create<AssessmentState>()(
         // If not found in question bank, check if it's an onboarding question
         if (!question) {
           const onboardingQuestions: Record<string, any> = {
-            // DEBUG: Test expiration question
-            'debug_expiration_test': {
-              id: 'debug_expiration_test',
-              text: 'DEBUG: Test expiration system',
-              weight: 1
-            },
             'platform_confirmation': {
               id: 'platform_confirmation',
               text: 'Platform confirmation',
