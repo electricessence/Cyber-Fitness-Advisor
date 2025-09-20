@@ -11,6 +11,7 @@ import { Recommendations } from './components/layout/Recommendations';
 import { SecurityStatus } from './components/layout/SecurityStatus';
 import { Footer } from './components/layout/Footer';
 import { ResetModal } from './components/layout/ResetModal';
+import { UnifiedOnboarding } from './components/UnifiedOnboarding';
 import { useNavigation } from './hooks/useNavigation';
 import { useAppState } from './hooks/useAppState';
 import { useBrowserDetection } from './hooks/useBrowserDetection';
@@ -40,6 +41,7 @@ function App() {
     answerQuestion,
     dismissCelebration,
     resetAssessment,
+    isOnboardingComplete,
   } = useAssessmentStore();
 
   // Initialize store on app load
@@ -138,13 +140,23 @@ function App() {
 
   // No device onboarding modal - questions show based on facts
 
+  // Smart onboarding: show for new users, hide when onboarding questions are complete
+  const shouldShowOnboarding = !isOnboardingComplete?.() && Object.keys(answers).length === 0;
+
   return (
     <AppLayout>
-      {/* Onboarding Modal - Removed redundant modal version */}
-      {/* Device onboarding is handled separately above */}
+      {/* Smart Onboarding Flow - Shows for new users and disappears when onboarding_complete */}
+      {shouldShowOnboarding && (
+        <UnifiedOnboarding 
+          onComplete={() => {
+            // Onboarding completion is automatically tracked by answered questions
+            // No additional state management needed
+          }}
+        />
+      )}
 
       {/* Privacy Notice */}
-      {appState.showPrivacyNotice && !appState.showOnboarding && (
+      {appState.showPrivacyNotice && !shouldShowOnboarding && (
         <PrivacyNotice
           onDismiss={() => {
             appState.setShowPrivacyNotice(false);
@@ -154,64 +166,69 @@ function App() {
         />
       )}
 
-      {/* Header */}
-      <AppHeader
-        totalQuestions={totalQuestions}
-        answeredQuestions={answeredQuestions}
-        mobileMenuOpen={navigation.mobileMenuOpen}
-        setMobileMenuOpen={navigation.setMobileMenuOpen}
-        onResetClick={() => appState.setShowResetModal(true)}
-        onExportData={exportData}
-        onImportData={importData}
-      />
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left Sidebar Navigation */}
-          <AppSidebar
-            currentDomain={navigation.currentDomain}
-            currentLevel={navigation.currentLevel}
+      {/* Main App Content - Only show when onboarding is complete */}
+      {!shouldShowOnboarding && (
+        <>
+          {/* Header */}
+          <AppHeader
+            totalQuestions={totalQuestions}
+            answeredQuestions={answeredQuestions}
             mobileMenuOpen={navigation.mobileMenuOpen}
-            setCurrentDomain={navigation.setCurrentDomain}
-            setCurrentLevel={navigation.setCurrentLevel}
             setMobileMenuOpen={navigation.setMobileMenuOpen}
+            onResetClick={() => appState.setShowResetModal(true)}
+            onExportData={exportData}
+            onImportData={importData}
           />
 
-          {/* Right Content Area - Main Content + Security Status */}
-          <div className="lg:col-span-3">
-            {/* Score Bar - spans full width */}
-            <ScoreBar
-              score={overallScore}
-              level={userLevel}
-              nextLevelProgress={nextLevelProgress}
-              quickWinsCompleted={quickWinsCompleted}
-              totalQuickWins={totalQuickWins}
-            />
+          {/* Main Content */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Left Sidebar Navigation */}
+              <AppSidebar
+                currentDomain={navigation.currentDomain}
+                currentLevel={navigation.currentLevel}
+                mobileMenuOpen={navigation.mobileMenuOpen}
+                setCurrentDomain={navigation.setCurrentDomain}
+                setCurrentLevel={navigation.setCurrentLevel}
+                setMobileMenuOpen={navigation.setMobileMenuOpen}
+              />
 
-            {/* Content Grid - Main Content + Security Status side by side */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
+              {/* Right Content Area - Main Content + Security Status */}
               <div className="lg:col-span-3">
-                {/* Action Recommendations - High-Impact Security Actions */}
-                <Recommendations
-                  answeredQuestions={answeredQuestions}
-                  getBrowserInfo={getBrowserInfo}
-                  getUserProfile={getUserProfile}
+                {/* Score Bar - spans full width */}
+                <ScoreBar
+                  score={overallScore}
+                  level={userLevel}
+                  nextLevelProgress={nextLevelProgress}
+                  quickWinsCompleted={quickWinsCompleted}
+                  totalQuickWins={totalQuickWins}
                 />
 
-                {/* Current Level Questions */}
-                <MainContent />
-              </div>
+                {/* Content Grid - Main Content + Security Status side by side */}
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
+                  <div className="lg:col-span-3">
+                    {/* Action Recommendations - High-Impact Security Actions */}
+                    <Recommendations
+                      answeredQuestions={answeredQuestions}
+                      getBrowserInfo={getBrowserInfo}
+                      getUserProfile={getUserProfile}
+                    />
 
-              {/* Security Status Sidebar */}
-              <SecurityStatus />
+                    {/* Current Level Questions */}
+                    <MainContent />
+                  </div>
+
+                  {/* Security Status Sidebar */}
+                  <SecurityStatus />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Footer */}
-      <Footer />
+          {/* Footer */}
+          <Footer />
+        </>
+      )}
 
       {/* Celebration Animation */}
       {showCelebration && (

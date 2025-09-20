@@ -54,7 +54,7 @@ describe('Recommendations', () => {
         />
       );
       
-      expect(screen.getByText('Biggest Impact Next Steps')).toBeInTheDocument();
+      expect(screen.getByText('Your Next Security Wins')).toBeInTheDocument();
       expect(screen.getByText('Does your phone lock automatically?')).toBeInTheDocument();
       expect(screen.getByText('Do you use a password manager?')).toBeInTheDocument();
     });
@@ -151,7 +151,7 @@ describe('Recommendations', () => {
         />
       );
       
-      expect(screen.getByText('🎉 Excellent work!')).toBeInTheDocument();
+      expect(screen.getByText('🎉 Outstanding security posture!')).toBeInTheDocument();
       // Should not crash with empty recommendations
     });
   });
