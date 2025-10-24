@@ -4,9 +4,10 @@ import { Shield, X, Eye, Github, Wifi } from 'lucide-react';
 interface PrivacyNoticeProps {
   onDismiss: () => void;
   isMinimized?: boolean;
+  inline?: boolean; // New prop for inline positioning
 }
 
-export function PrivacyNotice({ onDismiss, isMinimized = false }: PrivacyNoticeProps) {
+export function PrivacyNotice({ onDismiss, isMinimized = false, inline = false }: PrivacyNoticeProps) {
   const [showDetails, setShowDetails] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!isMinimized);
 
@@ -24,6 +25,53 @@ export function PrivacyNotice({ onDismiss, isMinimized = false }: PrivacyNoticeP
     );
   }
 
+  // Inline banner style (below ScoreBar)
+  if (inline) {
+    return (
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border-2 border-green-200 overflow-hidden animate-slide-down">
+        {/* Compact Header */}
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-1">
+            <div className="flex-shrink-0">
+              <Shield className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-green-800 text-sm">
+                🔒 Your Privacy is Protected
+              </h3>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-gray-600">
+                <span className="flex items-center gap-1">
+                  <span className="text-green-600">✓</span>
+                  <span className="hidden sm:inline">Runs 100% locally</span>
+                  <span className="sm:hidden">100% local</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="text-green-600">✓</span>
+                  <span className="hidden sm:inline">No tracking</span>
+                  <span className="sm:hidden">No tracking</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="text-green-600">✓</span>
+                  <span className="hidden sm:inline">Data stays on your device</span>
+                  <span className="sm:hidden">Data local</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={onDismiss}
+            className="flex-shrink-0 p-2 hover:bg-green-100 rounded text-green-600 transition-colors ml-2"
+            title="Dismiss"
+            aria-label="Dismiss privacy notice"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Original fixed positioning style
   return (
     <div className="fixed top-4 right-4 max-w-sm z-[60] animate-slide-in">
       <div className="bg-white rounded-lg shadow-lg border border-green-200 overflow-hidden">

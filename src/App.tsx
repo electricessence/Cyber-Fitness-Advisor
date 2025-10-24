@@ -179,17 +179,6 @@ function App() {
         <FirstActionFlow onComplete={handleFirstActionComplete} />
       )}
 
-      {/* Privacy Notice */}
-      {appState.showPrivacyNotice && !shouldShowOnboarding && (
-        <PrivacyNotice
-          onDismiss={() => {
-            appState.setShowPrivacyNotice(false);
-            localStorage.setItem('cyber-fitness-privacy-dismissed', 'true');
-          }}
-          isMinimized={appState.privacyNoticeMinimized}
-        />
-      )}
-
       {/* Main App Content - Only show when onboarding is complete */}
       {!shouldShowOnboarding && (
         <>
@@ -227,6 +216,20 @@ function App() {
                   quickWinsCompleted={quickWinsCompleted}
                   totalQuickWins={totalQuickWins}
                 />
+
+                {/* Privacy Notice - Appears below score bar when not dismissed */}
+                {appState.showPrivacyNotice && (
+                  <div className="mt-4">
+                    <PrivacyNotice
+                      inline={true}
+                      onDismiss={() => {
+                        appState.setShowPrivacyNotice(false);
+                        localStorage.setItem('cyber-fitness-privacy-dismissed', 'true');
+                      }}
+                      isMinimized={appState.privacyNoticeMinimized}
+                    />
+                  </div>
+                )}
 
                 {/* Content Grid - Main Content + Security Status side by side */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
