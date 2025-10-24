@@ -126,12 +126,15 @@ function App() {
     // Clear assessment data
     resetAssessment();
     
-    // Clear all related localStorage items
+    // Clear all related localStorage items (v1 keys)
     localStorage.removeItem('cyber-fitness-answers');
     localStorage.removeItem('cyber-fitness-onboarding-completed');
     localStorage.removeItem('cyber-fitness-privacy-dismissed');
     localStorage.removeItem('cyber-fitness-tech-comfort');
     localStorage.removeItem('cyber-fitness-main-concerns');
+    
+    // Clear v2 localStorage items
+    localStorage.removeItem('cfa:v2:first-action-completed');
     
     // Reset component state
     appState.setShowOnboarding(true);
@@ -139,6 +142,10 @@ function App() {
     appState.setPrivacyNoticeMinimized(false);
     navigation.setCurrentDomain('quickwins');
     navigation.setCurrentLevel(0);
+    
+    // Reset first action flow state
+    setFirstActionCompleted(false);
+    setShowFirstAction(false);
     
     // Force a page reload to ensure clean state
     setTimeout(() => window.location.reload(), 100);
