@@ -9,6 +9,7 @@ import { AppSidebar } from './components/layout/AppSidebar';
 import { MainContent } from './components/layout/MainContent';
 import { Recommendations } from './components/layout/Recommendations';
 import { SecurityStatus } from './components/layout/SecurityStatus';
+import { MobileSecurityStatus } from './components/layout/MobileSecurityStatus';
 import { Footer } from './components/layout/Footer';
 import { ResetModal } from './components/layout/ResetModal';
 import { UnifiedOnboarding } from './components/UnifiedOnboarding';
@@ -229,7 +230,7 @@ function App() {
 
                 {/* Content Grid - Main Content + Security Status side by side */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
-                  <div className="lg:col-span-3">
+                  <div className="lg:col-span-3 space-y-6">
                     {/* Action Recommendations - High-Impact Security Actions */}
                     <Recommendations
                       answeredQuestions={answeredQuestions}
@@ -241,8 +242,10 @@ function App() {
                     <MainContent />
                   </div>
 
-                  {/* Security Status Sidebar */}
-                  <SecurityStatus />
+                  {/* Security Status Sidebar - Hidden on mobile by default */}
+                  <div className="hidden lg:block lg:col-span-2">
+                    <SecurityStatus />
+                  </div>
                 </div>
               </div>
             </div>
@@ -250,6 +253,9 @@ function App() {
 
           {/* Footer */}
           <Footer />
+
+          {/* Mobile Security Status - Bottom Sheet */}
+          <MobileSecurityStatus />
         </>
       )}
 

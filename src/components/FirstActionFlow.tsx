@@ -50,19 +50,19 @@ export function FirstActionFlow({ onComplete }: FirstActionFlowProps) {
   if (step === 'intro') {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-in fade-in duration-300">
-          <div className="text-center space-y-6">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-4 sm:p-8 animate-in fade-in duration-300 max-h-[90vh] overflow-y-auto">
+          <div className="text-center space-y-4 sm:space-y-6">
             {/* Icon */}
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-              <Shield className="w-10 h-10 text-white" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+              <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
             </div>
 
             {/* Headline */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">
                 Let's Get You Protected
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-base sm:text-lg text-gray-600">
                 Most people start at <span className="font-semibold text-red-500">0/100</span> security score.
                 <br />
                 Let's change that right now.
@@ -70,16 +70,16 @@ export function FirstActionFlow({ onComplete }: FirstActionFlowProps) {
             </div>
 
             {/* Value Proposition */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-              <div className="flex items-start gap-4">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-200">
+              <div className="flex items-start gap-3 sm:gap-4">
                 <div className="flex-shrink-0">
-                  <TrendingUp className="w-6 h-6 text-blue-600" />
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-gray-900 mb-2">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 sm:mb-2">
                     Just ONE action can make a huge difference
                   </h3>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-xs sm:text-sm text-gray-700">
                     We've identified the single highest-impact security improvement for your {' '}
                     <span className="font-medium">specific device setup</span>. 
                     It takes about 2 minutes and could prevent a real attack.
@@ -91,7 +91,7 @@ export function FirstActionFlow({ onComplete }: FirstActionFlowProps) {
             {/* CTA */}
             <button
               onClick={handleStartAction}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
               Show Me My #1 Security Action →
             </button>
@@ -182,48 +182,48 @@ export function FirstActionFlow({ onComplete }: FirstActionFlowProps) {
     
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-in fade-in duration-300">
-          <div className="text-center space-y-6">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-4 sm:p-8 animate-in fade-in duration-300 max-h-[90vh] overflow-y-auto">
+          <div className="text-center space-y-4 sm:space-y-6">
             {/* Success Icon */}
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center animate-bounce">
-              <CheckCircle className="w-10 h-10 text-white" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center animate-bounce">
+              <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
             </div>
 
             {/* Celebration Message */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">
                 {comparisonEmoji} Great Job!
               </h2>
-              <p className="text-lg text-gray-600 mb-4">
+              <p className="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4">
                 {comparisonText}
               </p>
             </div>
 
             {/* Progress Stats */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
-              <div className="grid grid-cols-2 gap-6">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 border border-green-200">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <div className="text-4xl font-bold text-green-600 mb-1">
+                  <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-1">
                     {Math.round(overallScore)}
-                    <span className="text-xl text-gray-500">/100</span>
+                    <span className="text-lg sm:text-xl text-gray-500">/100</span>
                   </div>
-                  <div className="text-sm text-gray-600">Your Security Score</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Your Security Score</div>
                 </div>
                 <div>
-                  <div className="text-4xl font-bold text-blue-600 mb-1">
+                  <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-1">
                     Level 1
                   </div>
-                  <div className="text-sm text-gray-600">Security level reached</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Security level reached</div>
                 </div>
               </div>
             </div>
 
             {/* Momentum Message */}
-            <div className="text-left bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <p className="text-gray-700 mb-3">
+            <div className="text-left bg-blue-50 rounded-xl p-4 sm:p-6 border border-blue-200">
+              <p className="text-sm sm:text-base text-gray-700 mb-2 sm:mb-3">
                 <span className="font-semibold">You're off to a great start!</span> Small actions like this one add up to serious protection.
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 The next few questions will help you reach even higher security levels. Each one builds on the last.
               </p>
             </div>
