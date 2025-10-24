@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAssessmentStore, initializeStore } from './features/assessment/state/store';
 import { ScoreBar } from './components/ScoreBar';
 import { Celebration } from './components/Celebration';
@@ -12,6 +12,7 @@ import { SecurityStatus } from './components/layout/SecurityStatus';
 import { Footer } from './components/layout/Footer';
 import { ResetModal } from './components/layout/ResetModal';
 import { UnifiedOnboarding } from './components/UnifiedOnboarding';
+import { FirstActionFlow } from './components/FirstActionFlow';
 import { useNavigation } from './hooks/useNavigation';
 import { useAppState } from './hooks/useAppState';
 import { useBrowserDetection } from './hooks/useBrowserDetection';
@@ -21,7 +22,11 @@ import { CFASemantics } from './utils/semantics';
 import AuthoringDiagnostics from './components/development/AuthoringDiagnostics';
 
 function App() {
-  // No device onboarding modal - just use fact-based questions
+  // Track first action flow completion
+  const [showFirstAction, setShowFirstAction] = useState(false);
+  const [firstActionCompleted, setFirstActionCompleted] = useState(() => {
+    return localStorage.getItem('cfa:v2:first-action-completed') === 'true';
+  });
   
   // Use custom hooks for state management
   const navigation = useNavigation();
@@ -142,6 +147,19 @@ function App() {
 
   // Smart onboarding: show for new users, hide when onboarding questions are complete
   const shouldShowOnboarding = !isOnboardingComplete?.() && Object.keys(answers).length === 0;
+  
+  // Show first action flow after onboarding completes (but only once)
+  useEffect(() => {
+    if (isOnboardingComplete?.() && !firstActionCompleted && Object.keys(answers).length > 0) {
+      setShowFirstAction(true);
+    }
+  }, [isOnboardingComplete, firstActionCompleted, answers]);
+
+  const handleFirstActionComplete = () => {
+    setShowFirstAction(false);
+    setFirstActionCompleted(true);
+    localStorage.setItem('cfa:v2:first-action-completed', 'true');
+  };
 
   return (
     <AppLayout>
@@ -150,9 +168,14 @@ function App() {
         <UnifiedOnboarding 
           onComplete={() => {
             // Onboarding completion is automatically tracked by answered questions
-            // No additional state management needed
+            // This will trigger the FirstActionFlow via useEffect
           }}
         />
+      )}
+      
+      {/* First Action Flow - Critical "immediate value" moment after onboarding */}
+      {showFirstAction && !shouldShowOnboarding && (
+        <FirstActionFlow onComplete={handleFirstActionComplete} />
       )}
 
       {/* Privacy Notice */}
