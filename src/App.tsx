@@ -38,10 +38,10 @@ function App() {
     questionBank,
     answers,
     overallScore,
+    percentage,
     currentLevel: userLevel,
     quickWinsCompleted,
     totalQuickWins,
-    nextLevelProgress,
     showCelebration,
     lastScoreIncrease,
     answerQuestion,
@@ -217,11 +217,12 @@ function App() {
               <div className="lg:col-span-3">
                 {/* Score Bar - spans full width */}
                 <ScoreBar
-                  score={overallScore}
-                  level={userLevel}
-                  nextLevelProgress={nextLevelProgress}
+                  percentage={percentage}
+                  answeredCount={answeredQuestions}
+                  totalCount={totalQuestions}
                   quickWinsCompleted={quickWinsCompleted}
                   totalQuickWins={totalQuickWins}
+                  score={overallScore}
                 />
 
                 {/* Privacy Notice - Appears below score bar when not dismissed */}

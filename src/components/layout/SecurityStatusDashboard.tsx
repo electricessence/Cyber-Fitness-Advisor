@@ -17,6 +17,7 @@ import { ScoreBar } from '../ScoreBar';
 export function SecurityStatusDashboard() {
   const {
     overallScore,
+    percentage,
     currentLevel,
     nextLevelProgress,
     domainScores,
@@ -47,6 +48,12 @@ export function SecurityStatusDashboard() {
       status: domainScore >= 80 ? 'excellent' : domainScore >= 60 ? 'good' : domainScore >= 40 ? 'fair' : 'needs-work'
     };
   });
+
+  // Calculate total questions across all domains
+  const allTotalQuestions = questionBank.domains.reduce((sum, d) => 
+    sum + d.levels.reduce((levelSum, level) => levelSum + level.questions.length, 0), 0
+  );
+  const allAnsweredQuestions = Object.keys(answers).length;
 
   // Get top 3 areas that need attention
   const priorityAreas = domainProgress
@@ -86,11 +93,12 @@ export function SecurityStatusDashboard() {
 
         {/* Progress Bar */}
         <ScoreBar
-          score={overallScore}
-          level={currentLevel}
-          nextLevelProgress={nextLevelProgress}
+          percentage={percentage}
+          answeredCount={allAnsweredQuestions}
+          totalCount={allTotalQuestions}
           quickWinsCompleted={quickWinsCompleted}
           totalQuickWins={totalQuickWins}
+          score={overallScore}
           showAnimation={true}
         />
       </div>

@@ -114,6 +114,7 @@ interface AssessmentState extends FactsStoreState {
   
   // Computed state
   overallScore: number;
+  percentage: number; // Percentage of answered questions (0-100)
   domainScores: Record<string, number>;
   currentLevel: number;
   quickWinsCompleted: number;
@@ -217,6 +218,7 @@ const initialState = {
   taskResponses: {},
   taskReminders: [],
   overallScore: 0,
+  percentage: 0, // Percentage of answered questions
   domainScores: {},
   currentLevel: 0, // Keep original test expectation for now
   quickWinsCompleted: 0,
@@ -475,6 +477,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           ...prev, // Preserve existing state
           answers: newAnswers,
           overallScore: scoreResult.overallScore,
+          percentage: scoreResult.percentage,
           domainScores: Object.entries(scoreResult.domainScores).reduce((acc: Record<string, number>, [domain, scores]) => {
             acc[domain] = scores.score;
             return acc;
@@ -568,6 +571,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           ...freshFactsSlice, // Fresh facts system
           factsActions: freshEnhancedFactsActions, // Use fresh enhanced actions
           overallScore: 0, // Reset score to 0
+          percentage: 0, // Reset percentage to 0
           domainScores: {}, // Clear domain scores
           currentLevel: 1, // Reset to level 1 (consistent with nextLevelProgress)
           quickWinsCompleted: 0, // Reset quick wins
@@ -601,6 +605,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           
           set({
             overallScore: scoreResult.overallScore,
+            percentage: scoreResult.percentage,
             domainScores: simpleDomainScores,
             currentLevel: nextLevelProgress.currentLevel,
             quickWinsCompleted: scoreResult.quickWinsCompleted,
@@ -837,6 +842,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           
           scoreUpdate = {
             overallScore: scoreResult.overallScore,
+            percentage: scoreResult.percentage,
             domainScores: scoreResult.domainScores,
             currentLevel: scoreResult.level,
             quickWinsCompleted: scoreResult.quickWinsCompleted,
@@ -1169,6 +1175,7 @@ export const initializeStore = () => {
     useAssessmentStore.setState({
       answers: prePopulatedAnswers,
       overallScore: scoreResult.overallScore,
+      percentage: scoreResult.percentage,
       domainScores: domainScoresSimplified,
       currentLevel: nextLevelProgress.currentLevel,
       quickWinsCompleted,
