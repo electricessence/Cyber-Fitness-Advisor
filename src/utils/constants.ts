@@ -24,6 +24,8 @@ export const SCORE_CONSTANTS = {
   MAX_IMPACT_SCORE: 100,
   /** Perfect score */
   PERFECT_SCORE: 100,
+  /** Number of answered cards needed before trusting raw average */
+  MIN_CONFIDENT_ANSWERS: 12,
 } as const;
 
 // Performance constants

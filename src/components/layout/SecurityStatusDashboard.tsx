@@ -18,6 +18,8 @@ export function SecurityStatusDashboard() {
   const {
     overallScore,
     percentage,
+    coveragePercentage,
+    scoreConfidence,
     currentLevel,
     nextLevelProgress,
     domainScores,
@@ -26,7 +28,9 @@ export function SecurityStatusDashboard() {
     earnedBadges,
     recentBadgeUnlocks,
     questionBank,
-    answers
+    answers,
+    answeredQuestionCount,
+    totalRelevantQuestions
   } = useAssessmentStore();
 
   // Get current security level info
@@ -53,7 +57,10 @@ export function SecurityStatusDashboard() {
   const allTotalQuestions = questionBank.domains.reduce((sum, d) => 
     sum + d.levels.reduce((levelSum, level) => levelSum + level.questions.length, 0), 0
   );
-  const allAnsweredQuestions = Object.keys(answers).length;
+  const totalQuestions = totalRelevantQuestions > 0 ? totalRelevantQuestions : allTotalQuestions;
+  const answeredQuestions = totalQuestions > 0
+    ? Math.min(answeredQuestionCount > 0 ? answeredQuestionCount : Object.keys(answers).length, totalQuestions)
+    : Object.keys(answers).length;
 
   // Get top 3 areas that need attention
   const priorityAreas = domainProgress
@@ -94,11 +101,14 @@ export function SecurityStatusDashboard() {
         {/* Progress Bar */}
         <ScoreBar
           percentage={percentage}
-          answeredCount={allAnsweredQuestions}
-          totalCount={allTotalQuestions}
+          rawPercentage={coveragePercentage}
+          scoreConfidence={scoreConfidence}
+          answeredCount={answeredQuestions}
+          totalCount={totalQuestions}
           quickWinsCompleted={quickWinsCompleted}
           totalQuickWins={totalQuickWins}
-          score={overallScore}
+          level={currentLevel}
+          nextLevelProgress={nextLevelProgress}
           showAnimation={true}
         />
       </div>

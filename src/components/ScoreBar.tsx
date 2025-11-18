@@ -1,43 +1,96 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ExplainPopover from './development/ExplainPopover';
+import { SCORE_CONSTANTS } from '../utils/constants';
 
 interface ScoreBarProps {
-  score: number;
   percentage: number;
+  rawPercentage?: number;
+  scoreConfidence?: number;
   answeredCount: number;
   totalCount: number;
   quickWinsCompleted: number;
   totalQuickWins: number;
+  level: number;
+  nextLevelProgress?: {
+    currentLevel: number;
+    nextLevel: number | null;
+    pointsNeeded: number;
+    progress: number;
+  };
   showAnimation?: boolean;
 }
 
-// Simple color zones based on percentage
+// Soft gradients keep the focus on the current card without screaming for attention
 function getPercentageColor(percentage: number): string {
-  if (percentage >= 75) return 'from-green-500 to-green-600';
-  if (percentage >= 50) return 'from-yellow-500 to-yellow-600';
-  if (percentage >= 25) return 'from-orange-500 to-orange-600';
-  return 'from-red-500 to-red-600';
+  if (percentage >= 75) return 'from-emerald-500 via-teal-500 to-blue-500';
+  if (percentage >= 50) return 'from-blue-500 via-sky-500 to-cyan-500';
+  if (percentage >= 25) return 'from-amber-500 via-orange-400 to-rose-400';
+  return 'from-slate-400 via-slate-500 to-slate-600';
 }
 
-function getPercentageLabel(percentage: number): string {
-  if (percentage >= 75) return 'Strong Protection';
-  if (percentage >= 50) return 'Good Progress';
-  if (percentage >= 25) return 'Getting Started';
-  return 'Needs Attention';
+const STAGE_RANGES = [
+  {
+    min: 80,
+    name: 'Tier 4 · Locked In',
+    percentile: 'Ahead of 9 in 10 households',
+    copy: 'Only fine-tuning remains. Expect slower gains and focus on periodic reviews.'
+  },
+  {
+    min: 60,
+    name: 'Tier 3 · Solid Habits',
+    percentile: 'Ahead of 3 in 4 households',
+    copy: 'Daily hygiene is paying off. The remaining cards dial in advanced coverage.'
+  },
+  {
+    min: 40,
+    name: 'Tier 2 · Momentum',
+    percentile: 'Ahead of most new users',
+    copy: 'You are past the basics. Keep banking high-impact fixes when the deck surfaces them.'
+  },
+  {
+    min: 20,
+    name: 'Tier 1 · Shields Up',
+    percentile: 'Catching up with the average household',
+    copy: 'We are closing the obvious gaps. Answer a card or two per day to stay on pace.'
+  },
+  {
+    min: 0,
+    name: 'Tier 0 · Orientation',
+    percentile: 'Getting the lay of the land',
+    copy: 'We are still learning about your setup. Each card unlocks smarter suggestions.'
+  }
+];
+
+function getStageMeta(percentage: number) {
+  const sorted = [...STAGE_RANGES].sort((a, b) => b.min - a.min);
+  const current = sorted.find(stage => percentage >= stage.min) ?? sorted[sorted.length - 1];
+  const index = sorted.indexOf(current);
+  const nextStage = index > 0 ? sorted[index - 1] : null;
+  return { current, nextStage }; 
 }
 
 export function ScoreBar({ 
   percentage, 
+  rawPercentage,
+  scoreConfidence = 1,
   answeredCount,
   totalCount,
   quickWinsCompleted, 
   totalQuickWins,
+  level,
+  nextLevelProgress,
   showAnimation = true 
 }: ScoreBarProps) {
   const [displayPercentage, setDisplayPercentage] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [previousMilestone, setPreviousMilestone] = useState(0);
   const [showMilestone, setShowMilestone] = useState(false);
+
+  const stageMeta = useMemo(() => getStageMeta(percentage), [percentage]);
+  const baseRawPercentage = rawPercentage ?? percentage;
+  const normalizedConfidence = Math.max(0, Math.min(1, scoreConfidence));
+  const confidencePercent = Math.round(normalizedConfidence * 100);
+  const cardsToFullConfidence = Math.max(SCORE_CONSTANTS.MIN_CONFIDENT_ANSWERS - answeredCount, 0);
 
   // Enhanced smooth percentage animation with easing
   useEffect(() => {
@@ -96,129 +149,112 @@ export function ScoreBar({
   }, [percentage, previousMilestone]);
 
   const currentColor = getPercentageColor(displayPercentage);
-  const currentLabel = getPercentageLabel(displayPercentage);
+  const currentLabel = Math.round(displayPercentage);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 sticky top-4 z-10 border-l-4 border-l-blue-500 relative overflow-hidden">
-      {/* Milestone Animation Overlay */}
+    <section className="bg-white rounded-3xl shadow-sm p-5 sm:p-6 border border-slate-100 sticky top-3 z-10" aria-label="Protection progress">
       {showMilestone && (
-        <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-blue-400/20 animate-pulse pointer-events-none rounded-lg">
-          <div className="absolute top-2 right-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-bounce">
-            🎉 Great Progress!
+        <div className="absolute inset-0 rounded-3xl bg-slate-50 animate-pulse pointer-events-none" aria-hidden="true" />
+      )}
+
+      <div className="relative flex flex-col items-center text-center space-y-3">
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Percent protected</p>
+        <div className="text-5xl font-black text-slate-900 leading-tight">
+          {currentLabel}
+          <span className="text-lg font-semibold text-slate-400 align-super ml-1">%</span>
+        </div>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">
+          Score confidence · {confidencePercent}%
+        </p>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-slate-900">{stageMeta.current.name}</p>
+          <p className="text-sm text-slate-600 max-w-xs mx-auto">{stageMeta.current.copy}</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">{stageMeta.current.percentile}</p>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+          <div 
+            className={`h-full bg-gradient-to-r ${currentColor} transition-all duration-1000 ease-out rounded-full relative`}
+            style={{ width: `${Math.min(displayPercentage, 100)}%` }}
+          >
+            {isAnimating && (
+              <div className="absolute inset-0 bg-white/20 animate-pulse rounded-full" />
+            )}
           </div>
+        </div>
+      </div>
+
+      {stageMeta.nextStage && (
+        <div className="mt-4 bg-slate-50 border border-slate-100 rounded-2xl p-4 text-left">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Next big checkpoint</p>
+          <p className="text-sm text-slate-700 mt-1">
+            {stageMeta.nextStage.name} unlocks when you cross roughly {stageMeta.nextStage.min}% coverage.
+          </p>
         </div>
       )}
-      
-      {/* Mobile Layout - Stacked */}
-      <div className="sm:hidden space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="text-xl font-bold text-gray-800">
-            {Math.round(displayPercentage)}%
-            <span className="text-sm text-gray-500 font-normal ml-1">Protected</span>
-          </div>
+
+      {nextLevelProgress?.nextLevel && (
+        <div className="mt-3 bg-white border border-slate-100 rounded-2xl p-4 shadow-inner">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Tier progression</p>
+          <p className="text-sm text-slate-700 mt-1">
+            Level {level} → {nextLevelProgress.nextLevel} in {nextLevelProgress.pointsNeeded} more impact points.
+          </p>
+        </div>
+      )}
+
+      <details className="mt-4 text-xs text-slate-500 [&_summary]:cursor-pointer">
+        <summary className="list-none text-slate-600 font-medium inline-flex items-center gap-2 justify-center">
+          How this moves
+        </summary>
+        <div className="mt-2 space-y-1">
+          <p>Every time you finish the card in front of you we add to this percent.</p>
+          <p>{answeredCount} of {totalCount} cards completed for your setup.</p>
+          <p>Raw coverage sits at {Math.round(baseRawPercentage)}% with {confidencePercent}% certainty.</p>
+          <p>
+            Confidence tops out after roughly {Math.min(totalCount, SCORE_CONSTANTS.MIN_CONFIDENT_ANSWERS)} cards -
+            {cardsToFullConfidence > 0 ? ` ${cardsToFullConfidence} more to go.` : ' you are there.'}
+          </p>
           {quickWinsCompleted > 0 && (
-            <div className="text-sm font-medium text-green-600">
-              🚀 {quickWinsCompleted}/{totalQuickWins}
-            </div>
+            <p>Quick wins: {quickWinsCompleted}/{totalQuickWins} answered.</p>
+          )}
+          {nextLevelProgress?.nextLevel && (
+            <p>Need {nextLevelProgress.pointsNeeded} more points to reach Level {nextLevelProgress.nextLevel}.</p>
           )}
         </div>
+      </details>
+
+      <div className="mt-4">
         <ExplainPopover
-          title="Your Security Progress"
+          title="Protection percentage"
           semantics={{
-            version: "3.0.0",
-            behavior: "Percentage reflects completion of security actions relevant to YOUR specific setup",
+            version: '3.2.0',
+            behavior: 'Represents your protection grade, weighted by how many cards we truly know about you',
             rules: [
-              "100% = All recommended actions for YOUR devices/apps completed",
-              "Different users have different totals based on their scenario",
-              "Progress is relative to your threat model, not absolute"
+              'Each visible card contributes up to its maximum impact points',
+              'Unanswered relevant cards count as zero until confirmed',
+              `Confidence grows until roughly ${SCORE_CONSTANTS.MIN_CONFIDENT_ANSWERS} cards are answered`
             ],
-            implementation: "Percentage = (answered questions / total relevant questions) × 100"
+            implementation: 'grade = (earnedPoints / relevantMaxPoints) * confidenceFactor'
           }}
           debug={{
-            componentState: { 
+            componentState: {
               percentage: Math.round(displayPercentage),
               answeredCount,
               totalCount,
-              quickWins: `${quickWinsCompleted}/${totalQuickWins}`
+              rawPercentage: Math.round(baseRawPercentage),
+              scoreConfidence: normalizedConfidence
             },
             dataFlow: [
-              "User answers questions → Progress calculated",
-              "Percentage based on YOUR scenario", 
-              "Color changes based on completion",
-              "UI shows thermometer visualization"
+              'Answer card → store result locally',
+              'Recalculate relevant cards → update percentage with confidence weighting'
             ]
           }}
         >
-          <div className={`px-3 py-1 rounded-full text-sm font-medium text-white bg-gradient-to-r ${currentColor} w-fit`}>
-            {currentLabel}
-          </div>
+          <span className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Why this matters</span>
         </ExplainPopover>
-        <div className="text-xs text-gray-600">
-          {answeredCount} of {totalCount} actions for YOUR setup
-        </div>
       </div>
-
-      {/* Desktop Layout - Side by Side */}
-      <div className="hidden sm:flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <div className="text-2xl font-bold text-gray-800">
-            {Math.round(displayPercentage)}%
-            <span className="text-sm text-gray-500 font-normal ml-1">Protected</span>
-          </div>
-          <div className={`px-3 py-1 rounded-full text-sm font-medium text-white bg-gradient-to-r ${currentColor}`}>
-            {currentLabel}
-          </div>
-        </div>
-        
-        {quickWinsCompleted > 0 && (
-          <div className="text-right">
-            <div className="text-sm font-medium text-green-600">
-              🚀 {quickWinsCompleted}/{totalQuickWins} Quick Wins
-            </div>
-            <div className="text-xs text-gray-500">
-              Easy wins completed!
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Main progress bar - thermometer style */}
-      <div className="relative">
-        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
-          <div 
-            className={`h-full bg-gradient-to-r ${currentColor} transition-all duration-1200 ease-out rounded-full relative`}
-            style={{ 
-              width: `${Math.min(displayPercentage, 100)}%`,
-              transition: 'width 1.2s cubic-bezier(0.4, 0, 0.2, 1)' 
-            }}
-          >
-            {/* Animated shimmer effect during changes */}
-            {isAnimating && (
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer rounded-full" />
-            )}
-            
-            {/* Subtle pulsing effect on active progress */}
-            <div className="absolute inset-0 bg-white/10 animate-pulse rounded-full opacity-50" />
-          </div>
-        </div>
-        
-        {/* Milestone markers (25%, 50%, 75%, 100%) */}
-        <div className="absolute -top-1 left-0 w-full h-5 pointer-events-none">
-          {[25, 50, 75].map((milestone) => (
-            <div
-              key={milestone}
-              className="absolute w-0.5 h-5 bg-gray-400"
-              style={{ left: `${milestone}%` }}
-              title={`${milestone}%`}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Progress context message */}
-      <div className="hidden sm:block mt-2 text-xs text-gray-600">
-        {answeredCount} of {totalCount} security actions completed for your specific setup
-      </div>
-    </div>
+    </section>
   );
 }

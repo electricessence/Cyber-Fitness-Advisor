@@ -1,53 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAssessmentStore, initializeStore } from './features/assessment/state/store';
 import { ScoreBar } from './components/ScoreBar';
-import { Celebration } from './components/Celebration';
-import { PrivacyNotice } from './components/PrivacyNotice';
-import { AppHeader } from './components/AppHeader';
 import { AppLayout } from './components/layout/AppLayout';
-import { AppSidebar } from './components/layout/AppSidebar';
-import { MainContent } from './components/layout/MainContent';
-import { Recommendations } from './components/layout/Recommendations';
-import { SecurityStatus } from './components/layout/SecurityStatus';
-import { MobileSecurityStatus } from './components/layout/MobileSecurityStatus';
-import { Footer } from './components/layout/Footer';
 import { ResetModal } from './components/layout/ResetModal';
-import { UnifiedOnboarding } from './components/UnifiedOnboarding';
-import { FirstActionFlow } from './components/FirstActionFlow';
 import { useNavigation } from './hooks/useNavigation';
 import { useAppState } from './hooks/useAppState';
-import { useBrowserDetection } from './hooks/useBrowserDetection';
+import { QuestionDeck } from './components/questions/QuestionDeck';
+import { Menu, X, Download, Upload, RefreshCw, Github } from 'lucide-react';
 // Initialize semantic version for global access
 import './features/assessment/engine/semantics';
 import { CFASemantics } from './utils/semantics';
 import AuthoringDiagnostics from './components/development/AuthoringDiagnostics';
+import { removeStorage } from './utils/safeStorage';
 
 function App() {
-  // Track first action flow completion
-  const [showFirstAction, setShowFirstAction] = useState(false);
-  const [firstActionCompleted, setFirstActionCompleted] = useState(() => {
-    return localStorage.getItem('cfa:v2:first-action-completed') === 'true';
-  });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scoreDetailsOpen, setScoreDetailsOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Use custom hooks for state management
   const navigation = useNavigation();
   const appState = useAppState();
-  const { getBrowserInfo, getUserProfile } = useBrowserDetection();
 
   const {
     questionBank,
     answers,
-    overallScore,
     percentage,
+    coveragePercentage,
+    scoreConfidence,
     currentLevel: userLevel,
     quickWinsCompleted,
     totalQuickWins,
-    showCelebration,
-    lastScoreIncrease,
+    nextLevelProgress,
     answerQuestion,
-    dismissCelebration,
     resetAssessment,
-    isOnboardingComplete,
+    answeredQuestionCount,
+    totalRelevantQuestions,
   } = useAssessmentStore();
 
   // Initialize store on app load
@@ -63,13 +51,14 @@ function App() {
     navigation.setCurrentLevel(userLevel);
   }, [userLevel, navigation]);
   
-  const totalQuestions = questionBank.domains.reduce(
+  const fallbackTotalQuestions = questionBank.domains.reduce(
     (total, domain) => total + domain.levels.reduce(
       (levelTotal, level) => levelTotal + level.questions.length, 0
     ), 0
   );
-  const answeredQuestions = Object.keys(answers).length;
-
+  const totalQuestions = totalRelevantQuestions > 0 ? totalRelevantQuestions : fallbackTotalQuestions;
+  const answeredFromState = answeredQuestionCount > 0 ? answeredQuestionCount : Object.keys(answers).length;
+  const answeredQuestions = totalQuestions > 0 ? Math.min(answeredFromState, totalQuestions) : answeredFromState;
   const exportData = () => {
     const data = JSON.stringify({ answers, timestamp: new Date().toISOString() }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
@@ -126,159 +115,186 @@ function App() {
     // Clear assessment data
     resetAssessment();
     
-    // Clear all related localStorage items (v1 keys)
-    localStorage.removeItem('cyber-fitness-answers');
-    localStorage.removeItem('cyber-fitness-onboarding-completed');
-    localStorage.removeItem('cyber-fitness-privacy-dismissed');
-    localStorage.removeItem('cyber-fitness-tech-comfort');
-    localStorage.removeItem('cyber-fitness-main-concerns');
+    // Clear all related storage items (v1 keys)
+    removeStorage('cyber-fitness-answers');
+    removeStorage('cyber-fitness-onboarding-completed');
+    removeStorage('cyber-fitness-privacy-dismissed');
+    removeStorage('cyber-fitness-tech-comfort');
+    removeStorage('cyber-fitness-main-concerns');
     
-    // Clear v2 localStorage items
-    localStorage.removeItem('cfa:v2:first-action-completed');
-    
+    // Clear v2 storage items
     // Reset component state
-    appState.setShowOnboarding(true);
-    appState.setShowPrivacyNotice(true);
-    appState.setPrivacyNoticeMinimized(false);
     navigation.setCurrentDomain('quickwins');
     navigation.setCurrentLevel(0);
-    
-    // Reset first action flow state
-    setFirstActionCompleted(false);
-    setShowFirstAction(false);
     
     // Force a page reload to ensure clean state
     setTimeout(() => window.location.reload(), 100);
   };
-
-  // No device onboarding modal - questions show based on facts
-
-  // Smart onboarding: show for new users, hide when onboarding questions are complete
-  const shouldShowOnboarding = !isOnboardingComplete?.() && Object.keys(answers).length === 0;
   
-  // Show first action flow after onboarding completes (but only once)
-  useEffect(() => {
-    if (isOnboardingComplete?.() && !firstActionCompleted && Object.keys(answers).length > 0) {
-      setShowFirstAction(true);
-    }
-  }, [isOnboardingComplete, firstActionCompleted, answers]);
-
-  const handleFirstActionComplete = () => {
-    setShowFirstAction(false);
-    setFirstActionCompleted(true);
-    localStorage.setItem('cfa:v2:first-action-completed', 'true');
-  };
-
   return (
     <AppLayout>
-      {/* Smart Onboarding Flow - Shows for new users and disappears when onboarding_complete */}
-      {shouldShowOnboarding && (
-        <UnifiedOnboarding 
-          onComplete={() => {
-            // Onboarding completion is automatically tracked by answered questions
-            // This will trigger the FirstActionFlow via useEffect
-          }}
-        />
-      )}
-      
-      {/* First Action Flow - Critical "immediate value" moment after onboarding */}
-      {showFirstAction && !shouldShowOnboarding && (
-        <FirstActionFlow onComplete={handleFirstActionComplete} />
-      )}
-
-      {/* Main App Content - Only show when onboarding is complete */}
-      {!shouldShowOnboarding && (
-        <>
-          {/* Header */}
-          <AppHeader
-            totalQuestions={totalQuestions}
-            answeredQuestions={answeredQuestions}
-            mobileMenuOpen={navigation.mobileMenuOpen}
-            setMobileMenuOpen={navigation.setMobileMenuOpen}
-            onResetClick={() => appState.setShowResetModal(true)}
-            onExportData={exportData}
-            onImportData={importData}
+      <>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            className="hidden"
+            onChange={importData}
           />
+          <div className="min-h-screen bg-slate-950 text-white">
+            <div className="flex flex-col min-h-screen mx-auto w-full max-w-xl px-4 pb-8">
+              <header className="flex items-center justify-between py-4">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.4em] text-slate-500">Cyber</p>
+                  <p className="text-sm font-semibold text-white">Fitness Advisor</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setScoreDetailsOpen(true)}
+                    className="flex flex-col px-3 py-2 rounded-2xl bg-white/5 border border-white/10 text-left"
+                    aria-label="Open score details"
+                  >
+                    <span className="text-[10px] uppercase tracking-[0.35em] text-slate-400">Score</span>
+                    <span className="text-2xl font-bold text-white leading-none">
+                      {Math.round(percentage)}
+                      <span className="text-base text-slate-400 align-top ml-1">%</span>
+                    </span>
+                    <span className="text-[11px] text-slate-400">Climbing toward 100%</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen(true)}
+                    className="p-3 rounded-2xl bg-white/5 border border-white/10"
+                    aria-label="Open quick menu"
+                  >
+                    <Menu className="w-5 h-5" />
+                  </button>
+                </div>
+              </header>
 
-          {/* Main Content */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Left Sidebar Navigation */}
-              <AppSidebar
-                currentDomain={navigation.currentDomain}
-                currentLevel={navigation.currentLevel}
-                mobileMenuOpen={navigation.mobileMenuOpen}
-                setCurrentDomain={navigation.setCurrentDomain}
-                setCurrentLevel={navigation.setCurrentLevel}
-                setMobileMenuOpen={navigation.setMobileMenuOpen}
-              />
-
-              {/* Right Content Area - Main Content + Security Status */}
-              <div className="lg:col-span-3">
-                {/* Score Bar - spans full width */}
-                <ScoreBar
-                  percentage={percentage}
-                  answeredCount={answeredQuestions}
-                  totalCount={totalQuestions}
-                  quickWinsCompleted={quickWinsCompleted}
-                  totalQuickWins={totalQuickWins}
-                  score={overallScore}
-                />
-
-                {/* Privacy Notice - Appears below score bar when not dismissed */}
-                {appState.showPrivacyNotice && (
-                  <div className="mt-4">
-                    <PrivacyNotice
-                      inline={true}
-                      onDismiss={() => {
-                        appState.setShowPrivacyNotice(false);
-                        localStorage.setItem('cyber-fitness-privacy-dismissed', 'true');
-                      }}
-                      isMinimized={appState.privacyNoticeMinimized}
-                    />
-                  </div>
-                )}
-
-                {/* Content Grid - Main Content + Security Status side by side */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
-                  <div className="lg:col-span-3 space-y-6">
-                    {/* Action Recommendations - High-Impact Security Actions */}
-                    <Recommendations
-                      answeredQuestions={answeredQuestions}
-                      getBrowserInfo={getBrowserInfo}
-                      getUserProfile={getUserProfile}
-                    />
-
-                    {/* Current Level Questions */}
-                    <MainContent />
-                  </div>
-
-                  {/* Security Status Sidebar - Hidden on mobile by default */}
-                  <div className="hidden lg:block lg:col-span-2">
-                    <SecurityStatus />
-                  </div>
+              <div className="flex-1 flex flex-col py-2">
+                <div className="flex-1 flex flex-col justify-center">
+                  <QuestionDeck />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Footer */}
-          <Footer />
+          {menuOpen && (
+            <div className="fixed inset-0 z-40">
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/60"
+                aria-label="Close menu"
+                onClick={() => setMenuOpen(false)}
+              />
+              <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-slate-900/95 text-white backdrop-blur-sm p-6 flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Quick menu</p>
+                    <p className="text-lg font-semibold">Control Center</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen(false)}
+                    aria-label="Close menu"
+                    className="p-2 rounded-full bg-white/10"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
 
-          {/* Mobile Security Status - Bottom Sheet */}
-          <MobileSecurityStatus />
-        </>
-      )}
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      exportData();
+                      setMenuOpen(false);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10"
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium"><Download className="w-4 h-4" /> Export answers</span>
+                    <span className="text-xs text-slate-400">JSON</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10"
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium"><Upload className="w-4 h-4" /> Import answers</span>
+                    <span className="text-xs text-slate-400">JSON</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      appState.setShowResetModal(true);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10"
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium text-red-200"><RefreshCw className="w-4 h-4" /> Reset progress</span>
+                    <span className="text-xs text-slate-400">Start over</span>
+                  </button>
+                  <a
+                    href="https://github.com/electricessence/Cyber-Fitness-Advisor"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10"
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium"><Github className="w-4 h-4" /> View on GitHub</span>
+                    <span className="text-xs text-slate-400">Opens new tab</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
 
-      {/* Celebration Animation */}
-      {showCelebration && (
-        <Celebration
-          show={showCelebration}
-          scoreIncrease={lastScoreIncrease || 0}
-          level={userLevel}
-          onDismiss={dismissCelebration}
-        />
-      )}
+          {scoreDetailsOpen && (
+            <div className="fixed inset-0 z-40">
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/60"
+                aria-label="Close score panel"
+                onClick={() => setScoreDetailsOpen(false)}
+              />
+              <div className="relative z-50 mx-auto my-10 w-full max-w-md px-4">
+                <div className="bg-white rounded-3xl shadow-2xl p-6 text-slate-900">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Scoreboard</p>
+                      <h2 className="text-xl font-semibold">Your protection progress</h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setScoreDetailsOpen(false)}
+                      className="p-2 rounded-full bg-slate-100"
+                      aria-label="Close details"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <ScoreBar
+                    percentage={percentage}
+                    rawPercentage={coveragePercentage}
+                    scoreConfidence={scoreConfidence}
+                    answeredCount={answeredQuestions}
+                    totalCount={totalQuestions}
+                    quickWinsCompleted={quickWinsCompleted}
+                    totalQuickWins={totalQuickWins}
+                    level={userLevel}
+                    nextLevelProgress={nextLevelProgress}
+                  />
+                  <p className="mt-4 text-sm text-slate-600 text-center">
+                    This number moves every time you finish the card in front of you. It naturally slows as you cover more ground.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+      </>
 
       {/* Reset Modal */}
       <ResetModal

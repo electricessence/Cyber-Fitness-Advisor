@@ -1,3 +1,5 @@
+import { readStorage, writeStorage } from './safeStorage';
+
 /**
  * Content Migration System
  * Handles versioning and migration of user data and content schemas
@@ -66,7 +68,7 @@ function shouldApplyMigration(migration: Migration, from: string, to: string): b
  * Gets the content version from localStorage or defaults to current
  */
 export function getStoredContentVersion(): string {
-  const stored = localStorage.getItem('cfa:v2:contentVersion');
+  const stored = readStorage('cfa:v2:contentVersion');
   return stored || CURRENT_CONTENT_VERSION;
 }
 
@@ -74,5 +76,5 @@ export function getStoredContentVersion(): string {
  * Sets the content version in localStorage
  */
 export function setStoredContentVersion(version: string = CURRENT_CONTENT_VERSION): void {
-  localStorage.setItem('cfa:v2:contentVersion', version);
+  writeStorage('cfa:v2:contentVersion', version);
 }

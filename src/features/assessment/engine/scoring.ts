@@ -1,4 +1,34 @@
 import type { Question, QuestionBank, Answer, AnswerOption } from './schema';
+import { SCORE_CONSTANTS } from '../../../utils/constants';
+
+export interface ScoreCalculationOptions {
+  /** Explicit list of question IDs that should count toward the score */
+  relevantQuestionIds?: string[];
+  /** Override for how many answered cards we need before trusting the raw average */
+  minimumConfidenceSample?: number;
+}
+
+function getQuestionMaxPoints(question: Question): number {
+  if ((question as any).type === 'YN') {
+    return (question as any).weight || 0;
+  }
+
+  if (question.options && question.options.length > 0) {
+    return Math.max(...question.options.map(opt => opt.points || 0));
+  }
+
+  return question.points || 0;
+}
+
+function isQuickWin(question: Question): boolean {
+  if (question.quickWin) {
+    return true;
+  }
+  if (!question.tags) {
+    return false;
+  }
+  return question.tags.some(tag => tag.toLowerCase() === 'quickwin');
+}
 
 // Calculate points for a single question based on selected answer
 export function calculateQuestionPoints(question: Question, value: string | boolean | number): number {
@@ -71,62 +101,110 @@ export function calculateDomainScore(
 }
 
 // Main overall score calculation for new simplified schema
-export function calculateOverallScore(questionBank: QuestionBank, answers: Record<string, Answer>) {
-  let totalScore = 0;
-  let maxPossibleScore = 0;
-  let quickWinsCompleted = 0;
-  let totalQuickWins = 0;
-  const domainScores: Record<string, { score: number; maxScore: number; }> = {};
+export function calculateOverallScore(
+  questionBank: QuestionBank,
+  answers: Record<string, Answer>,
+  options: ScoreCalculationOptions = {}
+) {
+  const relevantQuestionIds = new Set(options.relevantQuestionIds ?? []);
+  Object.keys(answers).forEach(id => relevantQuestionIds.add(id));
 
-  // Navigate through domains -> levels -> questions
-  for (const domain of questionBank.domains) {
-    for (const level of domain.levels) {
-      for (const question of level.questions) {
-        // Count quick wins
-        if (question.quickWin) {
-          totalQuickWins++;
-          if (answers[question.id]) {
-            quickWinsCompleted++;
-          }
-        }
-
-        const answer = answers[question.id];
-        if (!answer) continue;
-
-        const points = calculateQuestionPoints(question, answer.value);
-        totalScore += points;
-
-        // Calculate max possible score for this question
-        let maxPoints = 0;
-        if ((question as any).type === 'YN') {
-          // YN questions: max points is the weight
-          maxPoints = (question as any).weight || 0;
-        } else if (question.options) {
-          // New format: max of all option points
-          maxPoints = Math.max(...question.options.map((opt: AnswerOption) => opt.points || 0));
-        }
-        maxPossibleScore += maxPoints;
-
-        // Track domain scores
-        if (domain.id) {
-          if (!domainScores[domain.id]) {
-            domainScores[domain.id] = { score: 0, maxScore: 0 };
-          }
-          domainScores[domain.id].score += points;
-          domainScores[domain.id].maxScore += maxPoints;
+  if (relevantQuestionIds.size === 0) {
+    for (const domain of questionBank.domains) {
+      for (const level of domain.levels) {
+        for (const question of level.questions) {
+          relevantQuestionIds.add(question.id);
         }
       }
     }
   }
 
-  const percentage = maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0;
+  const minimumConfidenceSample = options.minimumConfidenceSample ?? SCORE_CONSTANTS.MIN_CONFIDENT_ANSWERS;
+
+  let totalScore = 0;
+  let maxPossibleScore = 0;
+  let answeredRelevantCount = 0;
+  let totalRelevantQuestions = 0;
+  let quickWinsCompleted = 0;
+  let totalQuickWins = 0;
+  const domainScores: Record<string, { score: number; maxScore: number; }> = {};
+
+  const processQuestion = (question: Question, domainId?: string) => {
+    if (!relevantQuestionIds.has(question.id)) {
+      return;
+    }
+
+    totalRelevantQuestions++;
+
+    const maxPoints = getQuestionMaxPoints(question);
+    maxPossibleScore += maxPoints;
+
+    if (domainId) {
+      if (!domainScores[domainId]) {
+        domainScores[domainId] = { score: 0, maxScore: 0 };
+      }
+      domainScores[domainId].maxScore += maxPoints;
+    }
+
+    const answer = answers[question.id];
+    if (isQuickWin(question)) {
+      totalQuickWins++;
+      if (answer) {
+        quickWinsCompleted++;
+      }
+    }
+
+    if (!answer) {
+      return;
+    }
+
+    answeredRelevantCount++;
+    const points = calculateQuestionPoints(question, answer.value);
+    totalScore += points;
+
+    if (domainId) {
+      domainScores[domainId].score += points;
+    }
+  };
+
+  // Navigate through domains -> levels -> questions
+  for (const domain of questionBank.domains) {
+    for (const level of domain.levels) {
+      for (const question of level.questions) {
+        processQuestion(question, domain.id);
+      }
+    }
+  }
+
+  // Include suite questions if they are part of the relevant set
+  if (questionBank.suites) {
+    for (const suite of questionBank.suites) {
+      for (const question of suite.questions) {
+        processQuestion(question);
+      }
+    }
+  }
+
+  const rawPercentage = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+  const hasAnswers = answeredRelevantCount > 0;
+  const effectiveSampleTarget = totalRelevantQuestions > 0
+    ? Math.min(totalRelevantQuestions, minimumConfidenceSample)
+    : minimumConfidenceSample;
+  const scoreConfidence = hasAnswers
+    ? Math.min(1, answeredRelevantCount / Math.max(1, effectiveSampleTarget))
+    : 0;
+  const adjustedPercentage = hasAnswers ? rawPercentage * scoreConfidence : 0;
   const levelData = getNextLevelProgress(totalScore);
 
   return {
     overallScore: totalScore,
     maxPossibleScore,
     domainScores,
-    percentage,
+    percentage: Math.round(adjustedPercentage),
+    coveragePercentage: Math.round(rawPercentage),
+    scoreConfidence,
+    answeredRelevantQuestions: answeredRelevantCount,
+    totalRelevantQuestions,
     level: levelData.currentLevel,
     quickWinsCompleted,
     totalQuickWins

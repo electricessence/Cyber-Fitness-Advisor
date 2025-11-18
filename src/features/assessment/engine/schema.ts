@@ -57,6 +57,7 @@ export interface Question {
   
   // Optional metadata
   tags?: string[]; // Replaces quickWin, category, etc. e.g., ['quickwin', 'password', 'critical']
+  journeyIntent?: 'onboarding' | 'probe' | 'action-guided' | 'action-critical' | 'checklist' | 'insight';
   description?: string; // Why this matters
   
   // Simple conditional visibility

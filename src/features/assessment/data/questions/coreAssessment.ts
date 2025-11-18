@@ -9,7 +9,7 @@ export const coreAssessmentQuestions: Question[] = [
     id: 'password_manager',
     text: 'Do you use a password manager to store and generate your passwords?',
     priority: ASSESSMENT_PRIORITIES.PASSWORD_MANAGER,
-    tags: ['critical', 'password', 'quickwin'],
+    tags: ['critical', 'password', 'quickwin', 'action'],
     options: [
       { 
         id: 'yes',
@@ -35,7 +35,7 @@ export const coreAssessmentQuestions: Question[] = [
     id: 'two_factor_auth',
     text: 'Do you use two-factor authentication (2FA) to protect your important accounts?',
     priority: ASSESSMENT_PRIORITIES.TWO_FACTOR_AUTH,
-    tags: ['critical', 'authentication'],
+    tags: ['critical', 'authentication', 'action'],
     options: [
       { 
         id: 'yes',
@@ -70,7 +70,7 @@ export const coreAssessmentQuestions: Question[] = [
     id: 'software_updates',
     text: 'How do you handle software updates on your devices?',
     priority: ASSESSMENT_PRIORITIES.SOFTWARE_UPDATES,
-    tags: ['critical', 'updates'],
+    tags: ['critical', 'updates', 'action'],
     options: [
       { 
         id: 'automatic',
@@ -105,7 +105,7 @@ export const coreAssessmentQuestions: Question[] = [
     id: 'virus_scan_recent',
     text: 'When did you last run a virus scan?',
     priority: ASSESSMENT_PRIORITIES.VIRUS_SCANNING,
-    tags: ['security', 'antivirus'],
+    tags: ['security', 'antivirus', 'probe'],
     options: [
       { 
         id: 'this_week',
@@ -140,7 +140,7 @@ export const coreAssessmentQuestions: Question[] = [
     id: 'backup_frequency',
     text: 'How often do you back up your important data?',
     priority: ASSESSMENT_PRIORITIES.BACKUP_FREQUENCY,
-    tags: ['critical', 'backup'],
+    tags: ['critical', 'backup', 'probe'],
     options: [
       { 
         id: 'daily',
@@ -184,7 +184,7 @@ export const coreAssessmentQuestions: Question[] = [
     id: 'wifi_security',
     text: 'What type of security does your home WiFi network use?',
     priority: ASSESSMENT_PRIORITIES.WIFI_SECURITY,
-    tags: ['network', 'wifi'],
+    tags: ['network', 'wifi', 'checklist'],
     options: [
       { 
         id: 'wpa3',
@@ -237,7 +237,7 @@ export const coreAssessmentQuestions: Question[] = [
     id: 'email_attachments',
     text: 'How do you handle email attachments from unknown senders?',
     priority: ASSESSMENT_PRIORITIES.EMAIL_ATTACHMENTS,
-    tags: ['email', 'phishing'],
+    tags: ['email', 'phishing', 'probe'],
     options: [
       { 
         id: 'never_open',
@@ -281,7 +281,7 @@ export const coreAssessmentQuestions: Question[] = [
     id: 'browser_extensions',
     text: 'How careful are you about browser extensions/add-ons?',
     priority: ASSESSMENT_PRIORITIES.BROWSER_EXTENSIONS,
-    tags: ['browser', 'extensions'],
+    tags: ['browser', 'extensions', 'probe'],
     options: [
       { 
         id: 'very_selective',

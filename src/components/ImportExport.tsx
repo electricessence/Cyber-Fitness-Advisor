@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Download, Upload, FileText, Shield, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAssessmentStore } from '../features/assessment/state/store';
+import { readStorage, writeStorage } from '../utils/safeStorage';
 
 interface ExportData {
   version: string;
@@ -43,7 +44,7 @@ export function ImportExport({ className = "" }: ImportExportProps) {
         answers,
         deviceProfile,
         earnedBadges,
-        contentVersion: localStorage.getItem('cfa:v2:contentVersion') || '1.0.0'
+        contentVersion: readStorage('cfa:v2:contentVersion') || '1.0.0'
       };
 
       const dataStr = JSON.stringify(exportData, null, 2);
@@ -111,7 +112,7 @@ export function ImportExport({ className = "" }: ImportExportProps) {
       
       // Update localStorage items
       if (importData.contentVersion) {
-        localStorage.setItem('cfa:v2:contentVersion', importData.contentVersion);
+        writeStorage('cfa:v2:contentVersion', importData.contentVersion);
       }
       
       setImportStatus('success');

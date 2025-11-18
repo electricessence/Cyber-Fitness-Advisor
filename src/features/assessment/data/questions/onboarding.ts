@@ -11,7 +11,8 @@ export const onboardingQuestions: Question[] = [
     phase: 'onboarding',
     priority: ONBOARDING_PRIORITIES.PRIVACY_NOTICE,
     statement: '🔒 Privacy First',
-    text: 'Your data stays on your device. No tracking, no cloud storage.',
+    text: 'Everything happens right here in your browser—nothing is uploaded, logged, or analyzed on our side.',
+    description: 'We do not run servers for this assessment. You can verify by opening DevTools → Network (no calls leave the page) or by going offline; the experience still works because all data is stored in your browser.',
     tags: ['critical', 'onboarding', 'privacy'],
     conditions: {
       exclude: { "privacy_acknowledged": true }
@@ -19,11 +20,11 @@ export const onboardingQuestions: Question[] = [
     options: [
       {
         id: 'understood',
-        text: '✅ I understand',
+        text: '✅ Continue locally (keep everything on this device)',
         statement: 'Privacy: Acknowledged ✓',
         statusCategory: 'shields-up',
         facts: { "privacy_acknowledged": true },
-        feedback: '🔒 Perfect! Your security assessment begins now.'
+        feedback: '🔒 Perfect! We will keep every answer on this device only.'
       }
     ]
   },

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CheckCircle, Circle, Clock, Zap, Shield } from 'lucide-react';
 import { SecureHelp } from './SecureHelp';
 import { getRecommendedActions } from '../data/secureActions';
+import { readJSONStorage, writeStorage } from '../utils/safeStorage';
 
 interface ActionRecommendationsProps {
   browserInfo: {
@@ -25,8 +26,8 @@ export function ActionRecommendations({
   className = "" 
 }: ActionRecommendationsProps) {
   const [completedActions, setCompletedActions] = useState<Set<string>>(() => {
-    const saved = localStorage.getItem('cyber-fitness-completed-actions');
-    return new Set(saved ? JSON.parse(saved) : []);
+    const saved = readJSONStorage<string[]>('cyber-fitness-completed-actions', []);
+    return new Set(saved);
   });
 
   const [expandedAction, setExpandedAction] = useState<string | null>(null);
@@ -44,7 +45,7 @@ export function ActionRecommendations({
     }
     
     setCompletedActions(newCompleted);
-    localStorage.setItem('cyber-fitness-completed-actions', JSON.stringify([...newCompleted]));
+    writeStorage('cyber-fitness-completed-actions', JSON.stringify([...newCompleted]));
   };
 
   const getImpactColor = (impact: string) => {

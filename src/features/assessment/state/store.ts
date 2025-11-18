@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { QuestionBank, Answer, Question } from '../engine/schema';
 import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
@@ -15,10 +15,11 @@ import { ACHIEVEMENT_BADGES } from '../../badges/badgeDefinitions';
 import { getVisibleQuestionIds } from '../engine/conditionEvaluation';
 import type { Registry } from '../../../utils/Registry';
 import { createZustandRegistry } from '../../../utils/Registry';
+import { readJSONStorage, removeStorage, safeStorage } from '../../../utils/safeStorage';
 
 // Smart pre-population from onboarding data
 function prePopulateFromOnboarding(existingAnswers: Record<string, Answer>): Record<string, Answer> {
-  const onboardingAnswers = JSON.parse(localStorage.getItem('cfa:v2:onboarding-answers') || '{}');
+  const onboardingAnswers = readJSONStorage<Record<string, any>>('cfa:v2:onboarding-answers', {});
   const updatedAnswers = { ...existingAnswers };
 
   // Map password practices from onboarding to browser_passwords question
@@ -114,11 +115,15 @@ interface AssessmentState extends FactsStoreState {
   
   // Computed state
   overallScore: number;
-  percentage: number; // Percentage of answered questions (0-100)
+  percentage: number; // Confidence-adjusted percentage (0-100)
+  coveragePercentage: number; // Raw grade without confidence weighting
+  scoreConfidence: number; // 0-1 confidence multiplier based on answered volume
   domainScores: Record<string, number>;
   currentLevel: number;
   quickWinsCompleted: number;
   totalQuickWins: number;
+  answeredQuestionCount: number;
+  totalRelevantQuestions: number;
   nextLevelProgress: {
     currentLevel: number;
     nextLevel: number | null;
@@ -218,11 +223,15 @@ const initialState = {
   taskResponses: {},
   taskReminders: [],
   overallScore: 0,
-  percentage: 0, // Percentage of answered questions
+  percentage: 0, // Confidence-adjusted percentage
+  coveragePercentage: 0,
+  scoreConfidence: 0,
   domainScores: {},
   currentLevel: 0, // Keep original test expectation for now
   quickWinsCompleted: 0,
   totalQuickWins: 0,
+  answeredQuestionCount: 0,
+  totalRelevantQuestions: 0,
   nextLevelProgress: {
     currentLevel: 0,
     nextLevel: 1,
@@ -447,7 +456,15 @@ export const useAssessmentStore = create<AssessmentState>()(
           }
         }
         
-        const scoreResult = calculateOverallScore(state.questionBank, newAnswers);
+        const visibleQuestionIds = get().getVisibleQuestionIds();
+        const relevantQuestionIds = Array.from(new Set([
+          ...visibleQuestionIds,
+          ...Object.keys(newAnswers)
+        ]));
+
+        const scoreResult = calculateOverallScore(state.questionBank, newAnswers, {
+          relevantQuestionIds
+        });
         const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
         
         const scoreIncrease = scoreResult.overallScore - state.overallScore;
@@ -478,15 +495,17 @@ export const useAssessmentStore = create<AssessmentState>()(
           answers: newAnswers,
           overallScore: scoreResult.overallScore,
           percentage: scoreResult.percentage,
+          coveragePercentage: scoreResult.coveragePercentage,
+          scoreConfidence: scoreResult.scoreConfidence,
           domainScores: Object.entries(scoreResult.domainScores).reduce((acc: Record<string, number>, [domain, scores]) => {
             acc[domain] = scores.score;
             return acc;
           }, {}),
           currentLevel: nextLevelProgress.currentLevel,
-          quickWinsCompleted: 0, // Simplified for now
-          totalQuickWins: Object.values(state.questionBank.domains)
-            .flatMap(d => d.levels.flatMap(l => l.questions))
-            .filter(q => q.priority >= 8000).length, // Quick wins have priority 8000+
+          quickWinsCompleted: scoreResult.quickWinsCompleted,
+          totalQuickWins: scoreResult.totalQuickWins,
+          answeredQuestionCount: scoreResult.answeredRelevantQuestions,
+          totalRelevantQuestions: scoreResult.totalRelevantQuestions,
           nextLevelProgress,
           recommendations: newRecommendations,
           showCelebration: shouldCelebrate,
@@ -508,14 +527,13 @@ export const useAssessmentStore = create<AssessmentState>()(
       },
       
       resetAssessment: () => {
-        // Clear persisted data from localStorage (both old and new formats)
-        localStorage.removeItem('cyber-fitness-assessment');
-        localStorage.removeItem('cyber-fitness-onboarding-answers'); 
-        localStorage.removeItem('cfa:v2:answers');
-        localStorage.removeItem('cfa:v2:onboarding-answers');
-        localStorage.removeItem('cfa:v2:contentVersion');
-        localStorage.removeItem('cfa:v2:onboardingVersion');
-        localStorage.removeItem('cfa:v2:privacy-dismissed');
+        // Clear persisted data from storage (both old and new formats)
+        removeStorage('cyber-fitness-assessment');
+        removeStorage('cyber-fitness-onboarding-answers'); 
+        removeStorage('cfa:v2:answers');
+        removeStorage('cfa:v2:onboarding-answers');
+        removeStorage('cfa:v2:contentVersion');
+        removeStorage('cfa:v2:onboardingVersion');
         
         // Create a fresh facts slice to ensure clean state
         const freshFactsSlice = createFactsStoreSlice();
@@ -594,7 +612,15 @@ export const useAssessmentStore = create<AssessmentState>()(
           set({ answers: remainingAnswers });
           
           // Recalculate scores using existing scoring function
-          const scoreResult = calculateOverallScore(state.questionBank, remainingAnswers);
+          const visibleQuestionIds = get().getVisibleQuestionIds();
+          const relevantQuestionIds = Array.from(new Set([
+            ...visibleQuestionIds,
+            ...Object.keys(remainingAnswers)
+          ]));
+
+          const scoreResult = calculateOverallScore(state.questionBank, remainingAnswers, {
+            relevantQuestionIds
+          });
           const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
           
           // Convert domain scores to simple number format
@@ -606,10 +632,14 @@ export const useAssessmentStore = create<AssessmentState>()(
           set({
             overallScore: scoreResult.overallScore,
             percentage: scoreResult.percentage,
+            coveragePercentage: scoreResult.coveragePercentage,
+            scoreConfidence: scoreResult.scoreConfidence,
             domainScores: simpleDomainScores,
             currentLevel: nextLevelProgress.currentLevel,
             quickWinsCompleted: scoreResult.quickWinsCompleted,
             totalQuickWins: scoreResult.totalQuickWins,
+            answeredQuestionCount: scoreResult.answeredRelevantQuestions,
+            totalRelevantQuestions: scoreResult.totalRelevantQuestions,
             nextLevelProgress,
           });
           
@@ -661,36 +691,48 @@ export const useAssessmentStore = create<AssessmentState>()(
       // Unified model ordering (priority-first with phase fallback)
       getOrderedAvailableQuestions: () => {
         const raw = get().getAvailableQuestions();
+        const onboardingPending = (get().getOnboardingPendingCount?.() ?? 0) > 0;
+
+        const phaseRank = (question: Question) => {
+          if (question.phase === 'onboarding' && onboardingPending) return 0;
+          if (question.phase === 'onboarding') return 1;
+          return 2;
+        };
+
         return [...raw].sort((a, b) => {
-          // First: Sort by priority (higher priority first)
+          const phaseComparison = phaseRank(a) - phaseRank(b);
+          if (phaseComparison !== 0) {
+            return phaseComparison;
+          }
+
+          // Priority still dictates order within the same phase bucket
           const aPriority = a.priority || 0;
           const bPriority = b.priority || 0;
-          
           if (bPriority !== aPriority) {
-            return bPriority - aPriority; // Higher priority first
+            return bPriority - aPriority;
           }
-          
-          // Second: Phase order within same priority
+
           const ao = (a as any).phaseOrder ?? 9999;
           const bo = (b as any).phaseOrder ?? 9999;
           if (ao !== bo) return ao - bo;
-          
-          // Finally: ID for consistency
+
           return a.id.localeCompare(b.id);
         });
       },
 
       getOnboardingPendingCount: () => {
         const state = get();
-        const answered = Object.keys(state.answers);
-        const onboarding = state.questionBank.domains.find(d => d.id === 'onboarding_phase');
-        if (!onboarding) return 0;
-        const all = onboarding.levels.flatMap(l => l.questions);
-        return all.filter(q => !answered.includes(q.id)).length;
+        const answeredIds = new Set(Object.keys(state.answers));
+        const allQuestions = state.questionBank.domains.flatMap(domain => 
+          domain.levels.flatMap(level => level.questions)
+        );
+        const onboardingQuestions = allQuestions.filter(question => question.phase === 'onboarding');
+        return onboardingQuestions.filter(question => !answeredIds.has(question.id)).length;
       },
 
       isOnboardingComplete: () => {
-        return (get().getOnboardingPendingCount?.() || 0) === 0;
+        const pending = get().getOnboardingPendingCount?.() ?? 0;
+        return pending === 0;
       },
       
       getRecommendations: () => {
@@ -837,16 +879,32 @@ export const useAssessmentStore = create<AssessmentState>()(
         // Recalculate scores if task was completed
         let scoreUpdate = {};
         if (taskResponse.status === 'completed') {
-          const scoreResult = calculateOverallScore(state.questionBank, newAnswers);
+          const visibleQuestionIds = get().getVisibleQuestionIds();
+          const relevantQuestionIds = Array.from(new Set([
+            ...visibleQuestionIds,
+            ...Object.keys(newAnswers)
+          ]));
+
+          const scoreResult = calculateOverallScore(state.questionBank, newAnswers, {
+            relevantQuestionIds
+          });
           const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
+          const simpleDomainScores = Object.entries(scoreResult.domainScores).reduce((acc, [domain, data]) => {
+            acc[domain] = data.score;
+            return acc;
+          }, {} as Record<string, number>);
           
           scoreUpdate = {
             overallScore: scoreResult.overallScore,
             percentage: scoreResult.percentage,
-            domainScores: scoreResult.domainScores,
+            coveragePercentage: scoreResult.coveragePercentage,
+            scoreConfidence: scoreResult.scoreConfidence,
+            domainScores: simpleDomainScores,
             currentLevel: scoreResult.level,
             quickWinsCompleted: scoreResult.quickWinsCompleted,
             totalQuickWins: scoreResult.totalQuickWins,
+            answeredQuestionCount: scoreResult.answeredRelevantQuestions,
+            totalRelevantQuestions: scoreResult.totalRelevantQuestions,
             nextLevelProgress
           };
         }
@@ -1099,6 +1157,7 @@ export const useAssessmentStore = create<AssessmentState>()(
   },
     {
       name: 'cfa:v2:answers',
+      storage: createJSONStorage(() => safeStorage),
       // Only persist answers and earned badges, recompute scores on load
       partialize: (state) => ({ 
         answers: state.answers,
@@ -1156,14 +1215,16 @@ export const initializeStore = () => {
 
   // If we have any answers (existing or pre-populated), recalculate scores
   if (Object.keys(prePopulatedAnswers).length > 0) {
-    const scoreResult = calculateOverallScore(store.questionBank, prePopulatedAnswers);
+    const visibleQuestionIds = store.getVisibleQuestionIds();
+    const relevantQuestionIds = Array.from(new Set([
+      ...visibleQuestionIds,
+      ...Object.keys(prePopulatedAnswers)
+    ]));
+
+    const scoreResult = calculateOverallScore(store.questionBank, prePopulatedAnswers, {
+      relevantQuestionIds
+    });
     const nextLevelProgress = getNextLevelProgress(scoreResult.overallScore);
-    
-    // Calculate quickWins count - simplified for initialization
-    const quickWinsCompleted = 0;
-    const totalQuickWins = Object.values(store.questionBank.domains)
-      .flatMap(d => d.levels.flatMap(l => l.questions))
-      .filter(q => q.priority >= 8000).length; // Quick wins have priority 8000+
     
     // Convert domain scores to the expected format
     const domainScoresSimplified: Record<string, number> = {};
@@ -1176,10 +1237,14 @@ export const initializeStore = () => {
       answers: prePopulatedAnswers,
       overallScore: scoreResult.overallScore,
       percentage: scoreResult.percentage,
+      coveragePercentage: scoreResult.coveragePercentage,
+      scoreConfidence: scoreResult.scoreConfidence,
       domainScores: domainScoresSimplified,
       currentLevel: nextLevelProgress.currentLevel,
-      quickWinsCompleted,
-      totalQuickWins,
+      quickWinsCompleted: scoreResult.quickWinsCompleted,
+      totalQuickWins: scoreResult.totalQuickWins,
+      answeredQuestionCount: scoreResult.answeredRelevantQuestions,
+      totalRelevantQuestions: scoreResult.totalRelevantQuestions,
       nextLevelProgress,
       deviceProfile,
       sessionStartTime: new Date(), // Track session start for speed badges
