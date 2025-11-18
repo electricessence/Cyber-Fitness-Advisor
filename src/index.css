@@ -71,10 +71,6 @@
     animation: slideIn 0.3s ease-out;
   }
   
-  .animate-soft-pop {
-    animation: softPop 0.28s ease-out;
-  }
-  
   @keyframes slideIn {
     from {
       transform: translateX(100%);
@@ -86,17 +82,4 @@
     }
   }
   
-  @keyframes softPop {
-    0% {
-      transform: scale(0.96);
-      opacity: 0;
-    }
-    60% {
-      transform: scale(1.02);
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
 }
