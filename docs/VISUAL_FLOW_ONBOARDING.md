@@ -57,7 +57,7 @@ const detectedFacts = {
 │                                                             │
 │  Welcome to your personal cybersecurity assessment!        │
 │                                                             │
-│  🔒 Your Privacy is Protected:                             │
+│  🔒 Privacy First:                                        │
 │  • All data stays on YOUR device                           │
 │  • No tracking, no analytics, no data collection           │
 │  • Everything stored locally in your browser               │

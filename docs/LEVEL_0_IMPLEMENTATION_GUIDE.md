@@ -102,7 +102,7 @@ export function PrivacyNoticeModal({ isOpen, onAccept }: PrivacyNoticeModalProps
           <div className="space-y-6 text-gray-700 mb-8">
             <div>
               <h2 className="font-semibold text-lg text-gray-900 mb-2">
-                🔒 Your Privacy is Protected:
+                🔒 Privacy First:
               </h2>
               <ul className="space-y-1 ml-4">
                 <li>• All data stays on YOUR device</li>

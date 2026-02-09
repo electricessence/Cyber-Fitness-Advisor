@@ -227,7 +227,7 @@ const initialState = {
   coveragePercentage: 0,
   scoreConfidence: 0,
   domainScores: {},
-  currentLevel: 0, // Keep original test expectation for now
+  currentLevel: 0, // Pre-initialization default; resetAssessment() sets to 1
   quickWinsCompleted: 0,
   totalQuickWins: 0,
   answeredQuestionCount: 0,
@@ -597,10 +597,10 @@ export const useAssessmentStore = create<AssessmentState>()(
           nextLevelProgress: { currentLevel: 1, nextLevel: 2, pointsNeeded: 20, progress: 0 }
         });
         
-        // Reinitialize after reset to set up device detection and scoring
-        setTimeout(() => {
-          initializeStore();
-        }, 0);
+        // Reinitialize synchronously to set up device detection and scoring
+        // (deferred init via setTimeout causes race conditions with test frameworks
+        // and journey runners that set device profiles between reset and init)
+        initializeStore();
       },
       
       removeAnswer: (questionId: string) => {

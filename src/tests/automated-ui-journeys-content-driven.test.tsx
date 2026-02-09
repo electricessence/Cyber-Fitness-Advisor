@@ -34,7 +34,7 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       for (let attempt = 0; attempt < 3; attempt++) {
         // Look for any answer buttons in the UI
         const answerButtons = screen.queryAllByRole('button').filter(btn => 
-          btn.textContent && (btn.textContent.includes('Yes') || btn.textContent.includes('No') || btn.textContent.includes('→'))
+          btn.textContent && (btn.textContent.includes('Yes') || btn.textContent.includes('No') || btn.textContent.includes('→') || btn.textContent.includes('Continue locally'))
         );
         
         if (answerButtons.length > 0) {

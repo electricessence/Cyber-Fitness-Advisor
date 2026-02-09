@@ -15,6 +15,10 @@ dist-ssr
 # Test coverage
 coverage
 
+# Test artifacts
+test-output.txt
+test-results.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

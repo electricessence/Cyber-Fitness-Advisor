@@ -6,12 +6,13 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Registry } from '../../../utils/Registry';
 import { createZustandRegistry } from '../../../utils/Registry';
 import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { Answer } from '../engine/schema';
 import { detectCurrentDevice } from '../../device/deviceDetection';
+import { safeStorage } from '../../../utils/safeStorage';
 
 // Simplified state interface using registries
 interface SimplifiedAssessmentState {
@@ -141,6 +142,7 @@ export const useSimplifiedStore = create<SimplifiedAssessmentState>()(
     },
     {
       name: 'simplified-assessment-store',
+      storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({
         // Only persist the raw data
         factsData: state.factsData,

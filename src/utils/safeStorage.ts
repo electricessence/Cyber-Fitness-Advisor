@@ -29,9 +29,33 @@ class MemoryStorage implements Storage {
 
 const memoryStorage = new MemoryStorage();
 
-const browserStorage = typeof window !== 'undefined' ? window.localStorage : null;
+/**
+ * Lazily resolve the current storage backend.
+ * Validates that the storage actually works before returning it,
+ * falling back to in-memory storage when localStorage is broken
+ * (e.g., jsdom with invalid --localstorage-file, private browsing, SSR).
+ */
+function getCurrentStorage(): Storage {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage
+        && typeof window.localStorage.setItem === 'function') {
+      return window.localStorage;
+    }
+  } catch {
+    // localStorage unavailable (private browsing, SSR, etc.)
+  }
+  return memoryStorage;
+}
 
-export const safeStorage: Storage = browserStorage ?? memoryStorage;
+/** Lazy-delegating Storage wrapper — always calls through to the current environment's storage. */
+export const safeStorage: Storage = {
+  get length() { return getCurrentStorage().length; },
+  clear() { getCurrentStorage().clear(); },
+  getItem(key: string) { return getCurrentStorage().getItem(key); },
+  key(index: number) { return getCurrentStorage().key(index); },
+  removeItem(key: string) { getCurrentStorage().removeItem(key); },
+  setItem(key: string, value: string) { getCurrentStorage().setItem(key, value); },
+};
 
 export function readStorage(key: string): string | null {
   try {

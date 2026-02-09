@@ -67,7 +67,7 @@ describe('App Integration', () => {
       
       // Reset and test level progression
       store.resetAssessment()
-      expect(store.currentLevel).toBe(0)
+      expect(store.currentLevel).toBe(1)
       
       // This integration test verifies the store works as expected
       expect(typeof store.currentLevel).toBe('number')

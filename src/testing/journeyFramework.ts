@@ -90,11 +90,9 @@ export class JourneyTestRunner {
     console.log(`🚀 Starting journey: ${journey.name}`);
     console.log(`📋 Description: ${journey.description}`);
 
-    // Reset application state and re-initialize
-    const { initializeStore } = await import('../features/assessment/state/store');
+    // Reset application state (resetAssessment handles initializeStore internally)
     act(() => {
       useAssessmentStore.getState().resetAssessment();
-      initializeStore(); // Ensure device profile is set up
     });
 
     // Execute each step
