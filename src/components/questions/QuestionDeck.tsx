@@ -9,6 +9,11 @@ import {
   ArrowRight,
   Clock3,
   ShieldHalf,
+  RotateCcw,
+  TrendingUp,
+  ChevronDown,
+  ChevronUp,
+  AlertTriangle,
 } from 'lucide-react';
 import { useAssessmentStore } from '../../features/assessment/state/store';
 import type { AnswerOption, Question } from '../../features/assessment/engine/schema';
@@ -176,7 +181,11 @@ function normalizeOptions(question: Question): AnswerOption[] {
 export function QuestionDeck() {
   const {
     getOrderedAvailableQuestions,
-    answerQuestion
+    answerQuestion,
+    answers,
+    questionBank,
+    percentage,
+    removeAnswer,
   } = useAssessmentStore();
 
   const availableQuestions = getOrderedAvailableQuestions?.() ?? [];
@@ -184,6 +193,7 @@ export function QuestionDeck() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
+  const [showReviewAnswers, setShowReviewAnswers] = useState(false);
 
   useEffect(() => {
     if (activeIndex >= totalCards) {
@@ -211,14 +221,162 @@ export function QuestionDeck() {
   };
 
   if (!currentQuestion) {
+    // Build improvement recommendations from answered questions
+    const improvementItems: Array<{
+      questionId: string;
+      text: string;
+      currentAnswer: string;
+      currentOptionText: string;
+      bestOptionText: string;
+      potentialGain: number;
+      priority: number;
+    }> = [];
+
+    for (const domain of questionBank.domains) {
+      for (const level of domain.levels) {
+        for (const question of level.questions) {
+          const answer = answers[question.id];
+          if (!answer) continue;
+
+          const opts = question.options?.length ? question.options : [];
+          if (opts.length === 0) continue;
+
+          const currentOpt = opts.find(o => o.id === answer.value);
+          const currentPoints = currentOpt?.points ?? 0;
+          const bestOpt = opts.reduce((best, o) => ((o.points ?? 0) > (best.points ?? 0) ? o : best), opts[0]);
+          const bestPoints = bestOpt?.points ?? 0;
+          const gap = bestPoints - currentPoints;
+
+          if (gap > 0) {
+            improvementItems.push({
+              questionId: question.id,
+              text: question.text,
+              currentAnswer: answer.value as string,
+              currentOptionText: currentOpt?.text ?? String(answer.value),
+              bestOptionText: bestOpt?.text ?? '',
+              potentialGain: gap,
+              priority: question.priority || 0,
+            });
+          }
+        }
+      }
+    }
+
+    // Sort by potential gain (highest impact first), break ties by priority
+    improvementItems.sort((a, b) => b.potentialGain - a.potentialGain || b.priority - a.priority);
+
+    const topAction = improvementItems[0];
+    const answeredCount = Object.keys(answers).length;
+
     return (
-      <div className="bg-white rounded-3xl shadow-md p-8 text-center">
-        <div className="text-4xl mb-3">🎉</div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Nothing queued right now</h3>
-        <p className="text-gray-600 text-sm">
-          You have answered every card that applies to your setup. Check back soon or explore recommendations.
-        </p>
-      </div>
+      <section aria-label="Assessment complete" className="flex flex-col gap-4 h-full">
+        <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 flex flex-col gap-5">
+          {/* Score summary */}
+          <div className="text-center">
+            <div className="text-4xl mb-2">{percentage >= 80 ? '🛡️' : percentage >= 50 ? '🔧' : '⚠️'}</div>
+            <h3 className="text-xl font-semibold text-gray-900">
+              {percentage >= 80 ? 'Strong protection' : percentage >= 50 ? 'Good foundation' : 'Room to strengthen'}
+            </h3>
+            <p className="text-sm text-gray-500 mt-1">
+              {answeredCount} questions answered • {Math.round(percentage)}% coverage
+            </p>
+          </div>
+
+          {/* Top recommended action */}
+          {topAction && (
+            <div className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-1">
+                    Next most impactful action
+                  </p>
+                  <p className="text-base font-medium text-gray-900 leading-snug">
+                    {topAction.text}
+                  </p>
+                  <div className="flex items-center gap-3 mt-2 text-sm">
+                    <span className="text-gray-500">
+                      Currently: <span className="font-medium text-orange-600">{topAction.currentOptionText}</span>
+                    </span>
+                    <ArrowRight className="w-3 h-3 text-gray-400" />
+                    <span className="font-medium text-green-600">{topAction.bestOptionText}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeAnswer(topAction.questionId)}
+                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    Change this answer
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* More improvement opportunities */}
+          {improvementItems.length > 1 && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowReviewAnswers(!showReviewAnswers)}
+                className="w-full flex items-center justify-between px-1 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+              >
+                <span className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                  {improvementItems.length - 1} more area{improvementItems.length > 2 ? 's' : ''} to improve
+                </span>
+                {showReviewAnswers ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+
+              {showReviewAnswers && (
+                <div className="mt-2 space-y-2">
+                  {improvementItems.slice(1, 6).map(item => (
+                    <div
+                      key={item.questionId}
+                      className="flex items-center justify-between gap-3 px-4 py-3 bg-gray-50 rounded-xl"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-800 truncate">{item.text}</p>
+                        <p className="text-xs text-gray-500">
+                          <span className="text-orange-600">{item.currentOptionText}</span>
+                          {' → '}
+                          <span className="text-green-600">{item.bestOptionText}</span>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeAnswer(item.questionId)}
+                        className="flex-shrink-0 p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                        aria-label={`Change answer for: ${item.text}`}
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  {improvementItems.length > 6 && (
+                    <p className="text-xs text-gray-400 text-center pt-1">
+                      +{improvementItems.length - 6} more
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* All clear state */}
+          {improvementItems.length === 0 && (
+            <div className="text-center py-4">
+              <div className="text-3xl mb-2">🏆</div>
+              <p className="text-sm text-gray-600">
+                All answers are at their strongest settings. Excellent security posture!
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
     );
   }
 
@@ -239,7 +397,7 @@ export function QuestionDeck() {
                 </span>
                 <p className={`text-xs font-semibold uppercase tracking-wide ${accent}`}>{label}</p>
               </div>
-              <div className={`rounded-2xl px-4 py-3 ${tint} border border-white/60`}>
+              <div className={`rounded-xl px-4 py-3 ${tint}`}>
                 {currentQuestion.statement && (
                   <p className="text-base sm:text-lg font-medium text-slate-800 leading-snug">
                     {currentQuestion.statement}
