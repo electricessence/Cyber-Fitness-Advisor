@@ -10,10 +10,8 @@ import {
   Clock3,
   ShieldHalf,
   RotateCcw,
-  TrendingUp,
-  ChevronDown,
-  ChevronUp,
-  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useAssessmentStore } from '../../features/assessment/state/store';
 import type { AnswerOption, Question } from '../../features/assessment/engine/schema';
@@ -125,6 +123,25 @@ const INTENT_META: Record<JourneyIntent, { label: string; description: string; c
   }
 };
 
+const CATEGORY_STYLE: Record<string, { bg: string; border: string; label: string; icon: string }> = {
+  'to-do': { bg: 'bg-amber-50', border: 'border-amber-200', label: 'To-Do', icon: '📋' },
+  'room-for-improvement': { bg: 'bg-blue-50', border: 'border-blue-200', label: 'Room to Grow', icon: '🔧' },
+  'shields-up': { bg: 'bg-green-50', border: 'border-green-200', label: 'Good', icon: '🛡️' },
+};
+
+interface ImprovementItem {
+  questionId: string;
+  text: string;
+  currentOptionText: string;
+  currentFeedback: string;
+  statusCategory: string;
+  statement: string;
+  potentialGain: number;
+  priority: number;
+  description?: string;
+  explanation?: string;
+}
+
 function getVisuals(question: Question): QuestionVisual {
   const tag = question.tags?.find((t) => CARD_THEMES[t]) ?? question.category ?? question.type ?? 'default';
   return CARD_THEMES[tag] || CARD_THEMES.default;
@@ -193,13 +210,55 @@ export function QuestionDeck() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
-  const [showReviewAnswers, setShowReviewAnswers] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  // Build improvement items from answered questions (needed for slideIndex clamping)
+  const improvementItems = useMemo<ImprovementItem[]>(() => {
+    const items: ImprovementItem[] = [];
+    for (const domain of questionBank.domains) {
+      for (const level of domain.levels) {
+        for (const question of level.questions) {
+          const answer = answers[question.id];
+          if (!answer) continue;
+          const opts = question.options?.length ? question.options : [];
+          if (opts.length === 0) continue;
+          const currentOpt = opts.find(o => o.id === answer.value);
+          const currentPoints = currentOpt?.points ?? 0;
+          const bestOpt = opts.reduce((best, o) => ((o.points ?? 0) > (best.points ?? 0) ? o : best), opts[0]);
+          const gap = (bestOpt?.points ?? 0) - currentPoints;
+          if (gap > 0) {
+            items.push({
+              questionId: question.id,
+              text: question.text,
+              currentOptionText: currentOpt?.text ?? String(answer.value),
+              currentFeedback: currentOpt?.feedback ?? '',
+              statusCategory: currentOpt?.statusCategory ?? 'room-for-improvement',
+              statement: currentOpt?.statement ?? '',
+              potentialGain: gap,
+              priority: question.priority || 0,
+              description: question.description,
+              explanation: question.explanation,
+            });
+          }
+        }
+      }
+    }
+    items.sort((a, b) => b.potentialGain - a.potentialGain || b.priority - a.priority);
+    return items;
+  }, [questionBank, answers]);
 
   useEffect(() => {
     if (activeIndex >= totalCards) {
       setActiveIndex(totalCards > 0 ? totalCards - 1 : 0);
     }
   }, [activeIndex, totalCards]);
+
+  // Clamp slideIndex when improvement items shrink (e.g. after revisit round-trip)
+  useEffect(() => {
+    if (slideIndex >= improvementItems.length && improvementItems.length > 0) {
+      setSlideIndex(improvementItems.length - 1);
+    }
+  }, [slideIndex, improvementItems.length]);
 
   useEffect(() => {
     setShowDetails(false);
@@ -221,161 +280,131 @@ export function QuestionDeck() {
   };
 
   if (!currentQuestion) {
-    // Build improvement recommendations from answered questions
-    const improvementItems: Array<{
-      questionId: string;
-      text: string;
-      currentAnswer: string;
-      currentOptionText: string;
-      bestOptionText: string;
-      potentialGain: number;
-      priority: number;
-    }> = [];
-
-    for (const domain of questionBank.domains) {
-      for (const level of domain.levels) {
-        for (const question of level.questions) {
-          const answer = answers[question.id];
-          if (!answer) continue;
-
-          const opts = question.options?.length ? question.options : [];
-          if (opts.length === 0) continue;
-
-          const currentOpt = opts.find(o => o.id === answer.value);
-          const currentPoints = currentOpt?.points ?? 0;
-          const bestOpt = opts.reduce((best, o) => ((o.points ?? 0) > (best.points ?? 0) ? o : best), opts[0]);
-          const bestPoints = bestOpt?.points ?? 0;
-          const gap = bestPoints - currentPoints;
-
-          if (gap > 0) {
-            improvementItems.push({
-              questionId: question.id,
-              text: question.text,
-              currentAnswer: answer.value as string,
-              currentOptionText: currentOpt?.text ?? String(answer.value),
-              bestOptionText: bestOpt?.text ?? '',
-              potentialGain: gap,
-              priority: question.priority || 0,
-            });
-          }
-        }
-      }
-    }
-
-    // Sort by potential gain (highest impact first), break ties by priority
-    improvementItems.sort((a, b) => b.potentialGain - a.potentialGain || b.priority - a.priority);
-
-    const topAction = improvementItems[0];
     const answeredCount = Object.keys(answers).length;
+    const totalSlides = improvementItems.length;
+    const clampedIndex = Math.min(slideIndex, Math.max(0, totalSlides - 1));
+    const currentSlide = improvementItems[clampedIndex];
+    const cat = currentSlide
+      ? (CATEGORY_STYLE[currentSlide.statusCategory] ?? CATEGORY_STYLE['room-for-improvement'])
+      : null;
 
     return (
-      <section aria-label="Assessment complete" className="flex flex-col gap-4 h-full">
-        <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 flex flex-col gap-5">
-          {/* Score summary */}
-          <div className="text-center">
-            <div className="text-4xl mb-2">{percentage >= 80 ? '🛡️' : percentage >= 50 ? '🔧' : '⚠️'}</div>
-            <h3 className="text-xl font-semibold text-gray-900">
-              {percentage >= 80 ? 'Strong protection' : percentage >= 50 ? 'Good foundation' : 'Room to strengthen'}
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              {answeredCount} questions answered • {Math.round(percentage)}% coverage
+      <section aria-label="Assessment complete" className="flex flex-col gap-6 h-full">
+        {/* Score summary — breathing room */}
+        <div className="bg-white rounded-3xl shadow-xl px-6 py-8 sm:px-10 sm:py-10 text-center">
+          <div className="text-5xl mb-3">{percentage >= 80 ? '🛡️' : percentage >= 50 ? '🔧' : '⚠️'}</div>
+          <h3 className="text-2xl font-bold text-gray-900">
+            {percentage >= 80 ? 'Strong protection' : percentage >= 50 ? 'Good foundation' : 'Room to strengthen'}
+          </h3>
+          <p className="text-base text-gray-500 mt-2">
+            {answeredCount} questions answered &middot; {Math.round(percentage)}% coverage
+          </p>
+          {totalSlides > 0 && (
+            <p className="text-sm text-gray-400 mt-3">
+              {totalSlides} area{totalSlides !== 1 ? 's' : ''} where you can level up
             </p>
-          </div>
-
-          {/* Top recommended action */}
-          {topAction && (
-            <div className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-1">
-                    Next most impactful action
-                  </p>
-                  <p className="text-base font-medium text-gray-900 leading-snug">
-                    {topAction.text}
-                  </p>
-                  <div className="flex items-center gap-3 mt-2 text-sm">
-                    <span className="text-gray-500">
-                      Currently: <span className="font-medium text-orange-600">{topAction.currentOptionText}</span>
-                    </span>
-                    <ArrowRight className="w-3 h-3 text-gray-400" />
-                    <span className="font-medium text-green-600">{topAction.bestOptionText}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeAnswer(topAction.questionId)}
-                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    Change this answer
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* More improvement opportunities */}
-          {improvementItems.length > 1 && (
-            <div>
-              <button
-                type="button"
-                onClick={() => setShowReviewAnswers(!showReviewAnswers)}
-                className="w-full flex items-center justify-between px-1 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
-              >
-                <span className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
-                  {improvementItems.length - 1} more area{improvementItems.length > 2 ? 's' : ''} to improve
-                </span>
-                {showReviewAnswers ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </button>
-
-              {showReviewAnswers && (
-                <div className="mt-2 space-y-2">
-                  {improvementItems.slice(1, 6).map(item => (
-                    <div
-                      key={item.questionId}
-                      className="flex items-center justify-between gap-3 px-4 py-3 bg-gray-50 rounded-xl"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-800 truncate">{item.text}</p>
-                        <p className="text-xs text-gray-500">
-                          <span className="text-orange-600">{item.currentOptionText}</span>
-                          {' → '}
-                          <span className="text-green-600">{item.bestOptionText}</span>
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeAnswer(item.questionId)}
-                        className="flex-shrink-0 p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                        aria-label={`Change answer for: ${item.text}`}
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                  {improvementItems.length > 6 && (
-                    <p className="text-xs text-gray-400 text-center pt-1">
-                      +{improvementItems.length - 6} more
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* All clear state */}
-          {improvementItems.length === 0 && (
-            <div className="text-center py-4">
-              <div className="text-3xl mb-2">🏆</div>
-              <p className="text-sm text-gray-600">
-                All answers are at their strongest settings. Excellent security posture!
-              </p>
-            </div>
           )}
         </div>
+
+        {/* Slide: one improvement area at a time */}
+        {currentSlide && cat && (
+          <div
+            className={`bg-white rounded-3xl shadow-xl flex flex-col ${cat.border} border-2`}
+            aria-live="polite"
+          >
+            {/* Card header */}
+            <div className={`${cat.bg} px-6 py-4 sm:px-10 sm:py-5 rounded-t-3xl`}>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-600 tracking-wide uppercase">
+                  {cat.icon} {cat.label}
+                </span>
+                <span className="text-xs text-gray-400 font-medium tabular-nums">
+                  {clampedIndex + 1} of {totalSlides}
+                </span>
+              </div>
+            </div>
+
+            {/* Card body — educational content */}
+            <div className="px-6 py-6 sm:px-10 sm:py-8 flex flex-col gap-5">
+              {/* The question */}
+              <h4 className="text-lg font-semibold text-gray-900 leading-snug">
+                {currentSlide.text}
+              </h4>
+
+              {/* Current answer label — prefer statement (e.g. "Password Manager: Not used") over raw option text */}
+              <p className="text-sm text-gray-500">
+                {currentSlide.statement || currentSlide.currentOptionText}
+              </p>
+
+              {/* Educational feedback — the "why" */}
+              {currentSlide.currentFeedback && (
+                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl px-5 py-4">
+                  <p className="text-sm font-semibold text-indigo-700 mb-1.5">Why this matters</p>
+                  <p className="text-base text-gray-800 leading-relaxed">
+                    {currentSlide.currentFeedback}
+                  </p>
+                </div>
+              )}
+
+              {/* Extra context from question description/explanation (if available) */}
+              {(currentSlide.description || currentSlide.explanation) && (
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {currentSlide.description || currentSlide.explanation}
+                </p>
+              )}
+
+              {/* Revisit action */}
+              <button
+                type="button"
+                onClick={() => removeAnswer(currentSlide.questionId)}
+                className="self-start inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors mt-1"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Revisit this question
+              </button>
+            </div>
+
+            {/* Slide navigation */}
+            {totalSlides > 1 && (
+              <div className="px-6 pb-5 sm:px-10 sm:pb-7 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setSlideIndex(Math.max(0, clampedIndex - 1))}
+                  disabled={clampedIndex === 0}
+                  className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-600 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </button>
+
+                <span className="text-sm text-gray-400 font-medium tabular-nums">
+                  {clampedIndex + 1} / {totalSlides}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setSlideIndex(Math.min(totalSlides - 1, clampedIndex + 1))}
+                  disabled={clampedIndex === totalSlides - 1}
+                  className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-600 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* All-clear trophy state */}
+        {improvementItems.length === 0 && (
+          <div className="bg-white rounded-3xl shadow-xl px-6 py-10 sm:px-10 text-center">
+            <div className="text-5xl mb-3">🏆</div>
+            <p className="text-lg font-semibold text-gray-800">All answers are at their strongest</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Excellent security posture — keep it up!
+            </p>
+          </div>
+        )}
       </section>
     );
   }
