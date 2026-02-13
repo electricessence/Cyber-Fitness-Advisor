@@ -19,7 +19,6 @@ export const CFASemantics = {
       patching: "last writer wins, stable order (question id, then gate index)",
       scoring: "only visible + not nonScoring questions. Hidden answers retained but excluded",
       onboarding: "non-scored, one-time seed if undefined, idempotent on schema bump",
-      suites: "unlocked by any qualifying gate (OR logic)",
       cycles: "detected and prevented by authoring linter"
     };
   },

@@ -54,9 +54,4 @@ describe('Condition-Based Question Visibility', () => {
     const visibleIds = useAssessmentStore.getState().getVisibleQuestionIds();
     expect(visibleIds).not.toContain('advanced_2fa');
   });
-
-  it('should return empty array for getUnlockedSuiteIds (no suites defined)', () => {
-    const store = useAssessmentStore.getState();
-    expect(store.getUnlockedSuiteIds()).toEqual([]);
-  });
 });

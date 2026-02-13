@@ -7,7 +7,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { FactsEngine } from './engine';
 import { FactsQueries } from './integration';
-import { FactsConditionEngine, FactConditions } from './conditions';
 import type { Answer } from '../engine/schema';
 
 describe('FactsEngine', () => {
@@ -177,58 +176,5 @@ describe('FactsQueries', () => {
     // Remove behavior facts
     delete profile.facts['behavior.password_manager.browser'];
     expect(FactsQueries.hasMinimumFacts(profile)).toBe(false);
-  });
-});
-
-describe('FactsConditionEngine', () => {
-  let engine: FactsConditionEngine;
-  let profile: any;
-  
-  beforeEach(() => {
-    engine = new FactsConditionEngine();
-    profile = {
-      facts: {
-        'device.os.primary': {
-          id: 'device.os.primary',
-          value: 'windows'
-        },
-        'behavior.password_manager.browser': {
-          id: 'behavior.password_manager.browser', 
-          value: true
-        }
-      }
-    };
-  });
-  
-  it('should evaluate OS conditions', () => {
-    const windowsCondition = FactConditions.hasOS('windows');
-    const result = engine.evaluateCondition(windowsCondition, profile);
-    expect(result).toBe(true);
-    
-    const macCondition = FactConditions.hasOS('macos');
-    const macResult = engine.evaluateCondition(macCondition, profile);
-    expect(macResult).toBe(false);
-  });
-  
-  it('should evaluate password manager conditions', () => {
-    const condition = FactConditions.usesBrowserPasswordManager();
-    const result = engine.evaluateCondition(condition, profile);
-    expect(result).toBe(true);
-    
-    // Change fact value
-    profile.facts['behavior.password_manager.browser'].value = false;
-    const falseResult = engine.evaluateCondition(condition, profile);
-    expect(falseResult).toBe(false);
-  });
-  
-  it('should evaluate existence conditions', () => {
-    const condition = FactConditions.hasCompletedOnboarding();
-    const result = engine.evaluateCondition(condition, profile);
-    expect(result).toBe(true);
-    
-    // Remove OS fact
-    delete profile.facts['device.os.primary'];
-    const falseResult = engine.evaluateCondition(condition, profile);
-    expect(falseResult).toBe(false);
   });
 });

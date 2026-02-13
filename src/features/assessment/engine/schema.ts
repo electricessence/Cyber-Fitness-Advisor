@@ -1,6 +1,3 @@
-// Import gate types from conditions to avoid duplication
-import type { Gate } from './conditions';
-
 export interface AnswerOption {
   id: string; // Stable identifier for tests and logic
   text: string; // What the user sees as the choice (can change for UI)
@@ -106,16 +103,6 @@ export interface Domain {
 export interface QuestionBank {
   version: number;
   domains: Domain[];
-  suites?: Suite[]; // Phase 2.2: Unlockable question suites
-}
-
-// Phase 2.2: Unlockable question suites
-export interface Suite {
-  id: string;
-  title: string;
-  description: string;
-  gates: Gate[]; // Multiple gates with OR semantics - unlocks if any passes
-  questions: Question[];
 }
 
 export interface Answer {

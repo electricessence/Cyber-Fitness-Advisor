@@ -21,10 +21,6 @@ export const SEMANTIC_RULES = {
     inclusion: "visible + not nonScoring questions only",
     hiddenAnswers: "retained but excluded from scoring"
   },
-  suites: {
-    unlocking: "ANY gate passing unlocks suite (if suites exist)",
-    visibility: "suite questions become visible when unlocked"
-  },
   onboarding: {
     scoring: "non-scored by default (nonScoring: true)",
     seeding: "idempotent - only fills missing values",

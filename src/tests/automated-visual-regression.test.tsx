@@ -126,9 +126,8 @@ describe('Automated Visual Regression Testing', () => {
           })
           
           // Verify completion state (should have completed most questions)
-          // Note: Suite questions may be unlocked during completion, adding new questions
           const remainingQuestions = completeStore.getOrderedAvailableQuestions?.() || []
-          expect(remainingQuestions.length).toBeLessThanOrEqual(6) // Allow for unlocked suite questions
+          expect(remainingQuestions.length).toBeLessThanOrEqual(6) // Allow for condition-gated questions
           break
       }
       

@@ -27,15 +27,6 @@ export {
   type FactsStoreState 
 } from './integration';
 
-// Condition system
-export { 
-  FactsConditionEngine, 
-  FactConditions, 
-  ConditionMigration,
-  type FactGate,
-  type HybridCondition
-} from './conditions';
-
 /**
  * Quick start guide for using the facts system:
  * 
@@ -48,8 +39,6 @@ export {
  * 3. Query facts for conditions:
  *    const hasBrowserPM = factsSlice.factsActions.hasFactValue('behavior.password_manager.browser', true);
  * 
- * 4. Use fact-based conditions:
- *    const condition = FactConditions.hasOS('windows');
- *    const engine = new FactsConditionEngine();
- *    const result = engine.evaluateCondition(condition, factsProfile);
+ * 4. Question visibility is driven by conditions.include/exclude on questions,
+ *    evaluated by evaluateQuestionConditions() in engine/conditionEvaluation.ts
  */

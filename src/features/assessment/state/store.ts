@@ -4,7 +4,6 @@ import type { QuestionBank, Answer, Question } from '../engine/schema';
 import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration } from '../engine/scoring';
-import { evaluateGate } from '../engine/conditions';
 import { createFactsStoreSlice, type FactsStoreState } from '../facts/integration';
 import type { Fact } from '../facts/types';
 import unifiedQuestionBank from '../data/questionBank';
@@ -156,10 +155,8 @@ interface AssessmentState extends FactsStoreState {
   getHistoricAnswers: () => Array<Answer & { domain: string; level: number; question: Question | null }>;
   dismissCelebration: () => void;
   
-  // Phase 2.2: Derived selectors for contextual Q/A
+  // Condition-driven question visibility
   getVisibleQuestionIds: () => string[];
-  getUnlockedSuiteIds: () => string[];
-  getEffectivePatches: () => Record<string, Partial<Question>>;
 
   // Unified model derived (feature-flagged)
   getOrderedAvailableQuestions?: () => Question[];
@@ -631,13 +628,6 @@ export const useAssessmentStore = create<AssessmentState>()(
           });
         });
         
-        // Add suite questions
-        state.questionBank.suites?.forEach(suite => {
-          suite.questions.forEach(question => {
-            allQuestions.push(question);
-          });
-        });
-
         // Filter to only visible questions that aren't already answered
         const availableQuestions = allQuestions.filter(question => {
           // Must be visible according to condition engine
@@ -961,41 +951,8 @@ export const useAssessmentStore = create<AssessmentState>()(
           });
         });
         
-        // Add suite questions (only from unlocked suites)
-        const unlockedSuiteIds = state.getUnlockedSuiteIds();
-        state.questionBank.suites?.forEach(suite => {
-          if (unlockedSuiteIds.includes(suite.id)) {
-            suite.questions.forEach(question => {
-              allQuestions.push(question);
-            });
-          }
-        });
-        
         // Use extracted condition evaluation function for testability
         return getVisibleQuestionIds(allQuestions, state.factsProfile.facts);
-      },
-      
-      getUnlockedSuiteIds: () => {
-        const state = get();
-        const suites = state.questionBank.suites || [];
-        if (suites.length === 0) return [];
-        
-        // Build evaluation context from current answers
-        const context = {
-          answers: Object.fromEntries(
-            Object.entries(state.answers).map(([id, answer]) => [id, answer.value])
-          ),
-        };
-        
-        // Evaluate each suite's gates directly — any gate passing unlocks
-        return suites
-          .filter(suite => suite.gates.some(gate => evaluateGate(gate, context).passes))
-          .map(suite => suite.id);
-      },
-      
-      getEffectivePatches: () => {
-        // No patches — all question configuration lives in the question bank
-        return {};
       },
       
       // Badge system actions

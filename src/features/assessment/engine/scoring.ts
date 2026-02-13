@@ -176,15 +176,6 @@ export function calculateOverallScore(
     }
   }
 
-  // Include suite questions if they are part of the relevant set
-  if (questionBank.suites) {
-    for (const suite of questionBank.suites) {
-      for (const question of suite.questions) {
-        processQuestion(question);
-      }
-    }
-  }
-
   const rawPercentage = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
   const hasAnswers = answeredRelevantCount > 0;
   const effectiveSampleTarget = totalRelevantQuestions > 0
