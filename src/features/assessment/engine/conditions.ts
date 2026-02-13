@@ -408,7 +408,12 @@ export class ConditionEngine {
       if (question.conditions.include) {
         for (const [factName, expectedValue] of Object.entries(question.conditions.include)) {
           const actualValue = this.getFactValue(factName, context);
-          if (actualValue !== expectedValue) {
+          // Array means "any of these values" (OR semantics)
+          if (Array.isArray(expectedValue)) {
+            if (!expectedValue.includes(actualValue as never)) {
+              return true; // Filter out - include condition failed
+            }
+          } else if (actualValue !== expectedValue) {
             return true; // Filter out - include condition failed
           }
         }
@@ -418,7 +423,11 @@ export class ConditionEngine {
       if (question.conditions.exclude) {
         for (const [factName, excludeValue] of Object.entries(question.conditions.exclude)) {
           const actualValue = this.getFactValue(factName, context);
-          if (actualValue === excludeValue) {
+          if (Array.isArray(excludeValue)) {
+            if (excludeValue.includes(actualValue as never)) {
+              return true; // Filter out - exclude condition matched
+            }
+          } else if (actualValue === excludeValue) {
             return true; // Filter out - exclude condition matched
           }
         }

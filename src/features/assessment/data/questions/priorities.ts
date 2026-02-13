@@ -16,7 +16,17 @@ export const ONBOARDING_PRIORITIES = {
 // Assessment Priorities (90-40 range) 
 export const ASSESSMENT_PRIORITIES = {
   PASSWORD_MANAGER: 85,
+  // Password Manager deep-dive (slots between PM parent and 2FA)
+  PM_TYPE: 84,
+  PM_MASTER_PASSWORD: 83,
+  PM_CURRENT_METHOD: 82,
+  PM_BARRIER: 81,
   TWO_FACTOR_AUTH: 80,
+  // 2FA deep-dive (slots between 2FA parent and SOFTWARE_UPDATES)
+  TFA_METHOD: 79,
+  TFA_BACKUP_CODES: 78,
+  TFA_PRIORITY_ACCOUNTS: 77,
+  TFA_BARRIER: 76,
   SOFTWARE_UPDATES: 75,
   PHISHING_AWARENESS: 72,
   SCREEN_LOCK: 70,

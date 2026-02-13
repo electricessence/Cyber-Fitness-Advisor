@@ -13,10 +13,24 @@ export function evaluateQuestionConditions(
   if (question.conditions?.include) {
     for (const [factId, expectedValue] of Object.entries(question.conditions.include)) {
       const fact = facts[factId];
-      if (!fact || fact.value !== expectedValue) {
+      if (!fact) {
         return {
           visible: false,
-          reason: `Include condition failed: ${factId} expected ${expectedValue}, got ${fact?.value || 'undefined'}`
+          reason: `Include condition failed: ${factId} expected ${expectedValue}, got undefined`
+        };
+      }
+      // Array means "any of these values" (OR semantics)
+      if (Array.isArray(expectedValue)) {
+        if (!expectedValue.includes(fact.value as never)) {
+          return {
+            visible: false,
+            reason: `Include condition failed: ${factId} expected one of [${expectedValue}], got ${fact.value}`
+          };
+        }
+      } else if (fact.value !== expectedValue) {
+        return {
+          visible: false,
+          reason: `Include condition failed: ${factId} expected ${expectedValue}, got ${fact.value}`
         };
       }
     }
@@ -35,12 +49,21 @@ export function evaluateQuestionConditions(
         };
       }
       
-      // Normal case: exclude if fact matches specific value
-      if (fact && fact.value === expectedValue) {
-        return {
-          visible: false,
-          reason: `Exclude condition matched: ${factId} = ${expectedValue}`
-        };
+      // Normal case: exclude if fact matches specific value (or any in array)
+      if (fact) {
+        if (Array.isArray(expectedValue)) {
+          if (expectedValue.includes(fact.value as never)) {
+            return {
+              visible: false,
+              reason: `Exclude condition matched: ${factId} in [${expectedValue}]`
+            };
+          }
+        } else if (fact.value === expectedValue) {
+          return {
+            visible: false,
+            reason: `Exclude condition matched: ${factId} = ${expectedValue}`
+          };
+        }
       }
     }
   }
