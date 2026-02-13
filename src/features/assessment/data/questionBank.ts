@@ -1,10 +1,10 @@
 // Unified Question Bank (Clean Schema)
 // Uses the new simplified schema with priority-based ordering and facts-based state management
 
-import type { QuestionBank, Suite, Question } from '../engine/schema';
+import type { QuestionBank, Question } from '../engine/schema';
 import { onboardingQuestions, coreAssessmentQuestions, browserSecurityQuestions, securityHygieneQuestions, passwordManagerDeepDiveQuestions, twoFactorDeepDiveQuestions } from './questions/index.js';
 
-// Advanced security suite questions
+// Advanced security questions — gated by declarative conditions on facts
 const advancedSecurityQuestions: Question[] = [
   {
     id: 'advanced_2fa',
@@ -13,10 +13,17 @@ const advancedSecurityQuestions: Question[] = [
     statement: 'Hardware 2FA Keys Used',
     text: 'Do you use hardware security keys (like YubiKey) for 2FA?',
     tags: ['security', 'authentication', 'advanced'],
+    difficulty: 'advanced',
+    effort: '30 minutes to set up',
+    conditions: {
+      include: { password_manager: 'yes', updates: 'automatic' }
+    },
     options: [
       {
         id: 'yes',
         text: '✅ Yes, I use hardware security keys',
+        statement: 'Hardware 2FA: Enabled',
+        statusCategory: 'shields-up',
         points: 15,
         facts: { "hardware_2fa": true },
         feedback: '🔐 Excellent! Hardware keys provide the strongest 2FA protection.'
@@ -24,29 +31,13 @@ const advancedSecurityQuestions: Question[] = [
       {
         id: 'no',
         text: '❌ No, I don\'t use hardware keys',
+        statement: 'Hardware 2FA: Not using',
+        statusCategory: 'to-do',
         points: 0,
         facts: { "hardware_2fa": false },
         feedback: '📱 Consider YubiKey or similar FIDO2 security keys for maximum protection.'
       }
     ]
-  }
-];
-
-// Define suites for unlockable content
-const suites: Suite[] = [
-  {
-    id: 'advanced_security',
-    title: 'Advanced Security Features',
-    description: 'Unlocked when you demonstrate strong basic security practices',
-    gates: [
-      {
-        all: [
-          { questionId: 'password_manager', when: 'equals', value: 'yes' },
-          { questionId: 'software_updates', when: 'equals', value: 'automatic' }
-        ]
-      }
-    ],
-    questions: advancedSecurityQuestions
   }
 ];
 
@@ -60,12 +51,11 @@ const questionBank: QuestionBank = {
       levels: [
         {
           level: 1,
-          questions: [...onboardingQuestions, ...coreAssessmentQuestions, ...securityHygieneQuestions, ...passwordManagerDeepDiveQuestions, ...twoFactorDeepDiveQuestions, ...browserSecurityQuestions]
+          questions: [...onboardingQuestions, ...coreAssessmentQuestions, ...securityHygieneQuestions, ...passwordManagerDeepDiveQuestions, ...twoFactorDeepDiveQuestions, ...browserSecurityQuestions, ...advancedSecurityQuestions]
         }
       ]
     }
-  ],
-  suites: suites
+  ]
 };
 
 // Export both default and named

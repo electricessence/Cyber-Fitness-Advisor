@@ -1,10 +1,10 @@
 /**
- * Conditional Question Engine
+ * Gate Condition Types & Evaluators
  * 
- * Evaluates gate conditions to determine question visibility and unlocks.
- * Supports dependency graphs and cycle detection.
+ * Pure types and functions for evaluating gate conditions.
+ * All question visibility is data-driven through the question bank.
  * 
- * @version 2.0
+ * @version 3.0 — ConditionEngine class removed; pure functions only
  */
 
 /**
@@ -34,7 +34,7 @@ export interface GateCondition {
 }
 
 /**
- * Gate definition with optional logic operators and actions
+ * Gate definition with logic operators
  */
 export interface Gate {
   /** All conditions must be true (AND logic) */
@@ -43,50 +43,6 @@ export interface Gate {
   any?: GateCondition[];
   /** None of the conditions must be true (NOT logic) */
   none?: GateCondition[];
-  
-  /** Actions to take when this gate passes */
-  /** Questions to show */
-  show?: string[];
-  /** Questions to hide (overrides show) */
-  hide?: string[];
-  /** Suites to unlock */
-  unlockSuites?: string[];
-  /** Question patches to apply */
-  patch?: Record<string, Partial<any>>;
-}
-
-/**
- * Question patch to modify questions after gate evaluation
- * @deprecated Use Gate.patch instead
- */
-export interface QuestionPatch {
-  /** Target question ID */
-  questionId: string;
-  /** Fields to modify */
-  patch: {
-    text?: string;
-    options?: any[];
-    weight?: number;
-    [key: string]: any;
-  };
-}
-
-/**
- * Suite definition for unlockable question banks
- */
-export interface Suite {
-  /** Unique suite identifier */
-  id: string;
-  /** Display name */
-  title: string;
-  /** Description */
-  description: string;
-  /** Gate conditions to unlock this suite - any gate passing unlocks the suite */
-  gates: Gate[];
-  /** Questions in this suite */
-  questionIds: string[];
-  /** Priority for suite ordering */
-  priority?: number;
 }
 
 /**
@@ -95,10 +51,6 @@ export interface Suite {
 export interface EvaluationContext {
   /** Current user answers */
   answers: Record<string, any>;
-  /** User device profile */
-  deviceProfile?: any;
-  /** Additional context data */
-  metadata?: Record<string, any>;
 }
 
 /**
@@ -116,15 +68,7 @@ export interface EvaluationResult {
 }
 
 /**
- * Dependency graph edge
- */
-interface DependencyEdge {
-  from: string;
-  to: string;
-}
-
-/**
- * Evaluates a single gate condition
+ * Evaluates a single gate condition against a context
  */
 function evaluateCondition(condition: GateCondition, context: EvaluationContext): boolean {
   const { questionId, when, value, values } = condition;
@@ -200,7 +144,7 @@ function evaluateCondition(condition: GateCondition, context: EvaluationContext)
 }
 
 /**
- * Evaluates a complete gate
+ * Evaluates a complete gate (all/any/none logic)
  */
 export function evaluateGate(gate: Gate, context: EvaluationContext): EvaluationResult {
   const details: EvaluationResult['details'] = {};
@@ -230,425 +174,4 @@ export function evaluateGate(gate: Gate, context: EvaluationContext): Evaluation
   const passes = allPasses && anyPasses && nonePasses;
   
   return { passes, details };
-}
-
-/**
- * Extracts dependencies from a gate
- */
-function extractGateDependencies(gate: Gate): string[] {
-  const deps: string[] = [];
-  
-  if (gate.all) {
-    deps.push(...gate.all.map(c => c.questionId));
-  }
-  if (gate.any) {
-    deps.push(...gate.any.map(c => c.questionId));
-  }
-  if (gate.none) {
-    deps.push(...gate.none.map(c => c.questionId));
-  }
-  
-  return [...new Set(deps)]; // Remove duplicates
-}
-
-/**
- * Builds dependency graph from questions and suites
- */
-function buildDependencyGraph(
-  questions: Array<{ id: string; gates?: Gate[] }>,
-  suites: Suite[] = []
-): DependencyEdge[] {
-  const edges: DependencyEdge[] = [];
-  
-  // Question dependencies
-  for (const question of questions) {
-    if (question.gates) {
-      for (const gate of question.gates) {
-        const deps = extractGateDependencies(gate);
-        for (const dep of deps) {
-          edges.push({ from: dep, to: question.id });
-        }
-      }
-    }
-  }
-  
-  // Suite dependencies
-  for (const suite of suites) {
-    for (const gate of suite.gates) {
-      const deps = extractGateDependencies(gate);
-      for (const dep of deps) {
-        edges.push({ from: dep, to: `suite:${suite.id}` });
-      }
-    }
-  }
-  
-  return edges;
-}
-
-/**
- * Detects cycles in dependency graph using DFS
- */
-export function detectCycles(
-  questions: Array<{ id: string; gates?: Gate[] }>,
-  suites: Suite[] = []
-): string[] {
-  const edges = buildDependencyGraph(questions, suites);
-  const graph: Record<string, string[]> = {};
-  
-  // Build adjacency list
-  for (const edge of edges) {
-    if (!graph[edge.from]) graph[edge.from] = [];
-    graph[edge.from].push(edge.to);
-  }
-  
-  const visited = new Set<string>();
-  const recursionStack = new Set<string>();
-  const cycles: string[] = [];
-  
-  function dfs(node: string, path: string[] = []): void {
-    if (recursionStack.has(node)) {
-      const cycleStart = path.indexOf(node);
-      const cycle = path.slice(cycleStart).concat(node);
-      cycles.push(`Cycle detected: ${cycle.join(' → ')}`);
-      return;
-    }
-    
-    if (visited.has(node)) return;
-    
-    visited.add(node);
-    recursionStack.add(node);
-    
-    const neighbors = graph[node] || [];
-    for (const neighbor of neighbors) {
-      dfs(neighbor, [...path, node]);
-    }
-    
-    recursionStack.delete(node);
-  }
-  
-  // Check all nodes
-  for (const node of Object.keys(graph)) {
-    if (!visited.has(node)) {
-      dfs(node);
-    }
-  }
-  
-  return cycles;
-}
-
-/**
- * Main condition engine class
- */
-export class ConditionEngine {
-  private questions: Array<{ id: string; gates?: Gate[] }>;
-  private suites: Suite[];
-  private patches: QuestionPatch[];
-  private dependencyGraph: DependencyEdge[];
-  
-  constructor(
-    questions: Array<{ id: string; gates?: Gate[] }> = [],
-    suites: Suite[] = [],
-    patches: QuestionPatch[] = []
-  ) {
-    this.questions = questions;
-    this.suites = suites;
-    this.patches = patches;
-    
-    // Build and validate dependency graph
-    this.dependencyGraph = buildDependencyGraph(questions, suites);
-    
-    // Validate no cycles on construction
-    const cycles = detectCycles(questions, suites);
-    if (cycles.length > 0) {
-      throw new Error(`Dependency cycles detected:\n${cycles.join('\n')}`);
-    }
-  }
-  
-  /**
-   * Get a fact value from the context
-   * For now, this accesses device profile and metadata facts
-   * TODO: Integrate with the facts system properly
-   */
-  private getFactValue(factName: string, context: EvaluationContext): any {
-    // Access device facts from deviceProfile
-    if (factName.startsWith('device.') && context.deviceProfile) {
-      const devicePath = factName.replace('device.', '');
-      if (devicePath === 'os') return context.deviceProfile.currentDevice?.os;
-      if (devicePath === 'browser') return context.deviceProfile.currentDevice?.browser;
-      if (devicePath === 'type') return context.deviceProfile.currentDevice?.type;
-    }
-    
-    // Access metadata facts
-    if (context.metadata && factName in context.metadata) {
-      return context.metadata[factName];
-    }
-    
-    // Access answer-based facts (answers stored as facts)
-    if (context.answers && factName in context.answers) {
-      return context.answers[factName];
-    }
-    
-    return undefined;
-  }
-  
-  /**
-   * Determines if a question should be filtered out based on phase, device, or runtime logic
-   */
-  private shouldFilterQuestion(question: any, context: EvaluationContext): boolean {
-    // Filter onboarding questions if onboarding is complete
-    if (question.phase === 'onboarding') {
-      // Onboarding questions should be hidden after device profile is set
-      // (indicates onboarding completion)
-      return context.deviceProfile !== null && context.deviceProfile !== undefined;
-    }
-    
-    // Check simple include/exclude conditions
-    if (question.conditions) {
-      // Check include conditions - must match ALL to be visible
-      if (question.conditions.include) {
-        for (const [factName, expectedValue] of Object.entries(question.conditions.include)) {
-          const actualValue = this.getFactValue(factName, context);
-          // Array means "any of these values" (OR semantics)
-          if (Array.isArray(expectedValue)) {
-            if (!expectedValue.includes(actualValue as never)) {
-              return true; // Filter out - include condition failed
-            }
-          } else if (actualValue !== expectedValue) {
-            return true; // Filter out - include condition failed
-          }
-        }
-      }
-      
-      // Check exclude conditions - must NOT match ANY to be visible  
-      if (question.conditions.exclude) {
-        for (const [factName, excludeValue] of Object.entries(question.conditions.exclude)) {
-          const actualValue = this.getFactValue(factName, context);
-          if (Array.isArray(excludeValue)) {
-            if (excludeValue.includes(actualValue as never)) {
-              return true; // Filter out - exclude condition matched
-            }
-          } else if (actualValue === excludeValue) {
-            return true; // Filter out - exclude condition matched
-          }
-        }
-      }
-    }
-    
-    // Filter by device compatibility
-    if (question.deviceFilter && context.deviceProfile) {
-      const { os } = question.deviceFilter;
-      if (os && !os.includes(context.deviceProfile.currentDevice.os)) {
-        return true; // Filter out - device doesn't match
-      }
-    }
-    
-    // Apply runtime visibility function if present
-    if (question.runtimeVisibleFn && typeof question.runtimeVisibleFn === 'function') {
-      try {
-        const isVisible = question.runtimeVisibleFn(context);
-        return !isVisible; // Filter out if not visible
-      } catch (error) {
-        // If runtime function fails, default to visible
-        console.warn('Runtime visibility function failed for question:', question.id, error);
-        return false;
-      }
-    }
-    
-    return false; // Don't filter - question should be visible
-  }
-
-  /**
-   * Evaluates all conditions and returns visible questions, unlocked suites, and patches
-   */
-  evaluate(context: EvaluationContext): {
-    visibleQuestionIds: string[];
-    unlockedSuites: Suite[];
-    questionPatches: Record<string, QuestionPatch['patch']>;
-  } {
-    // Lightweight cycle check (cached graph)
-    if (this.dependencyGraph.length > 0) {
-      // Quick validation that no new cycles were introduced
-      const cycles = detectCycles(this.questions, this.suites);
-      if (cycles.length > 0) {
-        throw new Error(`Active dependency cycles detected:\n${cycles.join('\n')}`);
-      }
-    }
-
-    const visibleQuestionIds = new Set<string>();
-    const hiddenQuestionIds = new Set<string>();
-    const unlockedSuites: Suite[] = [];
-    const questionPatches: Record<string, QuestionPatch['patch']> = {};
-    
-    // Get all suite question IDs for special handling
-    const suiteQuestionIds = new Set<string>();
-    for (const suite of this.suites) {
-      for (const questionId of suite.questionIds) {
-        suiteQuestionIds.add(questionId);
-      }
-    }
-    
-    // First pass: determine base visibility 
-    // - Non-suite questions with no gates are visible by default, BUT with filtering
-    // - Suite questions are hidden by default
-    // - Apply phase, device, and runtime filtering
-    for (const question of this.questions) {
-      if (suiteQuestionIds.has(question.id)) {
-        // Suite questions are hidden by default
-        hiddenQuestionIds.add(question.id);
-      } else if (!question.gates || question.gates.length === 0) {
-        // Check if question should be filtered out by phase, device, or runtime logic
-        if (this.shouldFilterQuestion(question, context)) {
-          hiddenQuestionIds.add(question.id);
-        } else {
-          // Regular questions with no gates are visible
-          visibleQuestionIds.add(question.id);
-        }
-      }
-    }
-    
-    // Second pass: evaluate gates for show/hide/patch actions
-    const allGates: Array<{ gate: Gate; source: string }> = [];
-    
-    // Collect gates from questions
-    for (const question of this.questions) {
-      if (question.gates) {
-        for (const gate of question.gates) {
-          allGates.push({ gate, source: question.id });
-        }
-      }
-    }
-    
-    // Collect gates from suites
-    for (const suite of this.suites) {
-      for (const gate of suite.gates) {
-        allGates.push({ gate, source: `suite:${suite.id}` });
-      }
-    }
-    
-    // Process gates and their actions
-    for (const { gate } of allGates) {
-      const result = evaluateGate(gate, context);
-      
-      if (result.passes) {
-        // Handle show actions
-        if (gate.show) {
-          for (const questionId of gate.show) {
-            visibleQuestionIds.add(questionId);
-          }
-        }
-        
-        // Handle hide actions (override show)
-        if (gate.hide) {
-          for (const questionId of gate.hide) {
-            hiddenQuestionIds.add(questionId);
-            visibleQuestionIds.delete(questionId);
-          }
-        }
-        
-        // Handle suite unlocks
-        if (gate.unlockSuites) {
-          for (const suiteId of gate.unlockSuites) {
-            const suite = this.suites.find(s => s.id === suiteId);
-            if (suite && !unlockedSuites.some(s => s.id === suiteId)) {
-              unlockedSuites.push(suite);
-            }
-          }
-        }
-        
-        // Handle patches (deterministic by questionId)
-        if (gate.patch) {
-          for (const [questionId, patch] of Object.entries(gate.patch)) {
-            if (!questionPatches[questionId]) {
-              questionPatches[questionId] = {};
-            }
-            Object.assign(questionPatches[questionId], patch);
-          }
-        }
-      }
-    }
-    
-    // Third pass: evaluate questions with gates for visibility
-    for (const question of this.questions) {
-      if (question.gates && question.gates.length > 0) {
-        // Any gate passing makes the question visible (unless explicitly hidden)
-        let anyGatePasses = false;
-        for (const gate of question.gates) {
-          const result = evaluateGate(gate, context);
-          if (result.passes) {
-            anyGatePasses = true;
-            break;
-          }
-        }
-        
-        if (anyGatePasses && !hiddenQuestionIds.has(question.id)) {
-          visibleQuestionIds.add(question.id);
-        }
-      }
-    }
-    
-    // Fourth pass: evaluate suite unlocks
-    for (const suite of this.suites) {
-      // Any gate passing unlocks the suite
-      let anyGatePasses = false;
-      for (const gate of suite.gates) {
-        const result = evaluateGate(gate, context);
-        if (result.passes) {
-          anyGatePasses = true;
-          break;
-        }
-      }
-      
-      if (anyGatePasses && !unlockedSuites.some(s => s.id === suite.id)) {
-        unlockedSuites.push(suite);
-        
-        // Make suite questions visible when suite is unlocked
-        for (const questionId of suite.questionIds) {
-          hiddenQuestionIds.delete(questionId);
-          visibleQuestionIds.add(questionId);
-        }
-      }
-    }
-    
-    // Apply legacy patches (deprecated path)
-    const sortedPatches = this.patches.slice().sort((a, b) => 
-      a.questionId.localeCompare(b.questionId)
-    );
-    
-    for (const patch of sortedPatches) {
-      if (visibleQuestionIds.has(patch.questionId)) {
-        if (!questionPatches[patch.questionId]) {
-          questionPatches[patch.questionId] = {};
-        }
-        Object.assign(questionPatches[patch.questionId], patch.patch);
-      }
-    }
-    
-    return {
-      visibleQuestionIds: Array.from(visibleQuestionIds).sort(),
-      unlockedSuites: unlockedSuites.sort((a, b) => (b.priority || 0) - (a.priority || 0)),
-      questionPatches
-    };
-  }
-  
-  /**
-   * Updates the engine configuration
-   */
-  updateConfiguration(
-    questions?: Array<{ id: string; gates?: Gate[] }>,
-    suites?: Suite[],
-    patches?: QuestionPatch[]
-  ): void {
-    if (questions) this.questions = questions;
-    if (suites) this.suites = suites;
-    if (patches) this.patches = patches;
-    
-    // Rebuild dependency graph
-    this.dependencyGraph = buildDependencyGraph(this.questions, this.suites);
-    
-    // Re-validate cycles
-    const cycles = detectCycles(this.questions, this.suites);
-    if (cycles.length > 0) {
-      throw new Error(`Dependency cycles detected after update:\n${cycles.join('\n')}`);
-    }
-  }
 }

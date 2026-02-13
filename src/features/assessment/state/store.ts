@@ -4,7 +4,7 @@ import type { QuestionBank, Answer, Question } from '../engine/schema';
 import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration } from '../engine/scoring';
-import { ConditionEngine } from '../engine/conditions';
+import { evaluateGate } from '../engine/conditions';
 import { createFactsStoreSlice, type FactsStoreState } from '../facts/integration';
 import type { Fact } from '../facts/types';
 import unifiedQuestionBank from '../data/questionBank';
@@ -97,8 +97,7 @@ interface AssessmentState extends FactsStoreState {
   answers: Record<string, Answer>;
   deviceProfile: DeviceProfile | null;
   
-  // Phase 2.2: Condition engine for contextual Q/A
-  conditionEngine: ConditionEngine;
+
   
   // Registry pattern (simplified store integration)
   factsData: Record<string, any>;
@@ -185,41 +184,11 @@ interface AssessmentState extends FactsStoreState {
   updateStreakData: () => void;
 }
 
-// Helper to create the initial condition engine
-function createInitialConditionEngine(): ConditionEngine {
-  const questionBank = unifiedQuestionBank;
-  const allQuestions: Question[] = [];
-  
-  // Collect all questions from domains
-  for (const domain of questionBank.domains) {
-    for (const level of domain.levels) {
-      allQuestions.push(...level.questions);
-    }
-  }
-  
-  // Collect questions from suites and add them to the engine
-  const conditionSuites = (questionBank.suites || []).map(suite => {
-    // Add suite questions to the main questions list
-    allQuestions.push(...suite.questions);
-    
-    return {
-      id: suite.id,
-      title: suite.title,
-      description: suite.description,
-      gates: suite.gates,
-      questionIds: suite.questions.map(q => q.id),
-      priority: 0
-    };
-  });
-  
-  return new ConditionEngine(allQuestions, conditionSuites);
-}
 
 const initialState = {
   questionBank: unifiedQuestionBank,
   answers: {},
   deviceProfile: null as DeviceProfile | null,
-  conditionEngine: createInitialConditionEngine(),
   taskResponses: {},
   taskReminders: [],
   overallScore: 0,
@@ -1008,26 +977,25 @@ export const useAssessmentStore = create<AssessmentState>()(
       
       getUnlockedSuiteIds: () => {
         const state = get();
+        const suites = state.questionBank.suites || [];
+        if (suites.length === 0) return [];
+        
+        // Build evaluation context from current answers
         const context = {
           answers: Object.fromEntries(
             Object.entries(state.answers).map(([id, answer]) => [id, answer.value])
           ),
-          deviceProfile: state.deviceProfile,
-          metadata: {}
         };
-        const result = state.conditionEngine.evaluate(context);
-        return result.unlockedSuites.map(suite => suite.id);
+        
+        // Evaluate each suite's gates directly — any gate passing unlocks
+        return suites
+          .filter(suite => suite.gates.some(gate => evaluateGate(gate, context).passes))
+          .map(suite => suite.id);
       },
       
       getEffectivePatches: () => {
-        const state = get();
-        const context = {
-          answers: state.answers,
-          deviceProfile: state.deviceProfile,
-          metadata: {}
-        };
-        const result = state.conditionEngine.evaluate(context);
-        return result.questionPatches;
+        // No patches — all question configuration lives in the question bank
+        return {};
       },
       
       // Badge system actions

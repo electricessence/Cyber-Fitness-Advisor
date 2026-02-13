@@ -5,7 +5,7 @@
  * This version is exposed globally for debugging and compatibility checking.
  */
 
-export const CONTENT_SEMVER = "2.0.0";
+export const CONTENT_SEMVER = "3.0.0";
 
 /**
  * Semantic Rules Summary for Runtime Access
@@ -13,22 +13,16 @@ export const CONTENT_SEMVER = "2.0.0";
 export const SEMANTIC_RULES = {
   version: CONTENT_SEMVER,
   visibility: {
-    default: "visible (non-suite) or hidden (suite)",
-    anyGatePasses: "visible if ANY gate passes",
-    hidePrecedence: "hide actions override show actions",
-    deterministic: "conflicts resolved by question ID alphabetical order"
-  },
-  patching: {
-    order: "last writer wins, stable order (question ID, then gate index)",
-    merging: "field-level merging, not full replacement",
-    visibility: "patches only apply to visible questions"
+    default: "visible unless conditions.include/exclude hide it",
+    conditions: "include = ALL must match; exclude = ANY match hides",
+    deterministic: "purely data-driven from question bank conditions + facts"
   },
   scoring: {
     inclusion: "visible + not nonScoring questions only",
     hiddenAnswers: "retained but excluded from scoring"
   },
   suites: {
-    unlocking: "ANY gate passing unlocks suite",
+    unlocking: "ANY gate passing unlocks suite (if suites exist)",
     visibility: "suite questions become visible when unlocked"
   },
   onboarding: {
