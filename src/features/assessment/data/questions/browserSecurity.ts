@@ -15,6 +15,8 @@ export const browserSecurityQuestions: Question[] = [
     text: 'Have you enabled Microsoft Defender SmartScreen in Edge?',
     priority: ASSESSMENT_PRIORITIES.BROWSER_SECURITY,
     tags: ['browser', 'edge', 'windows', 'security'],
+    difficulty: 'beginner',
+    effort: '2 minutes',
     conditions: {
       include: { "browser": "edge" }
     },
@@ -55,6 +57,8 @@ export const browserSecurityQuestions: Question[] = [
     text: 'Do you use Microsoft Edge\'s built-in password manager?',
     priority: ASSESSMENT_PRIORITIES.PASSWORD_MANAGER,
     tags: ['browser', 'edge', 'passwords'],
+    difficulty: 'beginner',
+    effort: '5 minutes',
     conditions: {
       include: { "browser": "edge" }
     },
@@ -95,6 +99,8 @@ export const browserSecurityQuestions: Question[] = [
     text: 'Have you configured Safari\'s Intelligent Tracking Prevention?',
     priority: ASSESSMENT_PRIORITIES.BROWSER_SECURITY,
     tags: ['browser', 'safari', 'mac', 'privacy'],
+    difficulty: 'beginner',
+    effort: '2 minutes',
     conditions: {
       include: { "browser": "safari" }
     },
@@ -135,6 +141,8 @@ export const browserSecurityQuestions: Question[] = [
     text: 'Do you use Safari with iCloud Keychain for password management?',
     priority: ASSESSMENT_PRIORITIES.PASSWORD_MANAGER,
     tags: ['browser', 'safari', 'mac', 'passwords', 'icloud'],
+    difficulty: 'beginner',
+    effort: '5 minutes',
     conditions: {
       include: { "browser": "safari" }
     },
@@ -175,6 +183,8 @@ export const browserSecurityQuestions: Question[] = [
     text: 'Have you enabled two-factor authentication for your Apple ID?',
     priority: ASSESSMENT_PRIORITIES.TWO_FACTOR_AUTH,
     tags: ['apple', 'mac', 'safari', '2fa', 'authentication'],
+    difficulty: 'beginner',
+    effort: '5 minutes',
     conditions: {
       include: { "browser": "safari" }
     },
@@ -215,6 +225,8 @@ export const browserSecurityQuestions: Question[] = [
     text: 'Have you configured Firefox\'s Enhanced Tracking Protection?',
     priority: ASSESSMENT_PRIORITIES.BROWSER_SECURITY,
     tags: ['browser', 'firefox', 'privacy', 'tracking'],
+    difficulty: 'beginner',
+    effort: '2 minutes',
     conditions: {
       include: { "browser": "firefox" }
     },
@@ -264,6 +276,8 @@ export const browserSecurityQuestions: Question[] = [
     text: 'Have you optimized Firefox\'s privacy settings beyond the defaults?',
     priority: ASSESSMENT_PRIORITIES.BROWSER_PRIVACY,
     tags: ['browser', 'firefox', 'privacy', 'configuration'],
+    difficulty: 'intermediate',
+    effort: '15 minutes',
     conditions: {
       include: { "browser": "firefox" }
     },
@@ -304,6 +318,8 @@ export const browserSecurityQuestions: Question[] = [
     text: 'Have you hardened Chrome\'s privacy settings?',
     priority: ASSESSMENT_PRIORITIES.BROWSER_PRIVACY,
     tags: ['browser', 'chrome', 'privacy'],
+    difficulty: 'intermediate',
+    effort: '10 minutes',
     conditions: {
       include: { "browser": "chrome" }
     },

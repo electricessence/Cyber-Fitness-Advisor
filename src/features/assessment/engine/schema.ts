@@ -59,6 +59,10 @@ export interface Question {
   tags?: string[]; // Replaces quickWin, category, etc. e.g., ['quickwin', 'password', 'critical']
   journeyIntent?: 'onboarding' | 'probe' | 'action-guided' | 'action-critical' | 'checklist' | 'insight';
   description?: string; // Why this matters
+
+  // Actionability metadata — shown on improvement slides, used for ordering & gating
+  difficulty?: 'beginner' | 'intermediate' | 'advanced'; // How challenging the remediation action is
+  effort?: string; // Human-readable time estimate for the action (e.g. "2 minutes", "15 minutes")
   
   // Simple conditional visibility
   conditions?: {

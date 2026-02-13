@@ -10,6 +10,8 @@ export const coreAssessmentQuestions: Question[] = [
     text: 'Do you use a password manager to store and generate your passwords?',
     priority: ASSESSMENT_PRIORITIES.PASSWORD_MANAGER,
     tags: ['critical', 'password', 'quickwin', 'action'],
+    difficulty: 'beginner',
+    effort: '15 minutes to set up',
     options: [
       { 
         id: 'yes',
@@ -36,6 +38,8 @@ export const coreAssessmentQuestions: Question[] = [
     text: 'Do you use two-factor authentication (2FA) to protect your important accounts?',
     priority: ASSESSMENT_PRIORITIES.TWO_FACTOR_AUTH,
     tags: ['critical', 'authentication', 'action'],
+    difficulty: 'beginner',
+    effort: '5 minutes per account',
     options: [
       { 
         id: 'yes',
@@ -71,6 +75,8 @@ export const coreAssessmentQuestions: Question[] = [
     text: 'How do you handle software updates on your devices?',
     priority: ASSESSMENT_PRIORITIES.SOFTWARE_UPDATES,
     tags: ['critical', 'updates', 'action'],
+    difficulty: 'beginner',
+    effort: '2 minutes',
     options: [
       { 
         id: 'automatic',
@@ -106,6 +112,8 @@ export const coreAssessmentQuestions: Question[] = [
     text: 'When did you last run a virus scan?',
     priority: ASSESSMENT_PRIORITIES.VIRUS_SCANNING,
     tags: ['security', 'antivirus', 'probe'],
+    difficulty: 'beginner',
+    effort: '5 minutes',
     options: [
       { 
         id: 'this_week',
@@ -141,6 +149,8 @@ export const coreAssessmentQuestions: Question[] = [
     text: 'How often do you back up your important data?',
     priority: ASSESSMENT_PRIORITIES.BACKUP_FREQUENCY,
     tags: ['critical', 'backup', 'probe'],
+    difficulty: 'beginner',
+    effort: '15 minutes to set up',
     options: [
       { 
         id: 'daily',
@@ -185,6 +195,8 @@ export const coreAssessmentQuestions: Question[] = [
     text: 'What type of security does your home WiFi network use?',
     priority: ASSESSMENT_PRIORITIES.WIFI_SECURITY,
     tags: ['network', 'wifi', 'checklist'],
+    difficulty: 'intermediate',
+    effort: '10 minutes',
     options: [
       { 
         id: 'wpa3',
@@ -238,6 +250,8 @@ export const coreAssessmentQuestions: Question[] = [
     text: 'How do you handle email attachments from unknown senders?',
     priority: ASSESSMENT_PRIORITIES.EMAIL_ATTACHMENTS,
     tags: ['email', 'phishing', 'probe'],
+    difficulty: 'beginner',
+    effort: 'Ongoing habit',
     options: [
       { 
         id: 'never_open',
@@ -282,6 +296,8 @@ export const coreAssessmentQuestions: Question[] = [
     text: 'How careful are you about browser extensions/add-ons?',
     priority: ASSESSMENT_PRIORITIES.BROWSER_EXTENSIONS,
     tags: ['browser', 'extensions', 'probe'],
+    difficulty: 'beginner',
+    effort: '10 minutes to audit',
     options: [
       { 
         id: 'very_selective',

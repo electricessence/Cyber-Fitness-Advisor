@@ -140,6 +140,8 @@ interface ImprovementItem {
   priority: number;
   description?: string;
   explanation?: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  effort?: string;
 }
 
 function getVisuals(question: Question): QuestionVisual {
@@ -238,6 +240,8 @@ export function QuestionDeck() {
               priority: question.priority || 0,
               description: question.description,
               explanation: question.explanation,
+              difficulty: question.difficulty,
+              effort: question.effort,
             });
           }
         }
@@ -331,10 +335,29 @@ export function QuestionDeck() {
                 {currentSlide.text}
               </h4>
 
-              {/* Current answer label — prefer statement (e.g. "Password Manager: Not used") over raw option text */}
-              <p className="text-sm text-gray-500">
-                {currentSlide.statement || currentSlide.currentOptionText}
-              </p>
+              {/* Current answer + metadata pills */}
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm text-gray-500">
+                  {currentSlide.statement || currentSlide.currentOptionText}
+                </p>
+                {currentSlide.difficulty && (
+                  <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
+                    currentSlide.difficulty === 'beginner'
+                      ? 'bg-green-100 text-green-700'
+                      : currentSlide.difficulty === 'intermediate'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-red-100 text-red-700'
+                  }`}>
+                    {currentSlide.difficulty === 'beginner' ? '🟢' : currentSlide.difficulty === 'intermediate' ? '🟡' : '🔴'}{' '}
+                    {currentSlide.difficulty.charAt(0).toUpperCase() + currentSlide.difficulty.slice(1)}
+                  </span>
+                )}
+                {currentSlide.effort && (
+                  <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                    ⏱ {currentSlide.effort}
+                  </span>
+                )}
+              </div>
 
               {/* Educational feedback — the "why" */}
               {currentSlide.currentFeedback && (
