@@ -22,7 +22,6 @@ interface QuestionVisual {
   label: string;
   accent: string;
   tint: string;
-  promptBg: string;
 }
 
 type JourneyIntent = 'onboarding' | 'probe' | 'action-guided' | 'action-critical' | 'checklist' | 'insight';
@@ -34,7 +33,6 @@ const CARD_THEMES: Record<string, QuestionVisual> = {
     label: 'Password Safety',
     accent: 'text-purple-600',
     tint: 'bg-purple-50',
-    promptBg: 'bg-purple-100/60'
   },
   privacy: {
     icon: ShieldHalf,
@@ -42,7 +40,6 @@ const CARD_THEMES: Record<string, QuestionVisual> = {
     label: 'Privacy Basics',
     accent: 'text-emerald-600',
     tint: 'bg-emerald-50',
-    promptBg: 'bg-emerald-100/60'
   },
   browser: {
     icon: QrCode,
@@ -50,7 +47,6 @@ const CARD_THEMES: Record<string, QuestionVisual> = {
     label: 'Browser Care',
     accent: 'text-sky-600',
     tint: 'bg-sky-50',
-    promptBg: 'bg-sky-100/60'
   },
   device: {
     icon: Smartphone,
@@ -58,7 +54,6 @@ const CARD_THEMES: Record<string, QuestionVisual> = {
     label: 'Device Health',
     accent: 'text-orange-600',
     tint: 'bg-amber-50',
-    promptBg: 'bg-amber-100/70'
   },
   action: {
     icon: Sparkles,
@@ -66,7 +61,6 @@ const CARD_THEMES: Record<string, QuestionVisual> = {
     label: 'Action Step',
     accent: 'text-rose-600',
     tint: 'bg-rose-50',
-    promptBg: 'bg-rose-100/60'
   },
   default: {
     icon: ShieldCheck,
@@ -74,7 +68,6 @@ const CARD_THEMES: Record<string, QuestionVisual> = {
     label: 'Security Check',
     accent: 'text-slate-600',
     tint: 'bg-slate-50',
-    promptBg: 'bg-slate-100/60'
   }
 };
 
@@ -432,7 +425,7 @@ export function QuestionDeck() {
     );
   }
 
-  const { icon: Icon, gradient, label, accent, tint, promptBg } = questionVisuals;
+  const { icon: Icon, gradient, label, accent, tint } = questionVisuals;
 
   return (
     <section id="question-deck" aria-label="Security question deck" className="flex flex-col gap-4 h-full">
@@ -449,16 +442,14 @@ export function QuestionDeck() {
                 </span>
                 <p className={`text-xs font-semibold uppercase tracking-wide ${accent}`}>{label}</p>
               </div>
-              <div className={`rounded-xl px-4 py-3 ${tint}`}>
+              <div className={`px-4 py-3 ${tint} rounded-xl`}>
                 {currentQuestion.statement && (
                   <p className="text-base sm:text-lg font-medium text-slate-800 leading-snug">
                     {currentQuestion.statement}
                   </p>
                 )}
-                <h3 className="mt-2">
-                  <span className={`inline-flex px-3 py-1 rounded-xl ${promptBg} ${accent} font-bold text-sm sm:text-base`}>
-                    {currentQuestion.text}
-                  </span>
+                <h3 className={`${currentQuestion.statement ? 'mt-2 ' : ''}font-bold text-sm sm:text-base ${accent}`}>
+                  {currentQuestion.text}
                 </h3>
                 {currentQuestion.timeEstimate && (
                   <div className="inline-flex items-center gap-1 text-xs text-gray-600 bg-white/70 rounded-full px-2 py-1 mt-3">
