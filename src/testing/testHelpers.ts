@@ -46,3 +46,17 @@ export function injectDevice(
     primaryMobile: isMobile ? os as 'ios' | 'android' : undefined,
   });
 }
+
+/**
+ * Simulate failed device detection — sets `device_detection_completed`
+ * and `browser_detected: 'unknown'` without injecting `os_detected`,
+ * so the manual `os_selection` and `browser_selection` questions become
+ * visible.
+ *
+ * Used by personas that test the "unknown device" fallback flow.
+ */
+export function injectFailedDetection() {
+  const store = useAssessmentStore.getState();
+  store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
+  store.factsActions.injectFact('browser_detected', 'unknown', { source: 'auto-detection' });
+}

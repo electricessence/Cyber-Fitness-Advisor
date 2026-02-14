@@ -7,25 +7,32 @@
  * human being — not just a technical branch.
  *
  * Personas:
- *  1. "Grandma Dorothy"   — low-tech beginner, needs hand-holding
- *  2. "Tech Bro Marcus"   — advanced power user, maximum security
- *  3. "Farmer John"       — minimal tech, desktop-only, rarely updates
+ *  1. "Grandma Dorothy"    — low-tech beginner, needs hand-holding
+ *  2. "Tech Bro Marcus"    — advanced power user, maximum security
+ *  3. "Farmer John"        — minimal tech, desktop-only, rarely updates
  *  4. "Working Mom Sarah"  — practical, busy, partial security adoption
  *  5. "Privacy Pat"        — privacy-first advocate, Firefox strict
  *  6. "Financial Frank"    — finance-focused, 2FA everywhere, breach-aware
  *  7. "Linux Dev Dana"     — developer, Linux + Firefox, advanced
  *  8. "College Student Alex" — Mac + Safari, Apple ecosystem, moderate
+ *  9. "iPhone Emma"        — iOS mobile-first, Safari, Apple deep-dives
+ * 10. "Android Amir"       — Android mobile-first, Chrome, Android deep-dives
+ * 11. "Mobile-Only Maya"   — no desktop, failed detection → manual OS/browser
+ * 12. "Firefox Beginner Fiona" — rejects detection, fallback browser select,
+ *                              Firefox ad-block install, untested PM/2FA options
  *
  * OS × Browser diversity matrix:
- *   Windows: Edge (Dorothy, John) | Firefox (Marcus) | Chrome (Frank)
+ *   Windows: Edge (Dorothy, John) | Firefox (Marcus, Fiona*) | Chrome (Frank)
  *   Mac:     Chrome (Sarah) | Firefox (Pat) | Safari (Alex)
  *   Linux:   Firefox (Dana)
+ *   Mobile-Only: Android (Maya via manual selection)
+ *   * Fiona rejects Firefox detection, then picks Firefox via fallback
  */
 
 import { expect } from 'vitest';
 import { JourneyBuilder } from './journeyFramework';
 import { useAssessmentStore } from '../features/assessment/state/store';
-import { injectDevice } from './testHelpers';
+import { injectDevice, injectFailedDetection } from './testHelpers';
 import type { UserJourney } from './journeyFramework';
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -401,6 +408,14 @@ export const farmerJohn: UserJourney = JourneyBuilder
     .answerQuestion('adblock_edge_desktop', 'skipped')
     .then()
 
+  // — Browser-specific (Edge) —
+  .step('Edge SmartScreen: no')
+    .answerQuestion('edge_smartscreen', 'no')
+    .then()
+  .step('Edge password manager: none')
+    .answerQuestion('edge_password_manager', 'none')
+    .then()
+
   .finalOutcome(
     'Farmer John has very low score — nearly every answer is the worst option',
     () => {
@@ -416,6 +431,9 @@ export const farmerJohn: UserJourney = JourneyBuilder
       expect(store.answers['phishing_awareness']?.value).toBe('click_link');
       // Ad-block deep dive — offered but skipped
       expect(store.answers['adblock_edge_desktop']?.value).toBe('skipped');
+      // Edge browser-specific — SmartScreen off, no PM
+      expect(store.answers['edge_smartscreen']?.value).toBe('no');
+      expect(store.answers['edge_password_manager']?.value).toBe('none');
     }
   )
   .build();
@@ -1444,6 +1462,339 @@ export const androidAmir: UserJourney = JourneyBuilder
   .build();
 
 // ═══════════════════════════════════════════════════════════════════════
+// Persona 11 — "Mobile-Only Maya"
+// Mobile-only user with no desktop.  Device detection fails, so she
+// goes through the manual os_selection → mobile_only → mobile_os_selection
+// path that no other persona exercises.  Poor mobile security habits
+// cover the "bad path" branches that Emma and Amir (both power users)
+// never touch.
+// ═══════════════════════════════════════════════════════════════════════
+
+export const mobileOnlyMaya: UserJourney = JourneyBuilder
+  .create('Mobile-Only Maya — Android-Only, Failed Detection, Poor Mobile Habits')
+  .description(
+    'A user with only a phone and no desktop.  Device detection fails, so she ' +
+    'manually selects mobile_only → Android → Chrome.  Tests the os_selection, ' +
+    'mobile_os_selection, and browser_selection fallback paths that no other ' +
+    'persona reaches.  Poor habits exercise the worst-case mobile options.'
+  )
+
+  // — Onboarding (failed detection → manual selection) —
+  .step('Failed device detection')
+    .custom(() => injectFailedDetection())
+    .then()
+  .step('Privacy notice')
+    .answerQuestion('privacy_notice', 'understood')
+    .then()
+  .step('OS selection: mobile only')
+    .answerQuestion('os_selection', 'mobile_only')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('os')?.value).toBe('mobile_only');
+      expect(store.factsActions.getFact('os_confirmed')?.value).toBe(true);
+    })
+    .then()
+  .step('Mobile OS selection: Android')
+    .answerQuestion('mobile_os_selection', 'android')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('mobile_os')?.value).toBe('android');
+      expect(store.factsActions.getFact('has_mobile')?.value).toBe(true);
+    })
+    .then()
+  .step('Browser selection: Chrome')
+    .answerQuestion('browser_selection', 'chrome')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('browser')?.value).toBe('chrome');
+      expect(store.factsActions.getFact('browser_confirmed')?.value).toBe(true);
+    })
+    .then()
+  .step('Tech comfort: beginner')
+    .answerQuestion('tech_comfort', 'beginner')
+    .then()
+  .step('Priority: work security')
+    .answerQuestion('usage_context', 'work_security')
+    .then()
+
+  // — Core Assessment (poor security) —
+  .step('No password manager')
+    .answerQuestion('password_manager', 'no')
+    .then()
+  .step('PM method: memory only')
+    .answerQuestion('pm_current_method', 'memory')
+    .then()
+  .step('PM barrier: cost')
+    .answerQuestion('pm_barrier', 'cost')
+    .then()
+  .step('No 2FA')
+    .answerQuestion('two_factor_auth', 'no')
+    .then()
+  .step('TFA priority: social media')
+    .answerQuestion('tfa_priority_accounts', 'social')
+    .then()
+  .step('TFA barrier: lockout fear')
+    .answerQuestion('tfa_barrier', 'lockout_fear')
+    .then()
+  .step('Software updates: rarely')
+    .answerQuestion('software_updates', 'rarely')
+    .then()
+  .step('Virus scan: never')
+    .answerQuestion('virus_scan_recent', 'never')
+    .then()
+  .step('Backup: never')
+    .answerQuestion('backup_frequency', 'never')
+    .then()
+  .step('WiFi: open network')
+    .answerQuestion('wifi_security', 'open')
+    .then()
+  .step('Email: always opens attachments')
+    .answerQuestion('email_attachments', 'always_open')
+    .then()
+  .step('Extensions: installs freely')
+    .answerQuestion('browser_extensions', 'install_freely')
+    .then()
+
+  // — Security Hygiene (poor across the board) —
+  .step('Screen lock: pattern')
+    .answerQuestion('screen_lock', 'pattern')
+    .then()
+  .step('Password reuse: often')
+    .answerQuestion('password_reuse_habits', 'often')
+    .then()
+  .step('Phishing: clicks link')
+    .answerQuestion('phishing_awareness', 'click_link')
+    .then()
+  .step('Breach check: never')
+    .answerQuestion('breach_check', 'no')
+    .then()
+  .step('Account recovery: none')
+    .answerQuestion('account_recovery', 'no')
+    .then()
+  .step('Ad blocker: no')
+    .answerQuestion('ad_blocker', 'no')
+    .then()
+
+  // — Mobile Security (poor habits — key coverage gap) —
+  .step('Mobile screen lock: none')
+    .answerQuestion('mobile_screen_lock', 'none')
+    .then()
+  .step('Mobile updates: delay')
+    .answerQuestion('mobile_os_updates', 'delay')
+    .then()
+  .step('App permissions: always allow')
+    .answerQuestion('mobile_app_permissions', 'always_allow')
+    .then()
+  .step('Public WiFi: use freely')
+    .answerQuestion('mobile_public_wifi', 'use_freely')
+    .then()
+
+  // — Android-specific (poor habits) —
+  .step('Find My Device: no')
+    .answerQuestion('android_find_my', 'no')
+    .then()
+  .step('Play Protect: unsure')
+    .answerQuestion('android_play_protect', 'unsure')
+    .then()
+  .step('Sideloading: frequent')
+    .answerQuestion('android_unknown_sources', 'frequent')
+    .then()
+
+  .finalOutcome(
+    'Mobile-Only Maya has very low score — worst mobile options across the board',
+    () => {
+      const store = useAssessmentStore.getState();
+      expect(store.overallScore).toBeLessThan(20);
+      // Manual detection path worked
+      expect(store.factsActions.getFact('os')?.value).toBe('mobile_only');
+      expect(store.factsActions.getFact('mobile_os')?.value).toBe('android');
+      expect(store.factsActions.getFact('browser')?.value).toBe('chrome');
+      // os_selection, mobile_os_selection, browser_selection all answered
+      expect(store.answers['os_selection']?.value).toBe('mobile_only');
+      expect(store.answers['mobile_os_selection']?.value).toBe('android');
+      expect(store.answers['browser_selection']?.value).toBe('chrome');
+      // All mobile worst-case options
+      expect(store.answers['mobile_screen_lock']?.value).toBe('none');
+      expect(store.answers['mobile_os_updates']?.value).toBe('delay');
+      expect(store.answers['mobile_app_permissions']?.value).toBe('always_allow');
+      expect(store.answers['mobile_public_wifi']?.value).toBe('use_freely');
+      expect(store.answers['android_find_my']?.value).toBe('no');
+      expect(store.answers['android_play_protect']?.value).toBe('unsure');
+      expect(store.answers['android_unknown_sources']?.value).toBe('frequent');
+      // PM/2FA remediation paths
+      expect(store.answers['pm_current_method']?.value).toBe('memory');
+      expect(store.answers['pm_barrier']?.value).toBe('cost');
+      expect(store.answers['tfa_priority_accounts']?.value).toBe('social');
+      expect(store.answers['tfa_barrier']?.value).toBe('lockout_fear');
+    }
+  )
+  .build();
+
+// ═══════════════════════════════════════════════════════════════════════
+// Persona 12 — "Firefox Beginner Fiona"
+// Rejects browser detection → exercises browser_selection_fallback.
+// Uses Firefox with no ad blocker → unlocks adblock_firefox_desktop
+// and sponsorblock_firefox (the last 2 unreachable ad-block questions).
+// Firefox "standard" and "default" options cover untested branches.
+// PM type "browser" (Firefox built-in) is a new option no other
+// persona exercises.
+// ═══════════════════════════════════════════════════════════════════════
+
+export const firefoxBeginnerFiona: UserJourney = JourneyBuilder
+  .create('Firefox Beginner Fiona — Detection Rejection, Firefox Ad-Block Install')
+  .description(
+    'Windows + Firefox user who rejects browser detection, triggering the ' +
+    'browser_selection_fallback path.  Uses Firefox built-in PM, partial 2FA ' +
+    'with email codes, and no ad blocker — unlocking the full Firefox ad-block ' +
+    'installation flow (adblock_firefox_desktop + sponsorblock_firefox) that ' +
+    'no other persona reaches.'
+  )
+
+  // — Onboarding (detection rejected → fallback browser selection) —
+  .step('Detect Windows + Firefox')
+    .custom(() => injectDevice('windows', 'firefox'))
+    .then()
+  .step('Privacy notice')
+    .answerQuestion('privacy_notice', 'understood')
+    .then()
+  .step('Confirm Windows')
+    .answerQuestion('windows_detection_confirm', 'yes')
+    .then()
+  .step('Reject Firefox detection → triggers fallback')
+    .answerQuestion('firefox_detection_confirm', 'no')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      // browser_confirmed should be false, triggering fallback
+      expect(store.factsActions.getFact('browser_confirmed')?.value).toBe(false);
+    })
+    .then()
+  .step('Browser selection fallback: pick Firefox anyway')
+    .answerQuestion('browser_selection_fallback', 'firefox')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('browser')?.value).toBe('firefox');
+      expect(store.factsActions.getFact('browser_confirmed')?.value).toBe(true);
+    })
+    .then()
+  .step('Tech comfort: comfortable')
+    .answerQuestion('tech_comfort', 'comfortable')
+    .then()
+  .step('Has both iPhone and Android')
+    .answerQuestion('mobile_context', 'both')
+    .then()
+  .step('Priority: work security')
+    .answerQuestion('usage_context', 'work_security')
+    .then()
+
+  // — Core Assessment (mixed — uses Firefox built-in PM) —
+  .step('Uses password manager')
+    .answerQuestion('password_manager', 'yes')
+    .then()
+  .step('PM type: browser built-in (Firefox)')
+    .answerQuestion('pm_type', 'browser')
+    .then()
+  .step('PM master password: unsure')
+    .answerQuestion('pm_master_password', 'unsure')
+    .then()
+  .step('Partial 2FA')
+    .answerQuestion('two_factor_auth', 'partial')
+    .then()
+  .step('TFA method: email')
+    .answerQuestion('tfa_method', 'email')
+    .then()
+  .step('TFA backup codes: somewhere')
+    .answerQuestion('tfa_backup_codes', 'somewhere')
+    .then()
+  .step('TFA priority: work accounts')
+    .answerQuestion('tfa_priority_accounts', 'work')
+    .then()
+  .step('TFA barrier: not available')
+    .answerQuestion('tfa_barrier', 'not_available')
+    .then()
+  .step('Software updates: manual')
+    .answerQuestion('software_updates', 'manual')
+    .then()
+  .step('Virus scan: this month')
+    .answerQuestion('virus_scan_recent', 'this_month')
+    .then()
+  .step('Backup: monthly')
+    .answerQuestion('backup_frequency', 'monthly')
+    .then()
+  .step('WiFi: WPA')
+    .answerQuestion('wifi_security', 'wpa')
+    .then()
+  .step('Email: scan first')
+    .answerQuestion('email_attachments', 'scan_first')
+    .then()
+  .step('Extensions: research first')
+    .answerQuestion('browser_extensions', 'research_first')
+    .then()
+
+  // — Security Hygiene (middling) —
+  .step('Screen lock: pin')
+    .answerQuestion('screen_lock', 'pin')
+    .then()
+  .step('Password reuse: sometimes')
+    .answerQuestion('password_reuse_habits', 'sometimes')
+    .then()
+  .step('Phishing: hover first')
+    .answerQuestion('phishing_awareness', 'hover_first')
+    .then()
+  .step('Breach check: once')
+    .answerQuestion('breach_check', 'yes_once')
+    .then()
+  .step('Account recovery: basic')
+    .answerQuestion('account_recovery', 'yes_basic')
+    .then()
+  .step('Ad blocker: no')
+    .answerQuestion('ad_blocker', 'no')
+    .then()
+
+  // — Ad-Block Deep Dive (Firefox desktop + no ad blocker → QUALIFIES!) —
+  .step('Ad blocker Firefox: installed uBlock Origin')
+    .answerQuestion('adblock_firefox_desktop', 'installed')
+    .then()
+  .step('SponsorBlock: skipped')
+    .answerQuestion('sponsorblock_firefox', 'skipped')
+    .then()
+
+  // — Browser-specific (Firefox) — uses weaker options than power users —
+  .step('Firefox tracking: standard')
+    .answerQuestion('firefox_tracking_protection', 'standard')
+    .then()
+  .step('Firefox privacy: default settings')
+    .answerQuestion('firefox_privacy_config', 'default')
+    .then()
+
+  .finalOutcome(
+    'Fiona has moderate score — Firefox ad-block installed, but gaps in PM, 2FA, and hygiene',
+    () => {
+      const store = useAssessmentStore.getState();
+      expect(store.overallScore).toBeGreaterThan(30);
+      // Detection rejection → fallback → Firefox confirmed
+      expect(store.answers['firefox_detection_confirm']?.value).toBe('no');
+      expect(store.answers['browser_selection_fallback']?.value).toBe('firefox');
+      expect(store.factsActions.getFact('browser')?.value).toBe('firefox');
+      // Firefox ad-block flow completed (previously unreachable!)
+      expect(store.answers['adblock_firefox_desktop']?.value).toBe('installed');
+      expect(store.answers['sponsorblock_firefox']?.value).toBe('skipped');
+      // PM type browser (new option in this persona)
+      expect(store.answers['pm_type']?.value).toBe('browser');
+      expect(store.answers['pm_master_password']?.value).toBe('unsure');
+      // Email 2FA method (new option)
+      expect(store.answers['tfa_method']?.value).toBe('email');
+      expect(store.answers['tfa_priority_accounts']?.value).toBe('work');
+      expect(store.answers['tfa_barrier']?.value).toBe('not_available');
+      // Firefox browser-specific — standard and default (new options)
+      expect(store.answers['firefox_tracking_protection']?.value).toBe('standard');
+      expect(store.answers['firefox_privacy_config']?.value).toBe('default');
+      // advanced_2fa NOT unlocked (updates=manual)
+      expect(store.answers['advanced_2fa']).toBeUndefined();
+    }
+  )
+  .build();
+
+// ═══════════════════════════════════════════════════════════════════════
 // Exports
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -1458,4 +1809,6 @@ export const PERSONA_JOURNEYS = [
   collegeStudentAlex,
   iphoneEmma,
   androidAmir,
+  mobileOnlyMaya,
+  firefoxBeginnerFiona,
 ] as const;
