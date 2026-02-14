@@ -120,8 +120,8 @@ export const browserSecurityQuestions: Question[] = [
         statement: 'Safari ITP: Default configuration',
         statusCategory: 'shields-up',
         facts: { "safari_itp": true, "tracking_protection": "default" },
-        points: 12,
-        feedback: 'Good! Safari\'s default ITP settings are already quite protective.'
+        points: 6,
+        feedback: 'Safari\'s default ITP settings are already quite protective — you\'re getting solid tracking prevention out of the box.'
       },
       {
         id: 'disabled',

@@ -123,13 +123,17 @@ export const onboardingQuestions: Question[] = [
     options: [
       { 
         id: 'yes',
-        text: '✅ Yes, I use macOS', 
+        text: '✅ Yes, I use macOS',
+        statement: 'Desktop OS: macOS',
+        statusCategory: 'shields-up',
         facts: { "os": "mac", "os_confirmed": true },
         feedback: 'Great! We\'ll provide macOS-specific security advice.'
       },
       { 
         id: 'no',
-        text: '❌ No, that\'s wrong', 
+        text: '❌ No, that\'s wrong',
+        statement: 'Desktop OS: Unconfirmed',
+        statusCategory: 'room-for-improvement',
         facts: { "os_confirmed": false },
         feedback: 'No problem! We\'ll ask you to select your actual OS.'
       }
@@ -151,13 +155,17 @@ export const onboardingQuestions: Question[] = [
     options: [
       { 
         id: 'yes',
-        text: '✅ Yes, I use Linux', 
+        text: '✅ Yes, I use Linux',
+        statement: 'Desktop OS: Linux',
+        statusCategory: 'shields-up',
         facts: { "os": "linux", "os_confirmed": true },
         feedback: 'Excellent! We\'ll provide Linux-specific security advice.'
       },
       { 
         id: 'no',
-        text: '❌ No, that\'s wrong', 
+        text: '❌ No, that\'s wrong',
+        statement: 'Desktop OS: Unconfirmed',
+        statusCategory: 'room-for-improvement',
         facts: { "os_confirmed": false },
         feedback: 'No problem! We\'ll ask you to select your actual OS.'
       }

@@ -19,6 +19,11 @@ export function evaluateQuestionConditions(
           reason: `Include condition failed: ${factId} expected ${expectedValue}, got undefined`
         };
       }
+      // Special case: "*" means "any value" — include if fact exists
+      if (expectedValue === "*") {
+        continue; // fact exists (checked above), any value is fine
+      }
+
       // Array means "any of these values" (OR semantics)
       if (Array.isArray(expectedValue)) {
         if (!expectedValue.includes(fact.value as never)) {

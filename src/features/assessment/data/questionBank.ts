@@ -9,7 +9,7 @@ const advancedSecurityQuestions: Question[] = [
   {
     id: 'advanced_2fa',
     phase: 'assessment',
-    priority: 1000, // High priority for unlocked content
+    priority: 90, // Just above core assessment range (40-85)
     statement: 'Hardware 2FA Keys Used',
     text: 'Do you use hardware security keys (like YubiKey) for 2FA?',
     tags: ['security', 'authentication', 'advanced'],
@@ -26,7 +26,7 @@ const advancedSecurityQuestions: Question[] = [
         statusCategory: 'shields-up',
         points: 15,
         facts: { "hardware_2fa": true },
-        feedback: '🔐 Excellent! Hardware keys provide the strongest 2FA protection.'
+        feedback: 'Hardware security keys provide the strongest form of 2FA — they\'re phishing-resistant because the key must be physically present to authenticate.'
       },
       {
         id: 'no',
@@ -35,7 +35,7 @@ const advancedSecurityQuestions: Question[] = [
         statusCategory: 'to-do',
         points: 0,
         facts: { "hardware_2fa": false },
-        feedback: '📱 Consider YubiKey or similar FIDO2 security keys for maximum protection.'
+        feedback: 'FIDO2 hardware keys (like YubiKey) are the gold standard for phishing-resistant authentication. Worth researching if you want the strongest available protection.'
       }
     ]
   }

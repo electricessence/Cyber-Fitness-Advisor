@@ -195,6 +195,28 @@ describe('evaluateQuestionConditions', () => {
       });
     });
 
+    it('should handle wildcard "*" include conditions — visible when fact exists with any value', () => {
+      const question = createQuestion('include_wildcard', {
+        include: { tech_comfort: '*' }
+      });
+
+      const facts = {
+        tech_comfort: createFact('tech_comfort', 'beginner')
+      };
+
+      const result = evaluateQuestionConditions(question, facts);
+      expect(result).toEqual({ visible: true });
+    });
+
+    it('should handle wildcard "*" include conditions — hidden when fact missing', () => {
+      const question = createQuestion('include_wildcard_missing', {
+        include: { tech_comfort: '*' }
+      });
+
+      const result = evaluateQuestionConditions(question, {});
+      expect(result.visible).toBe(false);
+    });
+
     it('should handle wildcard "*" exclude conditions correctly', () => {
       const question = createQuestion('exclude_wildcard', {
         exclude: {

@@ -186,7 +186,7 @@ export const coreAssessmentQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "backup": "never" },
         points: 0,
-        feedback: 'Backups are essential! One hardware failure could lose everything.'
+        feedback: 'Without backups, a single hardware failure, ransomware attack, or accidental deletion could mean permanent data loss. Even a basic external drive or cloud backup adds significant resilience.'
       }
     ]
   },
@@ -232,7 +232,7 @@ export const coreAssessmentQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "wifi_security": "open" },
         points: 0,
-        feedback: 'This is very dangerous! Anyone can access your network and data.'
+        feedback: 'An open network means anyone nearby can see your traffic. If this is your home WiFi, adding a WPA2 or WPA3 password is one of the highest-impact changes you can make.'
       },
       { 
         id: 'unknown',
@@ -287,7 +287,7 @@ export const coreAssessmentQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "email_safety": "dangerous" },
         points: 0,
-        feedback: 'This is very dangerous! Email attachments are a common attack vector.'
+        feedback: 'Email attachments are one of the most common ways malware spreads. Even messages that look legitimate can carry threats — it\'s worth developing a habit of pausing before opening anything unexpected.'
       }
     ]
   },

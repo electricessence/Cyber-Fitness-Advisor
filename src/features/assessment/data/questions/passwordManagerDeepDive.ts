@@ -98,7 +98,7 @@ export const passwordManagerDeepDiveQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { pm_master_strength: 'reused' },
         points: 0,
-        feedback: 'This is the highest-risk scenario: if that password leaks from any other site, an attacker gets access to ALL your passwords at once. Change your master password immediately to a unique passphrase you\'ve never used anywhere else.'
+        feedback: 'This is the highest-risk password manager scenario: if that password leaks from any other site, an attacker could access all your stored passwords at once. A unique passphrase you\'ve never used anywhere else would close this gap — even a simple four-word phrase is vastly stronger than a reused password.'
       },
       {
         id: 'unsure',

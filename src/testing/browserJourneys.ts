@@ -161,7 +161,7 @@ export const windowsFirefoxJourney = JourneyBuilder
     .then()
   
   .step('User sets up Firefox privacy configuration')
-    .answerQuestion('firefox_privacy_config', 'strict')
+    .answerQuestion('firefox_privacy_config', 'optimized')
     .expectStoreState({ answersCount: 5 })
     .then()
   
@@ -237,7 +237,7 @@ export const windowsChromeJourney = JourneyBuilder
     .then()
   
   .step('User configures Chrome privacy hardening')
-    .answerQuestion('chrome_privacy_hardening', 'strict')
+    .answerQuestion('chrome_privacy_hardening', 'comprehensive')
     .expectStoreState({ answersCount: 4 })
     .then()
   
@@ -316,7 +316,7 @@ export const macChromeJourney = JourneyBuilder
     .then()
   
   .step('User configures Chrome privacy hardening')
-    .answerQuestion('chrome_privacy_hardening', 'strict')
+    .answerQuestion('chrome_privacy_hardening', 'comprehensive')
     .expectStoreState({ answersCount: 4 })
     .then()
   
@@ -486,7 +486,7 @@ export const macFirefoxJourney = JourneyBuilder
     .then()
   
   .step('User sets up Firefox privacy configuration')
-    .answerQuestion('firefox_privacy_config', 'strict')
+    .answerQuestion('firefox_privacy_config', 'optimized')
     .expectStoreState({ answersCount: 5 })
     .then()
   
