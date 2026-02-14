@@ -27,6 +27,8 @@ import {
   workingMomSarah,
   privacyPat,
   financialFrank,
+  linuxDevDana,
+  collegeStudentAlex,
   PERSONA_JOURNEYS,
 } from '../testing/personaJourneys';
 import { useAssessmentStore } from '../features/assessment/state/store';
@@ -45,11 +47,11 @@ describe('👤 Persona-Based User Journeys', () => {
   // ── Low-Tech / Beginner Personas ────────────────────────────────────
 
   describe('🧓 Low-Tech Beginners', () => {
-    it('Grandma Dorothy — novice help flow, all remediation branches, low score', async () => {
+    it('Grandma Dorothy — Windows/Edge, novice help flow, all remediation branches, low score', async () => {
       await runner.executeJourney(grandmaDorothy);
     }, 30000);
 
-    it('Farmer John — desktop-only, worst answers across the board', async () => {
+    it('Farmer John — Windows/Edge, desktop-only, worst answers across the board', async () => {
       await runner.executeJourney(farmerJohn);
     }, 30000);
   });
@@ -57,34 +59,42 @@ describe('👤 Persona-Based User Journeys', () => {
   // ── Moderate / Practical Personas ───────────────────────────────────
 
   describe('👩‍💼 Practical Middle-Ground', () => {
-    it('Working Mom Sarah — partial 2FA unlocks all four TFA deep-dives', async () => {
+    it('Working Mom Sarah — Mac/Chrome, partial 2FA unlocks all four TFA deep-dives', async () => {
       await runner.executeJourney(workingMomSarah);
     }, 30000);
 
-    it('Financial Frank — finance-focused, strong on banking security', async () => {
+    it('Financial Frank — Windows/Chrome, finance-focused, strong on banking security', async () => {
       await runner.executeJourney(financialFrank);
+    }, 30000);
+
+    it('College Student Alex — Mac/Safari, Apple ecosystem, Safari-specific questions', async () => {
+      await runner.executeJourney(collegeStudentAlex);
     }, 30000);
   });
 
   // ── Advanced / Power-User Personas ──────────────────────────────────
 
   describe('🔒 Power Users', () => {
-    it('Tech Bro Marcus — max security, unlocks advanced_2fa gate', async () => {
+    it('Tech Bro Marcus — Windows/Firefox, max security, unlocks advanced_2fa gate', async () => {
       await runner.executeJourney(techBroMarcus);
     }, 30000);
 
-    it('Privacy Pat — Firefox strict, privacy-first, high score', async () => {
+    it('Privacy Pat — Mac/Firefox, privacy-first, high score', async () => {
       await runner.executeJourney(privacyPat);
+    }, 30000);
+
+    it('Linux Dev Dana — Linux/Firefox, developer, full advanced_2fa unlock', async () => {
+      await runner.executeJourney(linuxDevDana);
     }, 30000);
   });
 
   // ── Coverage & Completeness ─────────────────────────────────────────
 
   describe('📊 Persona Coverage', () => {
-    it('All persona journeys complete successfully', async () => {
+    it('All 8 persona journeys complete successfully', async () => {
       for (const journey of PERSONA_JOURNEYS) {
         await runner.executeJourney(journey);
       }
-    }, 120000);
+    }, 180000);
   });
 });
