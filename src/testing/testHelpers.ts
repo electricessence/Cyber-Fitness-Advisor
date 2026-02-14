@@ -24,23 +24,25 @@ export function injectDevice(
   store.factsActions.injectFact('device_type', type, { source: 'auto-detection' });
   store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
 
+  const isMobile = type === 'mobile';
+
   store.setDeviceProfile({
     currentDevice: {
       type,
       // Test-only: cast needed because DeviceProfile accepts string literals but
       // journey definitions parameterise the OS/browser dynamically.
-      os: os as 'windows' | 'mac' | 'linux',
+      os: os as 'windows' | 'mac' | 'linux' | 'ios' | 'android',
       browser: browser as 'chrome' | 'firefox' | 'edge' | 'safari',
     },
     otherDevices: {
       hasWindows: os === 'windows',
       hasMac: os === 'mac',
       hasLinux: os === 'linux',
-      hasIPhone: false,
-      hasAndroid: false,
+      hasIPhone: os === 'ios',
+      hasAndroid: os === 'android',
       hasIPad: false,
     },
-    primaryDesktop: os as 'windows' | 'mac' | 'linux',
-    primaryMobile: undefined,
+    primaryDesktop: isMobile ? undefined : os as 'windows' | 'mac' | 'linux',
+    primaryMobile: isMobile ? os as 'ios' | 'android' : undefined,
   });
 }

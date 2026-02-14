@@ -1070,6 +1070,347 @@ export const collegeStudentAlex: UserJourney = JourneyBuilder
   .build();
 
 // ═══════════════════════════════════════════════════════════════════════
+// Persona 9 — "iPhone Emma"
+// iOS mobile-first user.  Arrives from an iPhone with Safari.
+// Tests the new iOS detection confirm flow, mobile security questions,
+// and iOS-specific deep-dives (Find My, iCloud, App Store).
+// ═══════════════════════════════════════════════════════════════════════
+
+export const iphoneEmma: UserJourney = JourneyBuilder
+  .create('iPhone Emma — iOS Mobile User')
+  .description(
+    'College-age iPhone user who visits from her phone. Tests iOS auto-detection ' +
+    'confirm flow, mobile security questions, and iOS-specific deep-dives. ' +
+    'Good security habits but gaps in some areas.'
+  )
+
+  // — Onboarding (Mobile) —
+  .step('Detect iOS + Safari (mobile device)')
+    .custom(() => injectDevice('ios', 'safari', 'mobile'))
+    .then()
+  .step('Acknowledge privacy notice')
+    .answerQuestion('privacy_notice', 'understood')
+    .expectStoreState({ answersCount: 1 })
+    .then()
+  .step('Confirm iOS detection')
+    .answerQuestion('ios_detection_confirm', 'yes')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('os')?.value).toBe('ios');
+      expect(store.factsActions.getFact('os_confirmed')?.value).toBe(true);
+      expect(store.factsActions.getFact('has_mobile')?.value).toBe(true);
+      expect(store.factsActions.getFact('mobile_os')?.value).toBe('ios');
+    })
+    .then()
+  .step('Confirm Safari browser')
+    .answerQuestion('safari_detection_confirm', 'yes')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('browser')?.value).toBe('safari');
+    })
+    .then()
+  .step('Tech comfort: comfortable')
+    .answerQuestion('tech_comfort', 'comfortable')
+    .then()
+  // mobile_context should be skipped (mobile_os already set by ios_detection_confirm)
+  .step('Usage concern: general')
+    .answerQuestion('usage_context', 'general')
+    .then()
+
+  // — Core Assessment —
+  .step('No dedicated password manager (uses iCloud Keychain)')
+    .answerQuestion('password_manager', 'no')
+    .then()
+  .step('PM method: browser save (iCloud Keychain)')
+    .answerQuestion('pm_current_method', 'browser_save')
+    .then()
+  .step('PM barrier: procrastination')
+    .answerQuestion('pm_barrier', 'procrastination')
+    .then()
+  .step('Uses 2FA on some accounts')
+    .answerQuestion('two_factor_auth', 'partial')
+    .then()
+  .step('2FA method: SMS')
+    .answerQuestion('tfa_method', 'sms')
+    .then()
+  .step('2FA backup codes: no')
+    .answerQuestion('tfa_backup_codes', 'no')
+    .then()
+  .step('2FA priority: email')
+    .answerQuestion('tfa_priority_accounts', 'email')
+    .then()
+  .step('2FA barrier: inconvenient')
+    .answerQuestion('tfa_barrier', 'inconvenient')
+    .then()
+  .step('Automatic updates')
+    .answerQuestion('software_updates', 'automatic')
+    .then()
+
+  // — Security Hygiene —
+  .step('Screen lock: short auto-lock')
+    .answerQuestion('screen_lock', 'auto_short')
+    .then()
+  .step('Password reuse: rarely')
+    .answerQuestion('password_reuse_habits', 'rarely')
+    .then()
+  .step('Phishing: checks carefully')
+    .answerQuestion('phishing_awareness', 'check_carefully')
+    .then()
+  .step('Breach check: never')
+    .answerQuestion('breach_check', 'never')
+    .then()
+  .step('Account recovery: basic setup')
+    .answerQuestion('account_recovery', 'yes_basic')
+    .then()
+  .step('Ad blocker: no')
+    .answerQuestion('ad_blocker', 'no')
+    .then()
+  .step('Virus scan: this month')
+    .answerQuestion('virus_scan', 'this_month')
+    .then()
+  .step('Backup: weekly')
+    .answerQuestion('backup_frequency', 'weekly')
+    .then()
+  .step('WiFi: WPA2')
+    .answerQuestion('wifi_security', 'wpa2')
+    .then()
+  .step('Email: scan first')
+    .answerQuestion('email_attachments', 'scan_first')
+    .then()
+  .step('Extensions: no extensions')
+    .answerQuestion('browser_extensions', 'no_extensions')
+    .then()
+
+  // — Safari-specific (via browser confirm) —
+  .step('Safari ITP: default')
+    .answerQuestion('safari_itp', 'default')
+    .then()
+  .step('iCloud Keychain: yes')
+    .answerQuestion('safari_icloud_keychain', 'yes')
+    .then()
+  .step('Apple ID 2FA: yes')
+    .answerQuestion('apple_id_2fa', 'yes')
+    .then()
+
+  // — iOS ad-block (no ad blocker on iOS) —
+  .step('iOS ad-block: skip for later')
+    .answerQuestion('adblock_mobile_ios', 'skipped')
+    .then()
+
+  // — Mobile Security (shared) —
+  .step('Mobile screen lock: biometric')
+    .answerQuestion('mobile_screen_lock', 'biometric')
+    .then()
+  .step('Mobile OS updates: automatic')
+    .answerQuestion('mobile_os_updates', 'automatic')
+    .then()
+  .step('Mobile app permissions: review carefully')
+    .answerQuestion('mobile_app_permissions', 'review')
+    .then()
+  .step('Mobile public WiFi: careful')
+    .answerQuestion('mobile_public_wifi', 'careful')
+    .then()
+
+  // — iOS-specific deep-dives —
+  .step('Find My iPhone: yes')
+    .answerQuestion('ios_find_my', 'yes')
+    .then()
+  .step('iCloud Backup: standard')
+    .answerQuestion('ios_icloud_backup', 'yes')
+    .then()
+  .step('iOS app sources: App Store only')
+    .answerQuestion('ios_app_sources', 'app_store_only')
+    .then()
+
+  .finalOutcome(
+    'iPhone Emma completes full iOS mobile flow with good score',
+    () => {
+      const store = useAssessmentStore.getState();
+      // iOS detected and confirmed
+      expect(store.factsActions.getFact('os')?.value).toBe('ios');
+      expect(store.factsActions.getFact('mobile_os')?.value).toBe('ios');
+      // Mobile security questions answered
+      expect(store.answers['mobile_screen_lock']?.value).toBe('biometric');
+      expect(store.answers['mobile_os_updates']?.value).toBe('automatic');
+      expect(store.answers['mobile_app_permissions']?.value).toBe('review');
+      expect(store.answers['mobile_public_wifi']?.value).toBe('careful');
+      // iOS-specific questions answered
+      expect(store.answers['ios_find_my']?.value).toBe('yes');
+      expect(store.answers['ios_icloud_backup']?.value).toBe('yes');
+      expect(store.answers['ios_app_sources']?.value).toBe('app_store_only');
+      // Safari questions also answered (browser detection)
+      expect(store.answers['safari_itp']?.value).toBe('default');
+      expect(store.answers['apple_id_2fa']?.value).toBe('yes');
+      // Score is reasonable
+      expect(store.overallScore).toBeGreaterThan(30);
+    }
+  )
+  .build();
+
+// ═══════════════════════════════════════════════════════════════════════
+// Persona 10 — "Android Amir"
+// Android power user.  Arrives from an Android device with Chrome.
+// Tests Android detection confirm, mobile security, and Android-specific
+// deep-dives (Find My Device, Play Protect, sideloading).
+// ═══════════════════════════════════════════════════════════════════════
+
+export const androidAmir: UserJourney = JourneyBuilder
+  .create('Android Amir — Android Mobile User')
+  .description(
+    'Tech-comfortable Android user. Tests Android auto-detection confirm flow, ' +
+    'mobile security questions, and Android-specific deep-dives. Good habits ' +
+    'with some sideloading risk.'
+  )
+
+  // — Onboarding (Mobile) —
+  .step('Detect Android + Chrome (mobile device)')
+    .custom(() => injectDevice('android', 'chrome', 'mobile'))
+    .then()
+  .step('Acknowledge privacy notice')
+    .answerQuestion('privacy_notice', 'understood')
+    .expectStoreState({ answersCount: 1 })
+    .then()
+  .step('Confirm Android detection')
+    .answerQuestion('android_detection_confirm', 'yes')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('os')?.value).toBe('android');
+      expect(store.factsActions.getFact('os_confirmed')?.value).toBe(true);
+      expect(store.factsActions.getFact('has_mobile')?.value).toBe(true);
+      expect(store.factsActions.getFact('mobile_os')?.value).toBe('android');
+    })
+    .then()
+  .step('Confirm Chrome browser')
+    .answerQuestion('chrome_detection_confirm', 'yes')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('browser')?.value).toBe('chrome');
+    })
+    .then()
+  .step('Tech comfort: advanced')
+    .answerQuestion('tech_comfort', 'advanced')
+    .then()
+  // mobile_context should be skipped (mobile_os already set by android_detection_confirm)
+  .step('Usage concern: personal data')
+    .answerQuestion('usage_context', 'personal_data')
+    .then()
+
+  // — Core Assessment —
+  .step('Uses password manager')
+    .answerQuestion('password_manager', 'yes')
+    .then()
+  .step('PM type: cloud')
+    .answerQuestion('pm_type', 'cloud')
+    .then()
+  .step('PM master password: strong passphrase')
+    .answerQuestion('pm_master_password', 'passphrase')
+    .then()
+  .step('Uses 2FA')
+    .answerQuestion('two_factor_auth', 'yes')
+    .then()
+  .step('2FA method: authenticator app')
+    .answerQuestion('tfa_method', 'authenticator')
+    .then()
+  .step('2FA backup codes: secure')
+    .answerQuestion('tfa_backup_codes', 'yes_secure')
+    .then()
+  .step('Automatic updates → should unlock advanced_2fa')
+    .answerQuestion('software_updates', 'automatic')
+    .then()
+  .step('Advanced 2FA: no (prefers authenticator)')
+    .answerQuestion('advanced_2fa', 'no')
+    .then()
+
+  // — Security Hygiene —
+  .step('Screen lock: short auto-lock')
+    .answerQuestion('screen_lock', 'auto_short')
+    .then()
+  .step('Password reuse: never')
+    .answerQuestion('password_reuse_habits', 'never')
+    .then()
+  .step('Phishing: ignores, goes direct')
+    .answerQuestion('phishing_awareness', 'ignore_direct')
+    .then()
+  .step('Breach check: regularly')
+    .answerQuestion('breach_check', 'regularly')
+    .then()
+  .step('Account recovery: multiple methods')
+    .answerQuestion('account_recovery', 'yes_comprehensive')
+    .then()
+  .step('Ad blocker: yes')
+    .answerQuestion('ad_blocker', 'yes')
+    .then()
+  .step('Virus scan: this week')
+    .answerQuestion('virus_scan', 'this_week')
+    .then()
+  .step('Backup: daily')
+    .answerQuestion('backup_frequency', 'daily')
+    .then()
+  .step('WiFi: WPA3')
+    .answerQuestion('wifi_security', 'wpa3')
+    .then()
+  .step('Email: never opens unknown')
+    .answerQuestion('email_attachments', 'never_open')
+    .then()
+  .step('Extensions: very selective')
+    .answerQuestion('browser_extensions', 'very_selective')
+    .then()
+
+  // — Chrome-specific (via browser confirm) —
+  .step('Chrome privacy: comprehensive')
+    .answerQuestion('chrome_privacy_hardening', 'comprehensive')
+    .then()
+
+  // — Mobile Security (shared) —
+  .step('Mobile screen lock: biometric')
+    .answerQuestion('mobile_screen_lock', 'biometric')
+    .then()
+  .step('Mobile OS updates: automatic')
+    .answerQuestion('mobile_os_updates', 'automatic')
+    .then()
+  .step('Mobile app permissions: review carefully')
+    .answerQuestion('mobile_app_permissions', 'review')
+    .then()
+  .step('Mobile public WiFi: VPN')
+    .answerQuestion('mobile_public_wifi', 'vpn')
+    .then()
+
+  // — Android-specific deep-dives —
+  .step('Find My Device: yes')
+    .answerQuestion('android_find_my', 'yes')
+    .then()
+  .step('Play Protect: yes')
+    .answerQuestion('android_play_protect', 'yes')
+    .then()
+  .step('Sideloading: trusted sources only (F-Droid)')
+    .answerQuestion('android_unknown_sources', 'trusted')
+    .then()
+
+  .finalOutcome(
+    'Android Amir completes full Android mobile flow with high score',
+    () => {
+      const store = useAssessmentStore.getState();
+      // Android detected and confirmed
+      expect(store.factsActions.getFact('os')?.value).toBe('android');
+      expect(store.factsActions.getFact('mobile_os')?.value).toBe('android');
+      // Mobile security questions answered
+      expect(store.answers['mobile_screen_lock']?.value).toBe('biometric');
+      expect(store.answers['mobile_os_updates']?.value).toBe('automatic');
+      expect(store.answers['mobile_app_permissions']?.value).toBe('review');
+      expect(store.answers['mobile_public_wifi']?.value).toBe('vpn');
+      // Android-specific questions answered
+      expect(store.answers['android_find_my']?.value).toBe('yes');
+      expect(store.answers['android_play_protect']?.value).toBe('yes');
+      expect(store.answers['android_unknown_sources']?.value).toBe('trusted');
+      // Chrome privacy answered
+      expect(store.answers['chrome_privacy_hardening']?.value).toBe('comprehensive');
+      // High score (power user with PM + 2FA + hygiene + mobile)
+      expect(store.overallScore).toBeGreaterThan(60);
+    }
+  )
+  .build();
+
+// ═══════════════════════════════════════════════════════════════════════
 // Exports
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -1082,4 +1423,6 @@ export const PERSONA_JOURNEYS = [
   financialFrank,
   linuxDevDana,
   collegeStudentAlex,
+  iphoneEmma,
+  androidAmir,
 ] as const;

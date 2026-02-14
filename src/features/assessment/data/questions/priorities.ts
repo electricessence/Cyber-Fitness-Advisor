@@ -43,7 +43,15 @@ export const ASSESSMENT_PRIORITIES = {
   EMAIL_ATTACHMENTS: 55,
   BROWSER_EXTENSIONS: 50,
   BROWSER_SECURITY: 48,
-  BROWSER_PRIVACY: 45
+  BROWSER_PRIVACY: 45,
+  // Mobile Security (44-38 range)
+  MOBILE_SCREEN_LOCK: 44,
+  MOBILE_OS_UPDATES: 43,
+  MOBILE_APP_PERMISSIONS: 42,
+  MOBILE_PUBLIC_WIFI: 41,
+  MOBILE_PLATFORM: 40,            // Find My (iOS/Android — mutually exclusive)
+  MOBILE_BACKUP_PROTECT: 39,     // iCloud backup / Play Protect (mutually exclusive)
+  MOBILE_APP_SOURCES: 38         // App Store / sideloading (mutually exclusive)
 } as const;
 
 // Suite-specific priorities can be added here as needed

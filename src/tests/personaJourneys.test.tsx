@@ -29,6 +29,8 @@ import {
   financialFrank,
   linuxDevDana,
   collegeStudentAlex,
+  iphoneEmma,
+  androidAmir,
   PERSONA_JOURNEYS,
 } from '../testing/personaJourneys';
 import { useAssessmentStore } from '../features/assessment/state/store';
@@ -72,6 +74,18 @@ describe('👤 Persona-Based User Journeys', () => {
     }, 30000);
   });
 
+  // ── Mobile Personas ─────────────────────────────────────────────────
+
+  describe('📱 Mobile Users', () => {
+    it('iPhone Emma — iOS/Safari mobile, iOS confirmation + mobile security + iOS deep-dives', async () => {
+      await runner.executeJourney(iphoneEmma);
+    }, 30000);
+
+    it('Android Amir — Android/Chrome mobile, Android confirmation + mobile security + Android deep-dives', async () => {
+      await runner.executeJourney(androidAmir);
+    }, 30000);
+  });
+
   // ── Advanced / Power-User Personas ──────────────────────────────────
 
   describe('🔒 Power Users', () => {
@@ -91,7 +105,7 @@ describe('👤 Persona-Based User Journeys', () => {
   // ── Coverage & Completeness ─────────────────────────────────────────
 
   describe('📊 Persona Coverage', () => {
-    it('All 8 persona journeys complete successfully', async () => {
+    it('All 10 persona journeys complete successfully', async () => {
       for (const journey of PERSONA_JOURNEYS) {
         await runner.executeJourney(journey);
       }

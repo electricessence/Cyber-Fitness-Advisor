@@ -172,6 +172,70 @@ export const onboardingQuestions: Question[] = [
     ]
   },
 
+  // OS Confirmation - iOS (when detected)
+  {
+    id: 'ios_detection_confirm',
+    phase: 'onboarding',
+    priority: ONBOARDING_PRIORITIES.OS_DETECTION,
+    statement: '📱 Detected: iOS (iPhone/iPad)',
+    text: 'Is this correct?',
+    tags: ['critical', 'onboarding'],
+    conditions: {
+      include: { "os_detected": "ios" },
+      exclude: { "os_confirmed": true }
+    },
+    options: [
+      {
+        id: 'yes',
+        text: '✅ Yes, I\'m on an iPhone/iPad',
+        statement: 'Mobile OS: iOS',
+        statusCategory: 'shields-up',
+        facts: { "os": "ios", "os_confirmed": true, "has_mobile": true, "mobile_os": "ios" },
+        feedback: 'Great! We\'ll provide iOS-specific security advice.'
+      },
+      {
+        id: 'no',
+        text: '❌ No, that\'s wrong',
+        statement: 'Mobile OS: Unconfirmed',
+        statusCategory: 'room-for-improvement',
+        facts: { "os_confirmed": false },
+        feedback: 'No problem! We\'ll ask you to select your actual device.'
+      }
+    ]
+  },
+
+  // OS Confirmation - Android (when detected)
+  {
+    id: 'android_detection_confirm',
+    phase: 'onboarding',
+    priority: ONBOARDING_PRIORITIES.OS_DETECTION,
+    statement: '📱 Detected: Android',
+    text: 'Is this correct?',
+    tags: ['critical', 'onboarding'],
+    conditions: {
+      include: { "os_detected": "android" },
+      exclude: { "os_confirmed": true }
+    },
+    options: [
+      {
+        id: 'yes',
+        text: '✅ Yes, I\'m on an Android device',
+        statement: 'Mobile OS: Android',
+        statusCategory: 'shields-up',
+        facts: { "os": "android", "os_confirmed": true, "has_mobile": true, "mobile_os": "android" },
+        feedback: 'Great! We\'ll provide Android-specific security advice.'
+      },
+      {
+        id: 'no',
+        text: '❌ No, that\'s wrong',
+        statement: 'Mobile OS: Unconfirmed',
+        statusCategory: 'room-for-improvement',
+        facts: { "os_confirmed": false },
+        feedback: 'No problem! We\'ll ask you to select your actual device.'
+      }
+    ]
+  },
+
   // OS Selection (when no OS has been detected and not confirmed)
   {
     id: 'os_selection',
@@ -526,7 +590,46 @@ export const onboardingQuestions: Question[] = [
     ]
   },
 
-  // Mobile Device Context (for desktop users)
+  // Mobile OS Selection (for users who selected "mobile only" from os_selection)
+  {
+    id: 'mobile_os_selection',
+    phase: 'onboarding',
+    priority: ONBOARDING_PRIORITIES.MOBILE_CONTEXT + 5, // just above mobile_context
+    text: 'Which mobile operating system do you use?',
+    tags: ['onboarding'],
+    conditions: {
+      include: { "os": "mobile_only" },
+      exclude: { "mobile_os": "*" }
+    },
+    options: [
+      {
+        id: 'ios',
+        text: '📱 iPhone / iPad (iOS)',
+        statement: 'Mobile OS: iOS',
+        statusCategory: 'shields-up',
+        facts: { "has_mobile": true, "mobile_os": "ios" },
+        feedback: 'Got it! We\'ll focus on iOS security.'
+      },
+      {
+        id: 'android',
+        text: '📱 Android',
+        statement: 'Mobile OS: Android',
+        statusCategory: 'shields-up',
+        facts: { "has_mobile": true, "mobile_os": "android" },
+        feedback: 'Got it! We\'ll focus on Android security.'
+      },
+      {
+        id: 'both',
+        text: '📱 Both iPhone and Android',
+        statement: 'Mobile Devices: Both iOS & Android',
+        statusCategory: 'shields-up',
+        facts: { "has_mobile": true, "mobile_os": "both" },
+        feedback: 'We\'ll cover security for both platforms.'
+      }
+    ]
+  },
+
+  // Mobile Device Context (for desktop users who haven't set mobile_os yet)
   {
     id: 'mobile_context',
     phase: 'onboarding',
@@ -535,7 +638,7 @@ export const onboardingQuestions: Question[] = [
     tags: ['onboarding'],
     conditions: {
       include: { "tech_comfort": "*" },
-      exclude: { "os": "mobile_only" }
+      exclude: { "mobile_os": "*" }
     },
     options: [
       {
