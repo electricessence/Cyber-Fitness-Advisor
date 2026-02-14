@@ -6,7 +6,10 @@ import { ResetModal } from './components/layout/ResetModal';
 import { useNavigation } from './hooks/useNavigation';
 import { useAppState } from './hooks/useAppState';
 import { QuestionDeck } from './components/questions/QuestionDeck';
-import { Menu, X, Download, Upload, RefreshCw, Github } from 'lucide-react';
+import { SecurityStatus } from './components/layout/SecurityStatus';
+import { BadgeSummary } from './components/badges/BadgeSummary';
+import { ConnectedRecommendations } from './components/ConnectedRecommendations';
+import { Menu, X, Download, Upload, RefreshCw, Github, Shield, Trophy, Lightbulb } from 'lucide-react';
 // Initialize semantic version for global access
 import './features/assessment/engine/semantics';
 import { CFASemantics } from './utils/semantics';
@@ -16,6 +19,9 @@ import { removeStorage } from './utils/safeStorage';
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scoreDetailsOpen, setScoreDetailsOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [badgesOpen, setBadgesOpen] = useState(false);
+  const [recommendationsOpen, setRecommendationsOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Use custom hooks for state management
@@ -231,6 +237,39 @@ function App() {
                     type="button"
                     onClick={() => {
                       setMenuOpen(false);
+                      setStatusOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10"
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium"><Shield className="w-4 h-4" /> Security status</span>
+                    <span className="text-xs text-slate-400">Your answers</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setBadgesOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10"
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium"><Trophy className="w-4 h-4" /> Achievements</span>
+                    <span className="text-xs text-slate-400">Badges earned</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setRecommendationsOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10"
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium"><Lightbulb className="w-4 h-4" /> Recommended actions</span>
+                    <span className="text-xs text-slate-400">Next steps</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
                       appState.setShowResetModal(true);
                     }}
                     className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10"
@@ -291,6 +330,78 @@ function App() {
                     This number moves every time you finish the card in front of you. It naturally slows as you cover more ground.
                   </p>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {statusOpen && (
+            <div className="fixed inset-0 z-40">
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/60"
+                aria-label="Close security status"
+                onClick={() => setStatusOpen(false)}
+              />
+              <div className="relative z-50 mx-auto my-6 w-full max-w-lg px-4 max-h-[90vh] overflow-y-auto">
+                <div className="mb-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setStatusOpen(false)}
+                    className="p-2 rounded-full bg-white shadow-lg"
+                    aria-label="Close security status"
+                  >
+                    <X className="w-5 h-5 text-slate-700" />
+                  </button>
+                </div>
+                <SecurityStatus />
+              </div>
+            </div>
+          )}
+
+          {badgesOpen && (
+            <div className="fixed inset-0 z-40">
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/60"
+                aria-label="Close achievements"
+                onClick={() => setBadgesOpen(false)}
+              />
+              <div className="relative z-50 mx-auto my-10 w-full max-w-md px-4">
+                <div className="mb-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setBadgesOpen(false)}
+                    className="p-2 rounded-full bg-white shadow-lg"
+                    aria-label="Close achievements"
+                  >
+                    <X className="w-5 h-5 text-slate-700" />
+                  </button>
+                </div>
+                <BadgeSummary />
+              </div>
+            </div>
+          )}
+
+          {recommendationsOpen && (
+            <div className="fixed inset-0 z-40">
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/60"
+                aria-label="Close recommendations"
+                onClick={() => setRecommendationsOpen(false)}
+              />
+              <div className="relative z-50 mx-auto my-6 w-full max-w-lg px-4 max-h-[90vh] overflow-y-auto">
+                <div className="mb-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setRecommendationsOpen(false)}
+                    className="p-2 rounded-full bg-white shadow-lg"
+                    aria-label="Close recommendations"
+                  >
+                    <X className="w-5 h-5 text-slate-700" />
+                  </button>
+                </div>
+                <ConnectedRecommendations />
               </div>
             </div>
           )}
