@@ -17,6 +17,7 @@ export const passwordManagerDeepDiveQuestions: Question[] = [
     tags: ['password', 'probe'],
     difficulty: 'beginner',
     effort: 'Quick reflection',
+    journeyIntent: 'probe',
     description: 'Different password manager architectures have different risk profiles. Understanding yours helps identify any gaps.',
     conditions: {
       include: { password_manager: 'yes' }
@@ -68,6 +69,7 @@ export const passwordManagerDeepDiveQuestions: Question[] = [
     tags: ['password', 'critical', 'probe'],
     difficulty: 'beginner',
     effort: '10 minutes to improve',
+    journeyIntent: 'probe',
     description: 'Your master password is the single key to every other password. If it\'s weak, everything inside the vault is at risk.',
     conditions: {
       include: { password_manager: 'yes' }
@@ -121,6 +123,7 @@ export const passwordManagerDeepDiveQuestions: Question[] = [
     tags: ['password', 'probe'],
     difficulty: 'beginner',
     effort: 'Quick reflection',
+    journeyIntent: 'probe',
     description: 'Understanding your current approach helps identify the specific risks you face and the best path to stronger security.',
     conditions: {
       include: { password_manager: 'no' }
@@ -181,6 +184,7 @@ export const passwordManagerDeepDiveQuestions: Question[] = [
     tags: ['password', 'action', 'probe'],
     difficulty: 'beginner',
     effort: '20 minutes to research',
+    journeyIntent: 'insight',
     description: 'Many people know they should use a password manager but haven\'t made the switch. Understanding what\'s holding you back helps find the right path forward.',
     conditions: {
       include: { password_manager: 'no' }

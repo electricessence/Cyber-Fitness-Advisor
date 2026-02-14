@@ -14,6 +14,7 @@ export const onboardingQuestions: Question[] = [
     text: 'Everything happens right here in your browser—nothing is uploaded, logged, or analyzed on our side.',
     description: 'We do not run servers for this assessment. You can verify by opening DevTools → Network (no calls leave the page) or by going offline; the experience still works because all data is stored in your browser.',
     tags: ['critical', 'onboarding', 'privacy'],
+    journeyIntent: 'onboarding',
     conditions: {
       exclude: { "privacy_acknowledged": true }
     },
@@ -37,6 +38,7 @@ export const onboardingQuestions: Question[] = [
     statement: '🖥️ Detected: Windows Operating System',
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_detected": "windows" },
       exclude: { "os_confirmed": true }
@@ -77,6 +79,7 @@ export const onboardingQuestions: Question[] = [
     statement: '🤝 Getting OS Help',
     text: 'No problem! Do you know which operating system you are using?',
     tags: ['novice', 'onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "tech_comfort": "novice", "os_confirmed": false }
     },
@@ -116,6 +119,7 @@ export const onboardingQuestions: Question[] = [
     statement: '🍎 Detected: macOS',
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_detected": "mac" },
       exclude: { "os_confirmed": true }
@@ -148,6 +152,7 @@ export const onboardingQuestions: Question[] = [
     statement: '🐧 Detected: Linux',
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_detected": "linux" },
       exclude: { "os_confirmed": true }
@@ -180,6 +185,7 @@ export const onboardingQuestions: Question[] = [
     statement: '📱 Detected: iOS (iPhone/iPad)',
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_detected": "ios" },
       exclude: { "os_confirmed": true }
@@ -212,6 +218,7 @@ export const onboardingQuestions: Question[] = [
     statement: '📱 Detected: Android',
     text: 'Is this correct?',
     tags: ['critical', 'onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_detected": "android" },
       exclude: { "os_confirmed": true }
@@ -243,6 +250,7 @@ export const onboardingQuestions: Question[] = [
     priority: ONBOARDING_PRIORITIES.OS_SELECTION,
     text: 'Which operating system do you primarily use?',
     tags: ['critical', 'onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "device_detection_completed": true },
       exclude: { 
@@ -302,6 +310,7 @@ export const onboardingQuestions: Question[] = [
     statement: '🌐 Detected: Chrome Browser',
     text: 'Is this your primary browser?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_confirmed": true, "browser_detected": "chrome" },
       exclude: { "browser_confirmed": true }
@@ -339,6 +348,7 @@ export const onboardingQuestions: Question[] = [
     statement: '🦊 Detected: Firefox Browser',
     text: 'Is this your primary browser?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_confirmed": true, "browser_detected": "firefox" },
       exclude: { "browser_confirmed": true }
@@ -376,6 +386,7 @@ export const onboardingQuestions: Question[] = [
     statement: '🔵 Detected: Microsoft Edge',
     text: 'Is this correct?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_confirmed": true, "browser_detected": "edge" },
       exclude: { "browser_confirmed": true }
@@ -413,6 +424,7 @@ export const onboardingQuestions: Question[] = [
     statement: '🧭 Detected: Safari Browser',
     text: 'Is this correct?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_confirmed": true, "browser_detected": "safari" },
       exclude: { "browser_confirmed": true }
@@ -449,6 +461,7 @@ export const onboardingQuestions: Question[] = [
     priority: ONBOARDING_PRIORITIES.BROWSER_SELECTION,
     text: 'Which browser do you primarily use?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_confirmed": true, "browser_detected": "unknown" },
       exclude: { "browser_confirmed": true }
@@ -504,6 +517,7 @@ export const onboardingQuestions: Question[] = [
     priority: ONBOARDING_PRIORITIES.BROWSER_SELECTION - 10, // Lower priority than main selection
     text: 'Which browser do you primarily use?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_confirmed": true, "browser_confirmed": false },
       exclude: { "browser_detected": "unknown" } // Don't show if browser was never detected
@@ -559,6 +573,7 @@ export const onboardingQuestions: Question[] = [
     priority: ONBOARDING_PRIORITIES.TECH_COMFORT,
     text: 'How would you describe your comfort with technology?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os_confirmed": true }
     },
@@ -597,6 +612,7 @@ export const onboardingQuestions: Question[] = [
     priority: ONBOARDING_PRIORITIES.MOBILE_CONTEXT + 5, // just above mobile_context
     text: 'Which mobile operating system do you use?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "os": "mobile_only" },
       exclude: { "mobile_os": "*" }
@@ -636,6 +652,7 @@ export const onboardingQuestions: Question[] = [
     priority: ONBOARDING_PRIORITIES.MOBILE_CONTEXT,
     text: 'Do you also use a smartphone or tablet for important activities like email, banking, or work?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "tech_comfort": "*" },
       exclude: { "mobile_os": "*" }
@@ -691,6 +708,7 @@ export const onboardingQuestions: Question[] = [
     priority: ONBOARDING_PRIORITIES.USAGE_CONTEXT,
     text: 'What\'s your main concern about digital security?',
     tags: ['onboarding'],
+    journeyIntent: 'onboarding',
     conditions: {
       include: { "tech_comfort": "*" }
     },

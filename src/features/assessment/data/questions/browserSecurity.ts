@@ -17,6 +17,7 @@ export const browserSecurityQuestions: Question[] = [
     tags: ['browser', 'edge', 'windows', 'security'],
     difficulty: 'beginner',
     effort: '2 minutes',
+    journeyIntent: 'probe',
     conditions: {
       include: { "browser": "edge" }
     },
@@ -59,6 +60,7 @@ export const browserSecurityQuestions: Question[] = [
     tags: ['browser', 'edge', 'passwords'],
     difficulty: 'beginner',
     effort: '5 minutes',
+    journeyIntent: 'probe',
     conditions: {
       include: { "browser": "edge" }
     },
@@ -101,6 +103,7 @@ export const browserSecurityQuestions: Question[] = [
     tags: ['browser', 'safari', 'mac', 'privacy'],
     difficulty: 'beginner',
     effort: '2 minutes',
+    journeyIntent: 'probe',
     conditions: {
       include: { "browser": "safari" }
     },
@@ -143,6 +146,7 @@ export const browserSecurityQuestions: Question[] = [
     tags: ['browser', 'safari', 'mac', 'passwords', 'icloud'],
     difficulty: 'beginner',
     effort: '5 minutes',
+    journeyIntent: 'probe',
     conditions: {
       include: { "browser": "safari" }
     },
@@ -185,6 +189,7 @@ export const browserSecurityQuestions: Question[] = [
     tags: ['apple', 'mac', 'safari', '2fa', 'authentication'],
     difficulty: 'beginner',
     effort: '5 minutes',
+    journeyIntent: 'probe',
     conditions: {
       include: { "browser": "safari" }
     },
@@ -227,6 +232,7 @@ export const browserSecurityQuestions: Question[] = [
     tags: ['browser', 'firefox', 'privacy', 'tracking'],
     difficulty: 'beginner',
     effort: '2 minutes',
+    journeyIntent: 'probe',
     conditions: {
       include: { "browser": "firefox" }
     },
@@ -278,6 +284,7 @@ export const browserSecurityQuestions: Question[] = [
     tags: ['browser', 'firefox', 'privacy', 'configuration'],
     difficulty: 'intermediate',
     effort: '15 minutes',
+    journeyIntent: 'probe',
     conditions: {
       include: { "browser": "firefox" }
     },
@@ -320,6 +327,7 @@ export const browserSecurityQuestions: Question[] = [
     tags: ['browser', 'chrome', 'privacy'],
     difficulty: 'intermediate',
     effort: '10 minutes',
+    journeyIntent: 'probe',
     conditions: {
       include: { "browser": "chrome" }
     },

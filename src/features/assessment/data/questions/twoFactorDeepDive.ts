@@ -16,6 +16,7 @@ export const twoFactorDeepDiveQuestions: Question[] = [
     tags: ['authentication', 'probe'],
     difficulty: 'beginner',
     effort: 'Quick reflection',
+    journeyIntent: 'probe',
     description: 'Not all 2FA is equal. The method you use determines how well it protects you against different attack types.',
     conditions: {
       include: { two_factor: ['yes', 'partial'] }
@@ -76,6 +77,7 @@ export const twoFactorDeepDiveQuestions: Question[] = [
     tags: ['authentication', 'critical', 'action'],
     difficulty: 'beginner',
     effort: '15 minutes',
+    journeyIntent: 'probe',
     description: 'If you lose your phone or 2FA device, backup codes are your only way back in. Without them, you can be permanently locked out of your own accounts.',
     conditions: {
       include: { two_factor: ['yes', 'partial'] }
@@ -129,6 +131,7 @@ export const twoFactorDeepDiveQuestions: Question[] = [
     tags: ['authentication', 'action', 'quickwin'],
     difficulty: 'beginner',
     effort: '5 minutes',
+    journeyIntent: 'action-guided',
     description: 'You don\'t need to secure everything at once. Starting with your most critical account gives you the biggest security improvement for the least effort.',
     conditions: {
       include: { two_factor: ['partial', 'no'] }
@@ -189,6 +192,7 @@ export const twoFactorDeepDiveQuestions: Question[] = [
     tags: ['authentication', 'probe'],
     difficulty: 'beginner',
     effort: 'Quick reflection',
+    journeyIntent: 'insight',
     description: 'Understanding what holds people back from 2FA helps find the right approach. Most barriers are smaller than they seem.',
     conditions: {
       include: { two_factor: ['partial', 'no'] }

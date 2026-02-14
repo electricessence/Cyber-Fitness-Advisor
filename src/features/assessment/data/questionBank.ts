@@ -15,6 +15,7 @@ const advancedSecurityQuestions: Question[] = [
     tags: ['security', 'authentication', 'advanced'],
     difficulty: 'advanced',
     effort: '30 minutes to set up',
+    journeyIntent: 'action-critical',
     conditions: {
       include: { password_manager: 'yes', updates: 'automatic' }
     },

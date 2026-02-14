@@ -14,6 +14,8 @@ export const securityHygieneQuestions: Question[] = [
     difficulty: 'beginner',
     effort: '2 minutes',
     description: 'An unlocked device is an open door. Auto-lock is your first line of defense if your device is lost, stolen, or left unattended.',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       {
         id: 'yes_short',
@@ -53,6 +55,8 @@ export const securityHygieneQuestions: Question[] = [
     difficulty: 'beginner',
     effort: '30 minutes to fix',
     description: 'When one site gets breached, attackers try those same passwords everywhere else. Unique passwords contain the damage to a single account.',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       {
         id: 'never',
@@ -92,6 +96,8 @@ export const securityHygieneQuestions: Question[] = [
     difficulty: 'beginner',
     effort: 'Ongoing awareness',
     description: 'Phishing is the #1 way attackers steal credentials and install malware. Learning to spot it is one of the most valuable security skills you can develop.',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       {
         id: 'ignore_go_direct',
@@ -131,6 +137,8 @@ export const securityHygieneQuestions: Question[] = [
     difficulty: 'beginner',
     effort: '5 minutes',
     description: 'Billions of credentials have been leaked in data breaches. Checking if yours are among them is a critical first step — you can\'t fix what you don\'t know about.',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       {
         id: 'yes_regularly',
@@ -170,6 +178,8 @@ export const securityHygieneQuestions: Question[] = [
     difficulty: 'beginner',
     effort: '10 minutes',
     description: 'If you lose your phone or forget your password, recovery methods are your lifeline. Without them, you can be permanently locked out of your own accounts.',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       {
         id: 'yes_multiple',
@@ -209,6 +219,8 @@ export const securityHygieneQuestions: Question[] = [
     difficulty: 'beginner',
     effort: '2 minutes',
     description: 'Malicious ads (malvertising) can install malware without you clicking anything. An ad blocker isn\'t just about convenience — it\'s a security layer.',
+    journeyIntent: 'action-guided',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       {
         id: 'yes',

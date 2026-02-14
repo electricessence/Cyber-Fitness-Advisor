@@ -396,6 +396,11 @@ export const farmerJohn: UserJourney = JourneyBuilder
     .answerQuestion('ad_blocker', 'no')
     .then()
 
+  // — Ad-Block Deep Dive (Edge desktop, no ad blocker → qualifies) —
+  .step('Ad blocker Edge: skipped')
+    .answerQuestion('adblock_edge_desktop', 'skipped')
+    .then()
+
   .finalOutcome(
     'Farmer John has very low score — nearly every answer is the worst option',
     () => {
@@ -409,6 +414,8 @@ export const farmerJohn: UserJourney = JourneyBuilder
       expect(store.answers['screen_lock']?.value).toBe('no');
       expect(store.answers['password_reuse_habits']?.value).toBe('often');
       expect(store.answers['phishing_awareness']?.value).toBe('click_link');
+      // Ad-block deep dive — offered but skipped
+      expect(store.answers['adblock_edge_desktop']?.value).toBe('skipped');
     }
   )
   .build();
@@ -746,6 +753,14 @@ export const financialFrank: UserJourney = JourneyBuilder
     .answerQuestion('chrome_privacy_hardening', 'basic')
     .then()
 
+  // — Ad-Block Deep Dive (Chrome desktop + partial ad blocker → qualifies) —
+  .step('Ad blocker Chrome: install lite')
+    .answerQuestion('adblock_chrome_desktop', 'install_lite')
+    .then()
+  .step('Ad blocker Android: just Firefox')
+    .answerQuestion('adblock_mobile_android', 'just_firefox')
+    .then()
+
   .finalOutcome(
     'Financial Frank achieves solid score with strong finance-relevant security',
     () => {
@@ -761,6 +776,9 @@ export const financialFrank: UserJourney = JourneyBuilder
       expect(store.answers['breach_check']?.value).toBe('yes_regularly');
       // advanced_2fa NOT unlocked (updates=manual, not automatic)
       expect(store.answers['advanced_2fa']).toBeUndefined();
+      // Ad-block deep dive — Chrome lite + Android Firefox installed
+      expect(store.answers['adblock_chrome_desktop']?.value).toBe('install_lite');
+      expect(store.answers['adblock_mobile_android']?.value).toBe('just_firefox');
     }
   )
   .build();
@@ -1043,6 +1061,17 @@ export const collegeStudentAlex: UserJourney = JourneyBuilder
     .answerQuestion('apple_id_2fa', 'yes')
     .then()
 
+  // — Ad-Block Deep Dive (Safari desktop + partial ad blocker → qualifies) —
+  .step('Ad blocker Safari: try Firefox instead')
+    .answerQuestion('adblock_safari_desktop', 'try_firefox')
+    .then()
+  .step('Browser switch progress: trying alongside Safari')
+    .answerQuestion('browser_switch_progress', 'trying')
+    .then()
+  .step('Ad blocker iOS: installed Firefox Focus')
+    .answerQuestion('adblock_mobile_ios', 'installed')
+    .then()
+
   .finalOutcome(
     'College Student Alex has moderate score with full Safari-specific question coverage',
     () => {
@@ -1065,6 +1094,10 @@ export const collegeStudentAlex: UserJourney = JourneyBuilder
       expect(store.answers['pm_current_method']?.value).toBe('browser_save');
       // advanced_2fa NOT unlocked (password_manager=no)
       expect(store.answers['advanced_2fa']).toBeUndefined();
+      // Ad-block deep dive — Safari user considers Firefox + iOS ad blocking
+      expect(store.answers['adblock_safari_desktop']?.value).toBe('try_firefox');
+      expect(store.answers['browser_switch_progress']?.value).toBe('trying');
+      expect(store.answers['adblock_mobile_ios']?.value).toBe('installed');
     }
   )
   .build();
@@ -1148,7 +1181,7 @@ export const iphoneEmma: UserJourney = JourneyBuilder
 
   // — Security Hygiene —
   .step('Screen lock: short auto-lock')
-    .answerQuestion('screen_lock', 'auto_short')
+    .answerQuestion('screen_lock', 'yes_short')
     .then()
   .step('Password reuse: rarely')
     .answerQuestion('password_reuse_habits', 'rarely')
@@ -1156,8 +1189,8 @@ export const iphoneEmma: UserJourney = JourneyBuilder
   .step('Phishing: checks carefully')
     .answerQuestion('phishing_awareness', 'check_carefully')
     .then()
-  .step('Breach check: never')
-    .answerQuestion('breach_check', 'never')
+  .step('Breach check: never checked')
+    .answerQuestion('breach_check', 'no')
     .then()
   .step('Account recovery: basic setup')
     .answerQuestion('account_recovery', 'yes_basic')
@@ -1166,7 +1199,7 @@ export const iphoneEmma: UserJourney = JourneyBuilder
     .answerQuestion('ad_blocker', 'no')
     .then()
   .step('Virus scan: this month')
-    .answerQuestion('virus_scan', 'this_month')
+    .answerQuestion('virus_scan_recent', 'this_month')
     .then()
   .step('Backup: weekly')
     .answerQuestion('backup_frequency', 'weekly')
@@ -1309,7 +1342,7 @@ export const androidAmir: UserJourney = JourneyBuilder
     .answerQuestion('two_factor_auth', 'yes')
     .then()
   .step('2FA method: authenticator app')
-    .answerQuestion('tfa_method', 'authenticator')
+    .answerQuestion('tfa_method', 'authenticator_app')
     .then()
   .step('2FA backup codes: secure')
     .answerQuestion('tfa_backup_codes', 'yes_secure')
@@ -1323,25 +1356,25 @@ export const androidAmir: UserJourney = JourneyBuilder
 
   // — Security Hygiene —
   .step('Screen lock: short auto-lock')
-    .answerQuestion('screen_lock', 'auto_short')
+    .answerQuestion('screen_lock', 'yes_short')
     .then()
   .step('Password reuse: never')
     .answerQuestion('password_reuse_habits', 'never')
     .then()
   .step('Phishing: ignores, goes direct')
-    .answerQuestion('phishing_awareness', 'ignore_direct')
+    .answerQuestion('phishing_awareness', 'ignore_go_direct')
     .then()
   .step('Breach check: regularly')
-    .answerQuestion('breach_check', 'regularly')
+    .answerQuestion('breach_check', 'yes_regularly')
     .then()
   .step('Account recovery: multiple methods')
-    .answerQuestion('account_recovery', 'yes_comprehensive')
+    .answerQuestion('account_recovery', 'yes_multiple')
     .then()
   .step('Ad blocker: yes')
     .answerQuestion('ad_blocker', 'yes')
     .then()
   .step('Virus scan: this week')
-    .answerQuestion('virus_scan', 'this_week')
+    .answerQuestion('virus_scan_recent', 'this_week')
     .then()
   .step('Backup: daily')
     .answerQuestion('backup_frequency', 'daily')

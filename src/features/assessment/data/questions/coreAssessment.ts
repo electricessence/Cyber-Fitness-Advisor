@@ -12,6 +12,8 @@ export const coreAssessmentQuestions: Question[] = [
     tags: ['critical', 'password', 'quickwin', 'action'],
     difficulty: 'beginner',
     effort: '15 minutes to set up',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       { 
         id: 'yes',
@@ -40,6 +42,8 @@ export const coreAssessmentQuestions: Question[] = [
     tags: ['critical', 'authentication', 'action'],
     difficulty: 'beginner',
     effort: '5 minutes per account',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       { 
         id: 'yes',
@@ -77,6 +81,8 @@ export const coreAssessmentQuestions: Question[] = [
     tags: ['critical', 'updates', 'action'],
     difficulty: 'beginner',
     effort: '2 minutes',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       { 
         id: 'automatic',
@@ -114,6 +120,8 @@ export const coreAssessmentQuestions: Question[] = [
     tags: ['security', 'antivirus', 'probe'],
     difficulty: 'beginner',
     effort: '5 minutes',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       { 
         id: 'this_week',
@@ -151,6 +159,8 @@ export const coreAssessmentQuestions: Question[] = [
     tags: ['critical', 'backup', 'probe'],
     difficulty: 'beginner',
     effort: '15 minutes to set up',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       { 
         id: 'daily',
@@ -197,6 +207,8 @@ export const coreAssessmentQuestions: Question[] = [
     tags: ['network', 'wifi', 'checklist'],
     difficulty: 'intermediate',
     effort: '10 minutes',
+    journeyIntent: 'checklist',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       { 
         id: 'wpa3',
@@ -252,6 +264,8 @@ export const coreAssessmentQuestions: Question[] = [
     tags: ['email', 'phishing', 'probe'],
     difficulty: 'beginner',
     effort: 'Ongoing habit',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       { 
         id: 'never_open',
@@ -298,6 +312,8 @@ export const coreAssessmentQuestions: Question[] = [
     tags: ['browser', 'extensions', 'probe'],
     difficulty: 'beginner',
     effort: '10 minutes to audit',
+    journeyIntent: 'probe',
+    conditions: { include: { privacy_acknowledged: true } },
     options: [
       { 
         id: 'very_selective',
