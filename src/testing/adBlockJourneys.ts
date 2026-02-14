@@ -214,8 +214,8 @@ export const chromePmWarning: UserJourney = JourneyBuilder
       expect(ids).toContain('chrome_password_warning');
     })
     .then()
-  .step('Answer chrome_password_warning — will switch')
-    .answerQuestion('chrome_password_warning', 'will_switch')
+  .step('Answer chrome_password_warning — will research')
+    .answerQuestion('chrome_password_warning', 'will_research')
     .expectCustom(() => {
       const store = useAssessmentStore.getState();
       expect(store.factsActions.getFact('chrome_pm_aware')?.value).toBe(true);
@@ -224,10 +224,10 @@ export const chromePmWarning: UserJourney = JourneyBuilder
     .then()
 
   .finalOutcome(
-    'Chrome PM user is aware of risks and considering a switch',
+    'Chrome PM user is informed and researching options',
     () => {
       const store = useAssessmentStore.getState();
-      expect(store.answers['chrome_password_warning']?.value).toBe('will_switch');
+      expect(store.answers['chrome_password_warning']?.value).toBe('will_research');
     }
   )
   .build();

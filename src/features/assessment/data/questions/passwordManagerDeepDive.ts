@@ -29,7 +29,7 @@ export const passwordManagerDeepDiveQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { pm_type: 'cloud' },
         points: 8,
-        feedback: 'Cloud-synced managers are convenient and secure when the provider uses zero-knowledge encryption — meaning they can\'t read your vault even if their servers are compromised. The tradeoff is that you\'re trusting a third party\'s infrastructure. Look for providers that have passed independent security audits and publish their audit reports.'
+        feedback: 'Cloud-synced managers are convenient and can be very secure — but not all are equal. Look for "zero-knowledge" encryption (the provider can\'t read your vault) and published independent audit reports. As of early 2026, the LastPass breach (December 2022) remains a cautionary example: encrypted vault backups were stolen along with unencrypted website URLs, and the UK ICO issued a penalty notice in November 2025. Privacy Guides (privacyguides.org) maintains current recommendations with specific criteria.'
       },
       {
         id: 'local',
@@ -38,7 +38,7 @@ export const passwordManagerDeepDiveQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { pm_type: 'local' },
         points: 9,
-        feedback: 'Local password managers like KeePass and KeePassXC keep your vault entirely on your device — no server to breach. The tradeoff is that syncing across devices requires manual effort (e.g., storing the vault file on an encrypted USB or your own cloud storage). You\'re fully in control, but also fully responsible for backups.'
+        feedback: 'Local password managers like KeePassXC keep your vault entirely on your device — no server to breach, no provider to trust. The tradeoff: syncing across devices is your responsibility, and losing the vault file without a backup means losing your passwords. As of 2025, KeePassXC passed an ANSSI CSPN security evaluation (Synacktiv, October 2025). Note that local encryption protects data at rest — it doesn\'t protect against malware on an already-compromised device (true of all password managers).'
       },
       {
         id: 'browser',
@@ -47,7 +47,7 @@ export const passwordManagerDeepDiveQuestions: Question[] = [
         statusCategory: 'to-do',
         facts: { pm_type: 'browser' },
         points: 5,
-        feedback: 'Browser password managers are better than reusing passwords, but they have limitations: they\'re tied to one browser, often lack strong master password protection, and may sync passwords to cloud accounts without zero-knowledge encryption. Consider whether a dedicated manager would give you better control.'
+        feedback: 'Browser password managers vary more than most people realise. As of early 2026: Safari/iCloud Keychain uses end-to-end encryption by default; Firefox Sync uses end-to-end encryption (AES-256-GCM); Chrome offers on-device encryption but it\'s opt-in, not default; and Edge\'s sync encryption model is less clearly documented. It\'s worth researching how your specific browser handles this — search "[your browser] password encryption" or check privacyguides.org for a comparison.'
       },
       {
         id: 'unsure',

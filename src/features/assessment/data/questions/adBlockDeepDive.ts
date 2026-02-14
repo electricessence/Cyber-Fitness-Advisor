@@ -214,34 +214,43 @@ export const adBlockDeepDiveQuestions: Question[] = [
   // Chrome password manager warning — gated by Chrome + using Chrome's built-in PM
   {
     id: 'chrome_password_warning',
-    text: 'A note about Chrome\'s built-in password manager: it syncs your passwords to your Google account, which means they\'re only as secure as your Google account. A dedicated password manager with zero-knowledge encryption keeps your passwords separate from any single company\'s ecosystem.',
+    text: 'Something worth knowing: as of early 2026, Chrome\'s password manager offers "on-device encryption" — but it\'s opt-in, not the default. In the standard mode, Google holds the encryption key in your Google Account and uses it to decrypt your passwords. This is different from "zero-knowledge" architectures where even the provider can\'t access your vault.',
     priority: AB_SECONDARY,
-    tags: ['browser', 'chrome', 'passwords', 'privacy'],
+    tags: ['browser', 'chrome', 'passwords', 'privacy', 'educational'],
     journeyIntent: 'insight',
     difficulty: 'beginner',
-    effort: 'Quick read',
-    description: 'Chrome\'s password manager ties your credentials to Google\'s infrastructure. A compromise of your Google account exposes all saved passwords. Dedicated managers use independent encryption.',
+    effort: 'Quick read + optional research',
+    description: 'As of early 2026, Google documents that in standard mode the encryption key is stored in your Google Account. Google offers an opt-in "on-device encryption" mode where only you hold the key, but the EFF and Privacy Guides both note this is not enabled by default (sources: EFF 2025-03-06; Privacy Guides 2025-09-12). This is worth researching yourself — search "Google Password Manager on-device encryption" to see the current state.',
     conditions: {
       include: { browser: 'chrome', pm_type: 'browser' }
     },
     options: [
       {
-        id: 'will_switch',
-        text: '🔄 I\'ll look into a dedicated password manager',
-        statement: 'Chrome Password Manager: Plans to switch',
+        id: 'will_research',
+        text: '🔍 I\'ll research my options',
+        statement: 'Browser Password Manager: Researching alternatives',
         statusCategory: 'to-do',
         facts: { chrome_pm_aware: true, considering_pm_switch: true },
         points: 5,
-        feedback: 'Good call. Open-source options like KeePassXC (local) or Bitwarden (cloud with zero-knowledge encryption) give you full control over your credentials without tying them to your browser.'
+        feedback: 'Good approach. Password managers fall into three categories — local/offline (like KeePassXC), cloud-based dedicated (like Bitwarden), and browser built-in. Each has different tradeoffs around convenience, control, and what happens if the provider is breached. Privacy Guides (privacyguides.org) maintains a comparison with specific criteria including published audits and documented encryption.'
       },
       {
-        id: 'keep_chrome',
-        text: '📌 I\'ll keep using Chrome\'s password manager',
-        statement: 'Chrome Password Manager: Keeping',
+        id: 'enable_encryption',
+        text: '🔒 I\'ll check if on-device encryption is enabled',
+        statement: 'Chrome PM: Checking on-device encryption status',
+        statusCategory: 'to-do',
+        facts: { chrome_pm_aware: true, chrome_ode_checking: true },
+        points: 3,
+        feedback: 'In Chrome, go to Settings → Google Password Manager → Settings and look for "On-device encryption." As of early 2026, Google states this is being rolled out gradually. Once enabled, it can\'t be removed — and if you lose access to your recovery method, Google cannot help you recover your passwords.'
+      },
+      {
+        id: 'keep_current',
+        text: '📌 I\'m fine with my current setup',
+        statement: 'Chrome Password Manager: Keeping current setup',
         statusCategory: 'room-for-improvement',
         facts: { chrome_pm_aware: true, considering_pm_switch: false },
-        points: 0,
-        feedback: 'That\'s your choice. At minimum, make sure your Google account has strong 2FA enabled — your Google account password is effectively the master key to all your saved passwords.'
+        points: 1,
+        feedback: 'Using any password manager is better than reusing passwords. If you stay with Chrome\'s, make sure your Google account has strong 2FA — in the standard mode, your Google account is the key to all your saved passwords. You can always revisit this later.'
       }
     ]
   },
