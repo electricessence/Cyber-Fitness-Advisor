@@ -2,7 +2,7 @@
 // Uses the new simplified schema with priority-based ordering and facts-based state management
 
 import type { QuestionBank, Question } from '../engine/schema';
-import { onboardingQuestions, coreAssessmentQuestions, browserSecurityQuestions, securityHygieneQuestions, passwordManagerDeepDiveQuestions, twoFactorDeepDiveQuestions } from './questions/index.js';
+import { onboardingQuestions, coreAssessmentQuestions, browserSecurityQuestions, securityHygieneQuestions, passwordManagerDeepDiveQuestions, twoFactorDeepDiveQuestions, adBlockDeepDiveQuestions } from './questions/index.js';
 
 // Advanced security questions — gated by declarative conditions on facts
 const advancedSecurityQuestions: Question[] = [
@@ -51,7 +51,7 @@ const questionBank: QuestionBank = {
       levels: [
         {
           level: 1,
-          questions: [...onboardingQuestions, ...coreAssessmentQuestions, ...securityHygieneQuestions, ...passwordManagerDeepDiveQuestions, ...twoFactorDeepDiveQuestions, ...browserSecurityQuestions, ...advancedSecurityQuestions]
+          questions: [...onboardingQuestions, ...coreAssessmentQuestions, ...securityHygieneQuestions, ...passwordManagerDeepDiveQuestions, ...twoFactorDeepDiveQuestions, ...browserSecurityQuestions, ...adBlockDeepDiveQuestions, ...advancedSecurityQuestions]
         }
       ]
     }

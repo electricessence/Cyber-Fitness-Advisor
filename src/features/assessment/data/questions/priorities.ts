@@ -34,6 +34,9 @@ export const ASSESSMENT_PRIORITIES = {
   BREACH_CHECK: 66,
   BACKUP_FREQUENCY: 65,
   AD_BLOCKER: 62,
+  AD_BLOCK_DESKTOP: 61,          // Browser-specific uBO/content-blocker install prompts
+  AD_BLOCK_SECONDARY: 59,        // SponsorBlock bonus, Chrome PM warning, mobile flows (mutually exclusive)
+  AD_BLOCK_FOLLOWUP: 57,         // Browser-switch progress check-in
   WIFI_SECURITY: 60,
   PASSWORD_REUSE: 58,
   ACCOUNT_RECOVERY: 56,

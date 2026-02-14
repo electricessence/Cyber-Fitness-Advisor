@@ -7,6 +7,7 @@ export { browserSecurityQuestions } from './browserSecurity.js';
 export { securityHygieneQuestions } from './securityHygiene.js';
 export { passwordManagerDeepDiveQuestions } from './passwordManagerDeepDive.js';
 export { twoFactorDeepDiveQuestions } from './twoFactorDeepDive.js';
+export { adBlockDeepDiveQuestions } from './adBlockDeepDive.js';
 export { ONBOARDING_PRIORITIES, ASSESSMENT_PRIORITIES } from './priorities.js';
 
 // Future question groups can be added here:

@@ -25,43 +25,8 @@
 import { expect } from 'vitest';
 import { JourneyBuilder } from './journeyFramework';
 import { useAssessmentStore } from '../features/assessment/state/store';
+import { injectDevice } from './testHelpers';
 import type { UserJourney } from './journeyFramework';
-
-// ═══════════════════════════════════════════════════════════════════════
-// Helper: inject detection facts the same way browserJourneys.ts does
-// ═══════════════════════════════════════════════════════════════════════
-
-function injectDevice(
-  os: string,
-  browser: string,
-  type: 'desktop' | 'mobile' = 'desktop',
-) {
-  const store = useAssessmentStore.getState();
-  store.factsActions.injectFact('os_detected', os, { source: 'auto-detection' });
-  store.factsActions.injectFact('browser_detected', browser, { source: 'auto-detection' });
-  store.factsActions.injectFact('device_type', type, { source: 'auto-detection' });
-  store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
-
-  store.setDeviceProfile({
-    currentDevice: {
-      type,
-      // Test-only: cast needed because DeviceProfile accepts string literals but
-      // persona journeys parameterise the OS/browser dynamically.
-      os: os as 'windows' | 'mac' | 'linux',
-      browser: browser as 'chrome' | 'firefox' | 'edge' | 'safari',
-    },
-    otherDevices: {
-      hasWindows: os === 'windows',
-      hasMac: os === 'mac',
-      hasLinux: os === 'linux',
-      hasIPhone: false,
-      hasAndroid: false,
-      hasIPad: false,
-    },
-    primaryDesktop: os as 'windows' | 'mac' | 'linux',
-    primaryMobile: undefined,
-  });
-}
 
 // ═══════════════════════════════════════════════════════════════════════
 // Persona 1 — "Grandma Dorothy"
