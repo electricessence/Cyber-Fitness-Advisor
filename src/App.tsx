@@ -158,7 +158,7 @@ function App() {
                   <button
                     type="button"
                     onClick={() => setScoreDetailsOpen(true)}
-                    className="flex flex-col px-3 py-2 rounded-2xl bg-white/5 border border-white/10 text-left"
+                    className="flex flex-col px-3 py-2 rounded-2xl bg-white/5 border border-white/10 text-left min-w-[100px]"
                     aria-label="Open score details"
                   >
                     <span className="text-[10px] uppercase tracking-[0.35em] text-slate-400">Score</span>
@@ -166,7 +166,13 @@ function App() {
                       {Math.round(percentage)}
                       <span className="text-base text-slate-400 align-top ml-1">%</span>
                     </span>
-                    <span className="text-[11px] text-slate-400">Climbing toward 100%</span>
+                    <div className="w-full bg-white/10 rounded-full h-1.5 mt-1.5 overflow-hidden" role="progressbar" aria-valuenow={Math.round(percentage)} aria-valuemin={0} aria-valuemax={100} aria-label={`Protection score ${Math.round(percentage)} percent`}>
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-1000 ease-out"
+                        style={{ width: `${Math.min(Math.max(percentage, 2), 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-[11px] text-slate-400 mt-1">{answeredQuestions}/{totalQuestions} cards</span>
                   </button>
                   <button
                     type="button"
