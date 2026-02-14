@@ -20,9 +20,10 @@
  * 11. "Mobile-Only Maya"   — no desktop, failed detection → manual OS/browser
  * 12. "Firefox Beginner Fiona" — rejects detection, fallback browser select,
  *                              Firefox ad-block install, untested PM/2FA options
+ * 13. "Chrome Carol"        — Chrome built-in PM, triggers chrome_password_warning
  *
  * OS × Browser diversity matrix:
- *   Windows: Edge (Dorothy, John) | Firefox (Marcus, Fiona*) | Chrome (Frank)
+ *   Windows: Edge (Dorothy, John) | Firefox (Marcus, Fiona*) | Chrome (Frank, Carol)
  *   Mac:     Chrome (Sarah) | Firefox (Pat) | Safari (Alex)
  *   Linux:   Firefox (Dana)
  *   Mobile-Only: Android (Maya via manual selection)
@@ -1539,8 +1540,8 @@ export const mobileOnlyMaya: UserJourney = JourneyBuilder
   .step('Software updates: rarely')
     .answerQuestion('software_updates', 'rarely')
     .then()
-  .step('Virus scan: never')
-    .answerQuestion('virus_scan_recent', 'never')
+  .step('Virus scan: rarely or never')
+    .answerQuestion('virus_scan_recent', 'rarely')
     .then()
   .step('Backup: never')
     .answerQuestion('backup_frequency', 'never')
@@ -1556,8 +1557,8 @@ export const mobileOnlyMaya: UserJourney = JourneyBuilder
     .then()
 
   // — Security Hygiene (poor across the board) —
-  .step('Screen lock: pattern')
-    .answerQuestion('screen_lock', 'pattern')
+  .step('Screen lock: disabled')
+    .answerQuestion('screen_lock', 'no')
     .then()
   .step('Password reuse: often')
     .answerQuestion('password_reuse_habits', 'often')
@@ -1731,14 +1732,14 @@ export const firefoxBeginnerFiona: UserJourney = JourneyBuilder
     .then()
 
   // — Security Hygiene (middling) —
-  .step('Screen lock: pin')
-    .answerQuestion('screen_lock', 'pin')
+  .step('Screen lock: long timeout')
+    .answerQuestion('screen_lock', 'yes_long')
     .then()
-  .step('Password reuse: sometimes')
-    .answerQuestion('password_reuse_habits', 'sometimes')
+  .step('Password reuse: rarely')
+    .answerQuestion('password_reuse_habits', 'rarely')
     .then()
-  .step('Phishing: hover first')
-    .answerQuestion('phishing_awareness', 'hover_first')
+  .step('Phishing: checks carefully')
+    .answerQuestion('phishing_awareness', 'check_carefully')
     .then()
   .step('Breach check: once')
     .answerQuestion('breach_check', 'yes_once')
@@ -1795,6 +1796,150 @@ export const firefoxBeginnerFiona: UserJourney = JourneyBuilder
   .build();
 
 // ═══════════════════════════════════════════════════════════════════════
+// Persona 13 — "Chrome Carol"
+// The last-mile persona: a Chrome user who relies on Chrome's built-in
+// password manager, triggering chrome_password_warning — the only
+// question that zero other personas reach.  Also hits untested options:
+//   pm_master_password → reused  (critical risk branch)
+//   chrome_privacy_hardening → default
+//   chrome_password_warning → enable_encryption
+// ═══════════════════════════════════════════════════════════════════════
+
+export const chromeCarol: UserJourney = JourneyBuilder
+  .create('Chrome Carol — Chrome Built-In PM, Triggers chrome_password_warning')
+  .description(
+    'Windows + Chrome user who uses Chrome\'s built-in password manager with a ' +
+    'reused master password.  This is the only persona that hits the ' +
+    'chrome_password_warning question (requires browser=chrome + pm_type=browser). ' +
+    'Also covers chrome_privacy_hardening → default and pm_master_password → reused.'
+  )
+
+  // — Onboarding (standard Chrome detection) —
+  .step('Detect Windows + Chrome')
+    .custom(() => injectDevice('windows', 'chrome'))
+    .then()
+  .step('Privacy notice')
+    .answerQuestion('privacy_notice', 'understood')
+    .then()
+  .step('Confirm Windows')
+    .answerQuestion('windows_detection_confirm', 'yes')
+    .then()
+  .step('Confirm Chrome')
+    .answerQuestion('chrome_detection_confirm', 'yes')
+    .then()
+  .step('Tech comfort: comfortable')
+    .answerQuestion('tech_comfort', 'comfortable')
+    .then()
+  .step('Mobile: no mobile')
+    .answerQuestion('mobile_context', 'no_mobile')
+    .then()
+  .step('Priority: general')
+    .answerQuestion('usage_context', 'general')
+    .then()
+
+  // — Core Assessment (PM → browser built-in, reused master) —
+  .step('Uses password manager')
+    .answerQuestion('password_manager', 'yes')
+    .then()
+  .step('PM type: browser built-in (Chrome)')
+    .answerQuestion('pm_type', 'browser')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      expect(store.factsActions.getFact('pm_type')?.value).toBe('browser');
+    })
+    .then()
+  .step('PM master password: reused (critical risk)')
+    .answerQuestion('pm_master_password', 'reused')
+    .then()
+  .step('Partial 2FA')
+    .answerQuestion('two_factor_auth', 'partial')
+    .then()
+  .step('TFA method: SMS')
+    .answerQuestion('tfa_method', 'sms')
+    .then()
+  .step('TFA backup codes: no')
+    .answerQuestion('tfa_backup_codes', 'no')
+    .then()
+  .step('TFA priority: banking')
+    .answerQuestion('tfa_priority_accounts', 'banking')
+    .then()
+  .step('TFA barrier: confusing')
+    .answerQuestion('tfa_barrier', 'confusing')
+    .then()
+  .step('Software updates: manual')
+    .answerQuestion('software_updates', 'manual')
+    .then()
+  .step('Virus scan: this month')
+    .answerQuestion('virus_scan_recent', 'this_month')
+    .then()
+  .step('Backup: weekly')
+    .answerQuestion('backup_frequency', 'weekly')
+    .then()
+  .step('WiFi: WPA2')
+    .answerQuestion('wifi_security', 'wpa2')
+    .then()
+  .step('Email: scan first')
+    .answerQuestion('email_attachments', 'scan_first')
+    .then()
+  .step('Extensions: research first')
+    .answerQuestion('browser_extensions', 'research_first')
+    .then()
+
+  // — Security Hygiene —
+  .step('Screen lock: short')
+    .answerQuestion('screen_lock', 'yes_short')
+    .then()
+  .step('Password reuse: often')
+    .answerQuestion('password_reuse_habits', 'often')
+    .then()
+  .step('Phishing: checks carefully')
+    .answerQuestion('phishing_awareness', 'check_carefully')
+    .then()
+  .step('Breach check: once')
+    .answerQuestion('breach_check', 'yes_once')
+    .then()
+  .step('Account recovery: basic')
+    .answerQuestion('account_recovery', 'yes_basic')
+    .then()
+  .step('Ad blocker: some sites')
+    .answerQuestion('ad_blocker', 'some_sites')
+    .then()
+
+  // — Chrome browser-specific —
+  .step('Chrome privacy hardening: default (untested option)')
+    .answerQuestion('chrome_privacy_hardening', 'default')
+    .then()
+
+  // — THE KEY QUESTION: chrome_password_warning (last uncovered question!) —
+  .step('Chrome password warning: will check encryption')
+    .answerQuestion('chrome_password_warning', 'enable_encryption')
+    .expectCustom(() => {
+      const store = useAssessmentStore.getState();
+      // This is the question that was previously unreachable!
+      expect(store.answers['chrome_password_warning']?.value).toBe('enable_encryption');
+      expect(store.factsActions.getFact('chrome_pm_aware')?.value).toBe(true);
+      expect(store.factsActions.getFact('chrome_ode_checking')?.value).toBe(true);
+    })
+    .then()
+
+  .finalOutcome(
+    'Carol has moderate score — chrome_password_warning finally answered, PM reuse flagged',
+    () => {
+      const store = useAssessmentStore.getState();
+      expect(store.overallScore).toBeGreaterThan(25);
+      // Chrome built-in PM → chrome_password_warning triggered (THE milestone!)
+      expect(store.answers['pm_type']?.value).toBe('browser');
+      expect(store.answers['chrome_password_warning']?.value).toBe('enable_encryption');
+      // Reused master password (new untested option)
+      expect(store.answers['pm_master_password']?.value).toBe('reused');
+      // Chrome privacy default (new untested option)
+      expect(store.answers['chrome_privacy_hardening']?.value).toBe('default');
+      // 68/68 questions now reachable!
+    }
+  )
+  .build();
+
+// ═══════════════════════════════════════════════════════════════════════
 // Exports
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -1811,4 +1956,5 @@ export const PERSONA_JOURNEYS = [
   androidAmir,
   mobileOnlyMaya,
   firefoxBeginnerFiona,
+  chromeCarol,
 ] as const;

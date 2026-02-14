@@ -33,6 +33,7 @@ import {
   androidAmir,
   mobileOnlyMaya,
   firefoxBeginnerFiona,
+  chromeCarol,
   PERSONA_JOURNEYS,
 } from '../testing/personaJourneys';
 import { useAssessmentStore } from '../features/assessment/state/store';
@@ -98,6 +99,10 @@ describe('👤 Persona-Based User Journeys', () => {
     it('Firefox Beginner Fiona — Rejects browser detection → fallback → Firefox ad-block install', async () => {
       await runner.executeJourney(firefoxBeginnerFiona);
     }, 30000);
+
+    it('Chrome Carol — Chrome built-in PM triggers chrome_password_warning', async () => {
+      await runner.executeJourney(chromeCarol);
+    }, 30000);
   });
 
   // ── Advanced / Power-User Personas ──────────────────────────────────
@@ -119,7 +124,7 @@ describe('👤 Persona-Based User Journeys', () => {
   // ── Coverage & Completeness ─────────────────────────────────────────
 
   describe('📊 Persona Coverage', () => {
-    it('All 12 persona journeys complete successfully', async () => {
+    it('All 13 persona journeys complete successfully', async () => {
       for (const journey of PERSONA_JOURNEYS) {
         await runner.executeJourney(journey);
       }
