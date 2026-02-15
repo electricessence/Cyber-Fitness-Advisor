@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { QuestionBank, Answer, Question } from '../engine/schema';
+import type { QuestionBank, Answer, Question, AnswerOption } from '../engine/schema';
 import type { DeviceProfile } from '../engine/deviceScenarios';
 import type { TaskResponse, TaskReminder } from '../../tasks/taskManagement';
 import { calculateOverallScore, getTopRecommendations, getNextLevelProgress, calculateQuestionPoints, calculateAnswerExpiration } from '../engine/scoring';
@@ -408,7 +408,7 @@ export const useAssessmentStore = create<AssessmentState>()(
         
         const targetQuestion = allQs.find((q: Question) => q.id === questionId);
         if (targetQuestion) {
-          const selectedOption = targetQuestion.options.find((option: any) => 
+          const selectedOption = targetQuestion.options.find((option: AnswerOption) => 
             option.id === newAnswers[questionId].value || option.text === newAnswers[questionId].value
           );
           if (selectedOption && selectedOption.facts) {
@@ -671,8 +671,8 @@ export const useAssessmentStore = create<AssessmentState>()(
             return bPriority - aPriority;
           }
 
-          const ao = (a as any).phaseOrder ?? 9999;
-          const bo = (b as any).phaseOrder ?? 9999;
+          const ao = a.phaseOrder ?? 9999;
+          const bo = b.phaseOrder ?? 9999;
           if (ao !== bo) return ao - bo;
 
           return a.id.localeCompare(b.id);

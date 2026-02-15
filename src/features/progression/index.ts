@@ -16,7 +16,9 @@ export async function loadTiersConfig(): Promise<{ tiers: any[] }> {
     const tiersModule = await import('../../data/tiers.json');
     return tiersModule.default;
   } catch (error) {
-    console.warn('Failed to load tiers.json, using empty config:', error);
+    if (import.meta.env.DEV) {
+      console.warn('Failed to load tiers.json, using empty config:', error);
+    }
     return { tiers: [] };
   }
 }

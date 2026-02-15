@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useAssessmentStore, initializeStore } from './features/assessment/state/store';
 import { ScoreBar } from './components/ScoreBar';
 import { AppLayout } from './components/layout/AppLayout';
@@ -13,7 +13,10 @@ import { Menu, X, Download, Upload, RefreshCw, Github, Shield, Trophy, Lightbulb
 // Initialize semantic version for global access
 import './features/assessment/engine/semantics';
 import { CFASemantics } from './utils/semantics';
-import AuthoringDiagnostics from './components/development/AuthoringDiagnostics';
+// Development tools — only loaded in dev mode (tree-shaken from prod build)
+const AuthoringDiagnostics = import.meta.env.DEV
+  ? lazy(() => import('./components/development/AuthoringDiagnostics'))
+  : null;
 import { removeStorage } from './utils/safeStorage';
 
 function App() {
@@ -22,6 +25,7 @@ function App() {
   const [statusOpen, setStatusOpen] = useState(false);
   const [badgesOpen, setBadgesOpen] = useState(false);
   const [recommendationsOpen, setRecommendationsOpen] = useState(false);
+  const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Use custom hooks for state management
@@ -49,13 +53,29 @@ function App() {
     // Initialize store and device detection facts
     initializeStore();
 
-    // Expose semantics globally for debugging (Task A: Lock & verify semantics)
-    window.__cfaSemantics = CFASemantics;
+    // Expose semantics globally for debugging (dev only)
+    if (import.meta.env.DEV) {
+      window.__cfaSemantics = CFASemantics;
+    }
   }, []); // Only run once on mount
 
   useEffect(() => {
     navigation.setCurrentLevel(userLevel);
   }, [userLevel, navigation]);
+
+  // Close any open modal/panel on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (menuOpen) setMenuOpen(false);
+      else if (scoreDetailsOpen) setScoreDetailsOpen(false);
+      else if (statusOpen) setStatusOpen(false);
+      else if (badgesOpen) setBadgesOpen(false);
+      else if (recommendationsOpen) setRecommendationsOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [menuOpen, scoreDetailsOpen, statusOpen, badgesOpen, recommendationsOpen]);
   
   const fallbackTotalQuestions = questionBank.domains.reduce(
     (total, domain) => total + domain.levels.reduce(
@@ -98,7 +118,8 @@ function App() {
             }
           });
           
-          alert('Data imported successfully!');
+          setImportStatus({ type: 'success', message: 'Data imported successfully!' });
+          setTimeout(() => setImportStatus(null), 4000);
           
           // Reset file input
           if (event.target) {
@@ -108,7 +129,8 @@ function App() {
           throw new Error('No valid answers found in file');
         }
       } catch (error) {
-        alert(`Failed to import data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        setImportStatus({ type: 'error', message: `Import failed: ${error instanceof Error ? error.message : 'Unknown error'}` });
+        setTimeout(() => setImportStatus(null), 6000);
         if (event.target) {
           event.target.value = '';
         }
@@ -150,6 +172,19 @@ function App() {
           <div className="min-h-screen bg-slate-950 text-white">
             <div className="flex flex-col min-h-screen mx-auto w-full max-w-xl px-4 pb-8">
               <header className="flex items-center justify-between py-4">
+                {importStatus && (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className={`absolute top-2 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl text-sm font-medium shadow-lg transition-opacity duration-300 ${
+                      importStatus.type === 'success'
+                        ? 'bg-emerald-500/90 text-white'
+                        : 'bg-red-500/90 text-white'
+                    }`}
+                  >
+                    {importStatus.message}
+                  </div>
+                )}
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.4em] text-slate-500">Cyber</p>
                   <p className="text-sm font-semibold text-white">Fitness Advisor</p>
@@ -421,7 +456,11 @@ function App() {
       />
 
       {/* Development Tools (Task C: Diagnostics & transparency) */}
-      <AuthoringDiagnostics />
+      {AuthoringDiagnostics && (
+        <Suspense fallback={null}>
+          <AuthoringDiagnostics />
+        </Suspense>
+      )}
     </AppLayout>
   );
 }

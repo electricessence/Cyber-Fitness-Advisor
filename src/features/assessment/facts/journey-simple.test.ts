@@ -33,11 +33,7 @@ describe('🎯 Facts-Based Architecture: User Journeys', () => {
     expect(updatedStore.answers['windows_detection_confirm']).toBeDefined();
     expect(updatedStore.answers['windows_detection_confirm'].value).toBe('yes');
     
-    // Verify facts were extracted and stored (when integrated)
-    // TODO: Uncomment once store integration is complete
-    // const osFact = updatedStore.factsActions?.getFact('device.os.primary');
-    // expect(osFact?.value).toBe('windows');
-    // expect(osFact?.category).toBe('device');
+    // Facts integration is tested in store.spec.ts and journey persona tests
   });
 
   it('🔐 Journey: Password manager usage establishes behavior facts', async () => {
@@ -57,9 +53,7 @@ describe('🎯 Facts-Based Architecture: User Journeys', () => {
     expect(updatedStore.answers['password_manager'].value).toBe('yes');
     expect(updatedStore.overallScore).toBeGreaterThan(0);
     
-    // TODO: Verify behavior facts once integration is complete
-    // const passwordFact = updatedStore.factsActions?.getFact('behavior.password_manager.browser');
-    // expect(passwordFact?.value).toBe(true);
+    // Behavior facts integration is tested in journey persona tests
   });
 
   it('🎯 Journey: Complete assessment flow maintains data integrity', async () => {

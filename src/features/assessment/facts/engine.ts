@@ -69,7 +69,9 @@ export class FactsEngine {
           }
         }
       } catch (error) {
-        console.warn(`Failed to extract facts from answer ${answer.questionId}:`, error);
+        if (import.meta.env.DEV) {
+          console.warn(`Failed to extract facts from answer ${answer.questionId}:`, error);
+        }
       }
     }
     
@@ -202,7 +204,9 @@ export class FactsEngine {
       
       case 'manual-review':
         // For now, keep the existing fact and log for manual review
-        console.warn(`Manual review required for fact conflict: ${newFact.id}`);
+        if (import.meta.env.DEV) {
+          console.warn(`Manual review required for fact conflict: ${newFact.id}`);
+        }
         return existingFact;
       
       default:

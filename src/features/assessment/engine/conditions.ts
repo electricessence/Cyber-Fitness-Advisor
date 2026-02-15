@@ -138,7 +138,9 @@ function evaluateCondition(condition: GateCondition, context: EvaluationContext)
         : false;
     
     default:
-      console.warn(`Unknown comparator: ${when}`);
+      if (import.meta.env.DEV) {
+        console.warn(`Unknown comparator: ${when}`);
+      }
       return false;
   }
 }

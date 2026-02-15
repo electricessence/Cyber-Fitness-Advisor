@@ -83,7 +83,7 @@ export function createFactsStoreSlice(): FactsStoreState {
         };
         
         // Log any conflicts for debugging (only warnings)
-        if (result.conflicts.length > 0) {
+        if (import.meta.env.DEV && result.conflicts.length > 0) {
           console.warn('Fact conflicts detected:', result.conflicts);
         }
       },
@@ -115,7 +115,9 @@ export function createFactsStoreSlice(): FactsStoreState {
           try {
             factsEngine.extractFactsFromAnswer(answer, factsProfile);
           } catch (error) {
-            console.warn(`Failed to import answer ${answer.questionId}:`, error);
+            if (import.meta.env.DEV) {
+              console.warn(`Failed to import answer ${answer.questionId}:`, error);
+            }
           }
         }
       },

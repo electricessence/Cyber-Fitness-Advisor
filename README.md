@@ -97,14 +97,17 @@ src/
 │   │   ├── schema.ts    # TypeScript interfaces
 │   │   └── scoring.ts   # Scoring algorithms
 │   ├── data/
-│   │   └── questions.json  # Question bank
+│   │   └── questions.json  # Question bank (options-based)
+│   ├── facts/           # Fact-based detection engine
 │   └── state/
 │       └── store.ts     # Zustand state management
 ├── components/
+│   ├── layout/          # AppLayout, SecurityStatus, ResetModal
+│   ├── questions/       # QuestionDeck (assessment flow)
+│   ├── badges/          # BadgeSummary (achievement display)
 │   ├── ScoreBar.tsx     # Animated progress display
-│   ├── QuestionCard.tsx # Individual question UI
-│   ├── Recommendations.tsx # Smart next steps
-│   └── Celebration.tsx  # Progress animations
+│   ├── ConnectedRecommendations.tsx # Smart next steps
+│   └── ErrorBoundary.tsx # Graceful error handling
 └── App.tsx              # Main application shell
 ```
 
@@ -122,18 +125,20 @@ src/
 
 ## 🔧 Adding Questions
 
-Questions follow a simple JSON schema:
+Questions follow a structured JSON schema organized by domain and level:
 
 ```json
 {
   "id": "unique_id",
-  "type": "YN" | "SCALE", 
-  "weight": 1-10,
+  "type": "YN",
+  "weight": 6,
   "quickWin": true,
   "timeEstimate": "2 minutes",
   "text": "Do you use a password manager?",
-  "explanation": "Why this matters...",
-  "actionHint": "How to do this..."
+  "affirmativeText": "Password Manager Active",
+  "negativeText": "No Password Manager",
+  "explanation": "Why this matters for your security...",
+  "actionHint": "How to enable this feature"
 }
 ```
 
@@ -162,7 +167,7 @@ See [`docs/QUESTION_AUTHORING.md`](docs/QUESTION_AUTHORING.md) for detailed guid
 
 ## 🤝 Contributing
 
-We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions!
 
 ### Development Setup
 ```bash
@@ -181,7 +186,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 Built with modern web technologies:
 - **Vite** - Lightning-fast development
-- **React 18** - Component-based UI
+- **React 19** - Component-based UI
 - **TypeScript** - Type-safe development  
 - **Tailwind CSS** - Utility-first styling
 - **Zustand** - Lightweight state management

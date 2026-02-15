@@ -259,7 +259,9 @@ export class TierEngine {
         return fact && typeof fact.value === 'number' && fact.value < (condition.value as number);
       
       default:
-        console.warn(`Unknown tier condition operator: ${condition.operator}`);
+        if (import.meta.env.DEV) {
+          console.warn(`Unknown tier condition operator: ${condition.operator}`);
+        }
         return false;
     }
   }

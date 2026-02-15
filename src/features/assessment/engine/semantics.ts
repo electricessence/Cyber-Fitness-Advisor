@@ -31,7 +31,7 @@ export const SEMANTIC_RULES = {
 /**
  * Expose semantic version globally for debugging
  */
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && import.meta.env.DEV) {
   (window as any).__cfaSemantics = {
     version: CONTENT_SEMVER,
     rules: SEMANTIC_RULES,

@@ -9,8 +9,8 @@ export interface ScoreCalculationOptions {
 }
 
 function getQuestionMaxPoints(question: Question): number {
-  if ((question as any).type === 'YN') {
-    return (question as any).weight || 0;
+  if (question.type === 'YN') {
+    return question.weight || 0;
   }
 
   if (question.options && question.options.length > 0) {
@@ -33,8 +33,8 @@ function isQuickWin(question: Question): boolean {
 // Calculate points for a single question based on selected answer
 export function calculateQuestionPoints(question: Question, value: string | boolean | number): number {
   // Handle YN (Yes/No) questions - legacy compatibility
-  if ((question as any).type === 'YN') {
-    const weight = (question as any).weight || 0;
+  if (question.type === 'YN') {
+    const weight = question.weight || 0;
     // For YN questions: full weight if true/yes, 0 if false/no
     if (value === true || value === 'yes' || value === 'true') {
       return weight;
@@ -73,9 +73,9 @@ export function calculateDomainScore(
       
       // Calculate max possible points for this question
       let maxQuestionPoints = 0;
-      if ((question as any).type === 'YN') {
+      if (question.type === 'YN') {
         // YN questions: max points is the weight
-        maxQuestionPoints = (question as any).weight || 0;
+        maxQuestionPoints = question.weight || 0;
       } else if (question.options) {
         // New format: max of all option points
         maxQuestionPoints = Math.max(...question.options.map(opt => opt.points || 0));
