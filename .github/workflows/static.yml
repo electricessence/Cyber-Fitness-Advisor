@@ -1,18 +1,9 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Build and deploy to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
-  # Runs after version bump completes on main branch
-  workflow_run:
-    workflows: ["Auto Version Bump"]
-    types:
-      - completed
+  push:
     branches: [main]
-  
-  # Test build on pull requests to main (no deployment)
-  pull_request:
-    branches: ["main"]
-    types: [opened, synchronize, reopened]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -43,12 +34,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+        uses: pnpm/action-setup@v4
 
       - name: Get pnpm store directory
         shell: bash
@@ -56,7 +45,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Setup pnpm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -64,7 +53,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: TypeScript type checking
         run: pnpm typecheck
@@ -81,11 +70,11 @@ jobs:
           node -e "
             const seedContent = require('./src/data/seed-content/seed-content-v1.json');
             console.log('Seed content validation:', {
-              questionsCount: seedContent.questions.length,
               suitesCount: seedContent.suites.length,
-              validStructure: seedContent.questions.length > 0 && seedContent.suites.length > 0
+              domainsCount: seedContent.domains.length,
+              validStructure: seedContent.suites.length > 0 && seedContent.domains.length > 0
             });
-            if (seedContent.questions.length === 0 || seedContent.suites.length === 0) {
+            if (seedContent.suites.length === 0 || seedContent.domains.length === 0) {
               process.exit(1);
             }
           "
@@ -112,6 +101,4 @@ jobs:
           
       - name: Deploy to GitHub Pages
         id: deployment
-        # Only deploy when triggered by successful version bump workflow
-        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
         uses: actions/deploy-pages@v4
