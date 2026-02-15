@@ -744,6 +744,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { "priority_concern": "general" },
         feedback: 'Excellent approach! We\'ll cover comprehensive security fundamentals.'
+      },
+      {
+        id: 'all_above',
+        text: '🛡️ All of the above!',
+        statement: 'Security Focus: Everything',
+        statusCategory: 'shields-up',
+        facts: { "priority_concern": "all" },
+        feedback: 'You\'re serious about security! We\'ll make sure every angle is covered.'
       }
     ]
   }
