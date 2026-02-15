@@ -226,7 +226,7 @@ export const mobileSecurityQuestions: Question[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════
-  // iOS-Specific — gated on mobile_os: ['ios', 'both']
+  // iOS-Specific — gated on mobile_os: 'ios'
   // ═══════════════════════════════════════════════════════════════════════
 
   {
@@ -239,7 +239,7 @@ export const mobileSecurityQuestions: Question[] = [
     effort: '2 minutes',
     description: 'Find My iPhone lets you locate, lock, or erase your device remotely if it\'s lost or stolen. It also activates Activation Lock, which prevents anyone from erasing and reusing your device without your Apple ID password.',
     conditions: {
-      include: { "mobile_os": ["ios", "both"] }
+      include: { "mobile_os": "ios" }
     },
     options: [
       {
@@ -282,7 +282,7 @@ export const mobileSecurityQuestions: Question[] = [
     effort: '5 minutes',
     description: 'iCloud Backup automatically saves your device data, including app data, photos, and settings. If your phone is lost, stolen, or breaks, a backup lets you restore everything to a new device.',
     conditions: {
-      include: { "mobile_os": ["ios", "both"] }
+      include: { "mobile_os": "ios" }
     },
     options: [
       {
@@ -334,7 +334,7 @@ export const mobileSecurityQuestions: Question[] = [
     effort: '1 minute',
     description: 'Apple\'s App Store review process screens apps for malware and policy violations. Apps installed through enterprise certificates or other methods bypass this review, which can introduce security risks.',
     conditions: {
-      include: { "mobile_os": ["ios", "both"] }
+      include: { "mobile_os": "ios" }
     },
     options: [
       {
@@ -377,7 +377,7 @@ export const mobileSecurityQuestions: Question[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════
-  // Android-Specific — gated on mobile_os: ['android', 'both']
+  // Android-Specific — gated on mobile_os: 'android'
   // ═══════════════════════════════════════════════════════════════════════
 
   {
@@ -390,7 +390,7 @@ export const mobileSecurityQuestions: Question[] = [
     effort: '2 minutes',
     description: 'Google\'s Find My Device lets you locate, lock, or erase your Android phone remotely. It\'s built into Android and works through your Google account.',
     conditions: {
-      include: { "mobile_os": ["android", "both"] }
+      include: { "mobile_os": "android" }
     },
     options: [
       {
@@ -433,7 +433,7 @@ export const mobileSecurityQuestions: Question[] = [
     effort: '1 minute',
     description: 'Play Protect is Google\'s built-in malware scanner for Android. It automatically scans apps from the Play Store and can also scan apps installed from other sources.',
     conditions: {
-      include: { "mobile_os": ["android", "both"] }
+      include: { "mobile_os": "android" }
     },
     options: [
       {
@@ -476,7 +476,7 @@ export const mobileSecurityQuestions: Question[] = [
     effort: '2 minutes',
     description: 'Android allows installing apps from outside the Play Store (sideloading). While this enables access to apps not in the store, it also bypasses Play Store security screening and can expose your device to malware.',
     conditions: {
-      include: { "mobile_os": ["android", "both"] }
+      include: { "mobile_os": "android" }
     },
     options: [
       {

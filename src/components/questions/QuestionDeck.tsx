@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, type ComponentType } from 'react';
+import { useState, useEffect, useMemo, useCallback, type ComponentType } from 'react';
 import {
   ShieldCheck,
   QrCode,
@@ -206,6 +206,7 @@ export function QuestionDeck() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
+  const [slideDetailsOpen, setSlideDetailsOpen] = useState(false);
 
   // Build improvement items from answered questions (needed for slideIndex clamping)
   const improvementItems = useMemo<ImprovementItem[]>(() => {
@@ -257,6 +258,8 @@ export function QuestionDeck() {
     }
   }, [slideIndex, improvementItems.length]);
 
+  // Reset detail panels when navigating
+  useEffect(() => { setSlideDetailsOpen(false); }, [slideIndex]);
   useEffect(() => {
     setShowDetails(false);
   }, [activeIndex]);
@@ -275,6 +278,16 @@ export function QuestionDeck() {
     if (!currentQuestion) return;
     answerQuestion(currentQuestion.id, optionId);
   };
+
+  // Track which option's info panel is expanded (by option id)
+  const [expandedOptionId, setExpandedOptionId] = useState<string | null>(null);
+  // Reset expanded info when question changes
+  useEffect(() => { setExpandedOptionId(null); }, [currentQuestion?.id]);
+
+  const toggleOptionInfo = useCallback((e: React.MouseEvent, optionId: string) => {
+    e.stopPropagation(); // don't trigger answer selection
+    setExpandedOptionId(prev => prev === optionId ? null : optionId);
+  }, []);
 
   if (!currentQuestion) {
     const answeredCount = Object.keys(answers).length;
@@ -322,13 +335,13 @@ export function QuestionDeck() {
             </div>
 
             {/* Card body — educational content */}
-            <div className="px-6 py-6 sm:px-10 sm:py-8 flex flex-col gap-5">
+            <div className="px-6 py-6 sm:px-10 sm:py-8 flex flex-col gap-4">
               {/* The question */}
               <h4 className="text-lg font-semibold text-gray-900 leading-snug">
                 {currentSlide.text}
               </h4>
 
-              {/* Current answer + metadata pills */}
+              {/* Current answer + metadata pills + info toggle */}
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-sm text-gray-500">
                   {currentSlide.statement || currentSlide.currentOptionText}
@@ -350,23 +363,43 @@ export function QuestionDeck() {
                     ⏱ {currentSlide.effort}
                   </span>
                 )}
+                {(currentSlide.currentFeedback || currentSlide.description || currentSlide.explanation) && (
+                  <button
+                    type="button"
+                    onClick={() => setSlideDetailsOpen(prev => !prev)}
+                    aria-expanded={slideDetailsOpen}
+                    aria-label={slideDetailsOpen ? 'Hide details' : 'Learn more'}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                      slideDetailsOpen
+                        ? 'bg-blue-100 text-blue-600'
+                        : 'bg-gray-100 text-gray-400 hover:bg-blue-50 hover:text-blue-500'
+                    }`}
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
-              {/* Educational feedback — the "why" */}
-              {currentSlide.currentFeedback && (
-                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl px-5 py-4">
-                  <p className="text-sm font-semibold text-indigo-700 mb-1.5">Why this matters</p>
-                  <p className="text-base text-gray-800 leading-relaxed">
-                    {currentSlide.currentFeedback}
-                  </p>
-                </div>
-              )}
+              {/* Collapsible detail panel */}
+              {slideDetailsOpen && (
+                <div className="flex flex-col gap-3 pt-1">
+                  {/* Educational feedback — the "why" */}
+                  {currentSlide.currentFeedback && (
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl px-5 py-4">
+                      <p className="text-sm font-semibold text-indigo-700 mb-1.5">Why this matters</p>
+                      <p className="text-base text-gray-800 leading-relaxed">
+                        {currentSlide.currentFeedback}
+                      </p>
+                    </div>
+                  )}
 
-              {/* Extra context from question description/explanation (if available) */}
-              {(currentSlide.description || currentSlide.explanation) && (
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {currentSlide.description || currentSlide.explanation}
-                </p>
+                  {/* Extra context from question description/explanation */}
+                  {(currentSlide.description || currentSlide.explanation) && (
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {currentSlide.description || currentSlide.explanation}
+                    </p>
+                  )}
+                </div>
               )}
 
               {/* Revisit action */}
@@ -487,17 +520,38 @@ export function QuestionDeck() {
                 className="w-full border-2 border-gray-200 rounded-2xl p-4 text-left hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <div className="text-base font-semibold text-gray-900 flex items-center gap-2">
                       {option.icon && <span className="text-xl" aria-hidden="true">{option.icon}</span>}
                       {option.text}
                     </div>
-                    {option.feedback && (
-                      <p className="text-sm text-gray-500 mt-1">{option.feedback}</p>
-                    )}
                   </div>
-                  <ArrowRight className="w-5 h-5 text-gray-400" />
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {option.feedback && (
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        aria-label={expandedOptionId === option.id ? `Hide details for ${option.text}` : `Show details for ${option.text}`}
+                        aria-expanded={expandedOptionId === option.id}
+                        onClick={(e) => toggleOptionInfo(e, option.id)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOptionInfo(e as unknown as React.MouseEvent, option.id); } }}
+                        className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                          expandedOptionId === option.id
+                            ? 'bg-blue-100 text-blue-600'
+                            : 'bg-gray-100 text-gray-400 hover:bg-blue-50 hover:text-blue-500'
+                        }`}
+                      >
+                        <Info className="w-3.5 h-3.5" />
+                      </span>
+                    )}
+                    <ArrowRight className="w-5 h-5 text-gray-400" />
+                  </div>
                 </div>
+                {option.feedback && expandedOptionId === option.id && (
+                  <p className="text-sm text-gray-500 mt-3 pt-3 border-t border-gray-100 leading-relaxed">
+                    {option.feedback}
+                  </p>
+                )}
               </button>
             ))}
           </div>

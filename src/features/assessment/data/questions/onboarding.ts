@@ -635,12 +635,12 @@ export const onboardingQuestions: Question[] = [
         feedback: 'Got it! We\'ll focus on Android security.'
       },
       {
-        id: 'both',
-        text: '📱 Both iPhone and Android',
-        statement: 'Mobile Devices: Both iOS & Android',
+        id: 'other',
+        text: '📱 Other',
+        statement: 'Mobile OS: Other',
         statusCategory: 'shields-up',
-        facts: { "has_mobile": true, "mobile_os": "both" },
-        feedback: 'We\'ll cover security for both platforms.'
+        facts: { "has_mobile": true, "mobile_os": "other" },
+        feedback: 'Got it! We\'ll include general mobile security advice.'
       }
     ]
   },
@@ -650,7 +650,7 @@ export const onboardingQuestions: Question[] = [
     id: 'mobile_context',
     phase: 'onboarding',
     priority: ONBOARDING_PRIORITIES.MOBILE_CONTEXT,
-    text: 'Do you also use a smartphone or tablet for important activities like email, banking, or work?',
+    text: 'Do you also use a smartphone or tablet?',
     tags: ['onboarding'],
     journeyIntent: 'onboarding',
     conditions: {
@@ -659,40 +659,32 @@ export const onboardingQuestions: Question[] = [
     },
     options: [
       {
-        id: 'iphone',
-        text: '📱 Yes - iPhone (iOS)',
-        statement: 'Mobile Device: iPhone',
+        id: 'ios',
+        text: '📱 iOS (iPhone / iPad)',
+        statement: 'Mobile Device: iOS',
         statusCategory: 'shields-up',
         facts: { "has_mobile": true, "mobile_os": "ios" },
-        feedback: 'Great! We\'ll include iPhone security recommendations.'
+        feedback: 'Great! We\'ll include iOS security recommendations.'
       },
       {
         id: 'android',
-        text: '📱 Yes - Android phone',
+        text: '📱 Android',
         statement: 'Mobile Device: Android',
         statusCategory: 'shields-up',
         facts: { "has_mobile": true, "mobile_os": "android" },
         feedback: 'Perfect! We\'ll include Android security recommendations.'
       },
       {
-        id: 'both',
-        text: '📱 Yes - Both iPhone and Android',
-        statement: 'Mobile Devices: Both iOS & Android',
+        id: 'other',
+        text: '📱 Other',
+        statement: 'Mobile Device: Other',
         statusCategory: 'shields-up',
-        facts: { "has_mobile": true, "mobile_os": "both" },
-        feedback: 'We\'ll provide security advice for both platforms.'
+        facts: { "has_mobile": true, "mobile_os": "other" },
+        feedback: 'Got it! We\'ll include general mobile security advice.'
       },
       {
-        id: 'tablet_only',
-        text: '📱 Yes - iPad/tablet only',
-        statement: 'Mobile Device: Tablet',
-        statusCategory: 'shields-up',
-        facts: { "has_mobile": true, "mobile_os": "tablet" },
-        feedback: 'Good! We\'ll include tablet-specific security advice.'
-      },
-      {
-        id: 'no_mobile',
-        text: '❌ No - Just this computer',
+        id: 'neither',
+        text: '❌ Neither — just this computer',
         statement: 'Mobile Devices: Desktop Only',
         statusCategory: 'shields-up',
         facts: { "has_mobile": false },

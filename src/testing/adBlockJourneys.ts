@@ -293,8 +293,8 @@ export const mobileIosAdBlock: UserJourney = JourneyBuilder
       store.factsActions.injectFact('browser', 'safari', { source: 'auto-detection' });
     })
     .then()
-  .step('Set mobile_context = iphone (asserts mobile_os=ios)')
-    .answerQuestion('mobile_context', 'iphone')
+  .step('Set mobile_context = ios (asserts mobile_os=ios)')
+    .answerQuestion('mobile_context', 'ios')
     .expectCustom(() => {
       const store = useAssessmentStore.getState();
       expect(store.factsActions.getFact('mobile_os')?.value).toBe('ios');
