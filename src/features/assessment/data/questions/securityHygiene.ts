@@ -248,6 +248,15 @@ export const securityHygieneQuestions: Question[] = [
         facts: { "ad_blocker": "no" },
         points: 0,
         feedback: 'Without an ad blocker, you\'re exposed to malicious ads that can redirect you to phishing sites or silently install malware. Installing one takes under 2 minutes and is one of the easiest security wins.'
+      },
+      {
+        id: 'whats_that',
+        text: '🤔 What\'s an ad blocker?',
+        statement: 'Ad Blocker: Unfamiliar',
+        statusCategory: 'room-for-improvement',
+        facts: { "ad_blocker": "no", "ad_blocker_unfamiliar": true },
+        points: 0,
+        feedback: 'An ad blocker is a free tool that installs in your browser and makes ads go away. But it\'s not just about convenience — it also blocks malicious ads that can install malware or redirect you to scam sites without you clicking anything. Installing one takes under 2 minutes.'
       }
     ]
   }

@@ -282,4 +282,146 @@ describe('Question Flow System', () => {
       });
     });
   });
+
+  describe('Probe Ceiling (Action-First Pacing)', () => {
+    it('should never show more than 3 consecutive probe questions while non-probes remain', () => {
+      const { result } = renderHook(() => useAssessmentStore());
+
+      // Complete onboarding so assessment questions appear
+      act(() => {
+        result.current.answerQuestion('privacy_notice', 'understood');
+        result.current.answerQuestion('windows_detection_confirm', 'yes');
+        result.current.answerQuestion('chrome_detection_confirm', 'yes');
+        result.current.answerQuestion('tech_comfort', 'comfortable');
+        result.current.answerQuestion('mobile_context', 'neither');
+        result.current.answerQuestion('usage_context', 'general');
+      });
+
+      const questions = result.current.getOrderedAvailableQuestions?.() || [];
+      const assessmentQuestions = questions.filter(q => q.phase !== 'onboarding');
+
+      // Find the position of the last non-probe
+      let lastNonProbeIdx = -1;
+      for (let i = assessmentQuestions.length - 1; i >= 0; i--) {
+        const intent = assessmentQuestions[i].journeyIntent;
+        if (intent !== 'probe' && intent !== 'insight') {
+          lastNonProbeIdx = i;
+          break;
+        }
+      }
+
+      // Check: within the interleaved region (before non-probes are exhausted),
+      // max consecutive probes should be <= 3
+      let maxStreak = 0;
+      let streak = 0;
+      for (let i = 0; i <= lastNonProbeIdx; i++) {
+        const q = assessmentQuestions[i];
+        if (q.journeyIntent === 'probe' || q.journeyIntent === 'insight') {
+          streak++;
+          maxStreak = Math.max(maxStreak, streak);
+        } else {
+          streak = 0;
+        }
+      }
+
+      expect(maxStreak).toBeLessThanOrEqual(3);
+      // Also verify an action break appears within the first 4 questions
+      const firstFour = assessmentQuestions.slice(0, 4);
+      const hasEarlyAction = firstFour.some(q => 
+        q.journeyIntent !== 'probe' && q.journeyIntent !== 'insight'
+      );
+      expect(hasEarlyAction).toBe(true);
+    });
+
+    it('should preserve the first question as highest priority', () => {
+      const { result } = renderHook(() => useAssessmentStore());
+
+      act(() => {
+        result.current.answerQuestion('privacy_notice', 'understood');
+        result.current.answerQuestion('windows_detection_confirm', 'yes');
+        result.current.answerQuestion('chrome_detection_confirm', 'yes');
+        result.current.answerQuestion('tech_comfort', 'comfortable');
+        result.current.answerQuestion('mobile_context', 'neither');
+        result.current.answerQuestion('usage_context', 'general');
+      });
+
+      const questions = result.current.getOrderedAvailableQuestions?.() || [];
+      const assessmentQuestions = questions.filter(q => q.phase !== 'onboarding');
+
+      expect(assessmentQuestions.length).toBeGreaterThan(0);
+      // First assessment question should still be the highest-priority one
+      const firstPriority = assessmentQuestions[0].priority || 0;
+      const maxPriority = Math.max(...assessmentQuestions.map(q => q.priority || 0));
+      expect(firstPriority).toBe(maxPriority);
+    });
+  });
+
+  describe('What\'s That? Educational Options', () => {
+    it('password_manager should have a whats_that option', () => {
+      const { result } = renderHook(() => useAssessmentStore());
+
+      act(() => {
+        result.current.answerQuestion('privacy_notice', 'understood');
+      });
+
+      const allQuestions = result.current.getOrderedAvailableQuestions?.() || [];
+      const pmQuestion = allQuestions.find(q => q.id === 'password_manager');
+      expect(pmQuestion).toBeDefined();
+      const whatsThat = pmQuestion!.options.find(o => o.id === 'whats_that');
+      expect(whatsThat).toBeDefined();
+      expect(whatsThat!.facts?.password_manager).toBe('no');
+      expect(whatsThat!.facts?.pm_unfamiliar).toBe(true);
+    });
+
+    it('two_factor_auth should have a whats_that option', () => {
+      const { result } = renderHook(() => useAssessmentStore());
+
+      act(() => {
+        result.current.answerQuestion('privacy_notice', 'understood');
+      });
+
+      const allQuestions = result.current.getOrderedAvailableQuestions?.() || [];
+      const tfaQuestion = allQuestions.find(q => q.id === 'two_factor_auth');
+      expect(tfaQuestion).toBeDefined();
+      const whatsThat = tfaQuestion!.options.find(o => o.id === 'whats_that');
+      expect(whatsThat).toBeDefined();
+      expect(whatsThat!.facts?.two_factor).toBe('no');
+      expect(whatsThat!.facts?.tfa_unfamiliar).toBe(true);
+    });
+
+    it('ad_blocker should have a whats_that option', () => {
+      const { result } = renderHook(() => useAssessmentStore());
+
+      // Must acknowledge privacy to see ad_blocker
+      act(() => {
+        result.current.answerQuestion('privacy_notice', 'understood');
+      });
+
+      const allQuestions = result.current.getOrderedAvailableQuestions?.() || [];
+      const abQuestion = allQuestions.find(q => q.id === 'ad_blocker');
+      expect(abQuestion).toBeDefined();
+      const whatsThat = abQuestion!.options.find(o => o.id === 'whats_that');
+      expect(whatsThat).toBeDefined();
+      expect(whatsThat!.facts?.ad_blocker).toBe('no');
+      expect(whatsThat!.facts?.ad_blocker_unfamiliar).toBe(true);
+    });
+
+    it('whats_that on password_manager should unlock deep-dive questions', () => {
+      const { result } = renderHook(() => useAssessmentStore());
+
+      // Answer whats_that
+      act(() => {
+        result.current.answerQuestion('privacy_notice', 'understood');
+        result.current.answerQuestion('password_manager', 'whats_that');
+      });
+
+      // Should assert password_manager=no, which unlocks pm_current_method and pm_barrier
+      const fact = result.current.factsProfile.facts['password_manager'];
+      expect(fact?.value).toBe('no');
+
+      const questions = result.current.getOrderedAvailableQuestions?.() || [];
+      const pmDeepDive = questions.filter(q => q.id.startsWith('pm_'));
+      expect(pmDeepDive.length).toBeGreaterThan(0);
+    });
+  });
 });

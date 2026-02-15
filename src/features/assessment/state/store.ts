@@ -647,7 +647,7 @@ export const useAssessmentStore = create<AssessmentState>()(
         return availableQuestions;
       },
 
-      // Unified model ordering (priority-first with phase fallback)
+      // Unified model ordering (priority-first with phase fallback + probe ceiling)
       getOrderedAvailableQuestions: () => {
         const raw = get().getAvailableQuestions();
         const onboardingPending = (get().getOnboardingPendingCount?.() ?? 0) > 0;
@@ -658,7 +658,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           return 2;
         };
 
-        return [...raw].sort((a, b) => {
+        const prioritySorted = [...raw].sort((a, b) => {
           const phaseComparison = phaseRank(a) - phaseRank(b);
           if (phaseComparison !== 0) {
             return phaseComparison;
@@ -677,6 +677,52 @@ export const useAssessmentStore = create<AssessmentState>()(
 
           return a.id.localeCompare(b.id);
         });
+
+        // Probe ceiling: after MAX_CONSECUTIVE_PROBES probe-intent questions,
+        // pull the next non-probe question forward to break up the interrogation.
+        // Onboarding questions are exempt — they form a fixed orientation flow.
+        const MAX_CONSECUTIVE_PROBES = 3;
+
+        // Separate onboarding (exempt) from assessment (subject to ceiling)
+        const onboarding = prioritySorted.filter(q => phaseRank(q) < 2);
+        const assessment = prioritySorted.filter(q => phaseRank(q) >= 2);
+
+        // Split assessment into probes and non-probes (preserving priority order)
+        const probes: Question[] = [];
+        const nonProbes: Question[] = [];
+        for (const q of assessment) {
+          if (q.journeyIntent === 'probe' || q.journeyIntent === 'insight') {
+            probes.push(q);
+          } else {
+            nonProbes.push(q);
+          }
+        }
+
+        // Interleave: take up to MAX probes, then insert a non-probe, repeat
+        const paced: Question[] = [];
+        let pi = 0; // probe index
+        let ni = 0; // non-probe index
+
+        while (pi < probes.length || ni < nonProbes.length) {
+          // Emit up to MAX_CONSECUTIVE_PROBES probes
+          let emitted = 0;
+          while (pi < probes.length && emitted < MAX_CONSECUTIVE_PROBES) {
+            paced.push(probes[pi++]);
+            emitted++;
+          }
+
+          // Insert a non-probe as a break (if available)
+          if (ni < nonProbes.length) {
+            paced.push(nonProbes[ni++]);
+          } else if (pi < probes.length) {
+            // No more non-probes left — emit remaining probes
+            while (pi < probes.length) {
+              paced.push(probes[pi++]);
+            }
+          }
+        }
+
+        return [...onboarding, ...paced];
       },
 
       getOnboardingPendingCount: () => {

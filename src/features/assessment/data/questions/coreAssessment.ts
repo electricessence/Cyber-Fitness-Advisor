@@ -32,6 +32,15 @@ export const coreAssessmentQuestions: Question[] = [
         facts: { "password_manager": "no" },
         points: 0,
         feedback: 'Consider using a password manager - it\'s the single most impactful security improvement you can make.'
+      },
+      {
+        id: 'whats_that',
+        text: '🤔 What\'s a password manager?',
+        statement: 'Password Manager: Unfamiliar',
+        statusCategory: 'room-for-improvement',
+        facts: { "password_manager": "no", "pm_unfamiliar": true },
+        points: 0,
+        feedback: 'A password manager is an app that remembers all your passwords for you. You only need to remember one master password — it handles the rest, creating strong unique passwords for every site and filling them in automatically. Think of it as a secure vault for all your logins.'
       }
     ]
   },
@@ -71,6 +80,15 @@ export const coreAssessmentQuestions: Question[] = [
         facts: { "two_factor": "no" },
         points: 0,
         feedback: '2FA is crucial - it prevents most account breaches even if passwords are stolen.'
+      },
+      {
+        id: 'whats_that',
+        text: '🤔 What\'s two-factor authentication?',
+        statement: 'Two-Factor Auth: Unfamiliar',
+        statusCategory: 'room-for-improvement',
+        facts: { "two_factor": "no", "tfa_unfamiliar": true },
+        points: 0,
+        feedback: 'Two-factor authentication (2FA) adds an extra step when you log in — after your password, you also need a code from your phone or an app. Even if someone steals your password, they can\'t get in without that second code. Most banks and email providers offer it for free.'
       }
     ]
   },
