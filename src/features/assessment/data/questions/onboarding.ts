@@ -67,6 +67,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'to-do',
         facts: { "os_confirmed": false, "tech_comfort": "novice" },
         feedback: 'No worries! We\'ll help you figure out what you\'re using.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Desktop OS: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "os": "unknown", "os_confirmed": true },
+        feedback: 'No problem at all! We\'ll give you general advice that works everywhere.'
       }
     ]
   },
@@ -140,6 +148,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "os_confirmed": false },
         feedback: 'No problem! We\'ll ask you to select your actual OS.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Desktop OS: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "os": "unknown", "os_confirmed": true },
+        feedback: 'No problem at all! We\'ll give you general advice that works everywhere.'
       }
     ]
   },
@@ -173,6 +189,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "os_confirmed": false },
         feedback: 'No problem! We\'ll ask you to select your actual OS.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Desktop OS: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "os": "unknown", "os_confirmed": true },
+        feedback: 'No problem at all! We\'ll give you general advice that works everywhere.'
       }
     ]
   },
@@ -206,6 +230,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "os_confirmed": false },
         feedback: 'No problem! We\'ll ask you to select your actual device.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Device: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "os": "unknown", "os_confirmed": true },
+        feedback: 'No problem at all! We\'ll give you general advice that works everywhere.'
       }
     ]
   },
@@ -239,6 +271,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'room-for-improvement',
         facts: { "os_confirmed": false },
         feedback: 'No problem! We\'ll ask you to select your actual device.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Device: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "os": "unknown", "os_confirmed": true },
+        feedback: 'No problem at all! We\'ll give you general advice that works everywhere.'
       }
     ]
   },
@@ -298,6 +338,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { "os": "other", "os_confirmed": true },
         feedback: 'Thanks! We\'ll provide general security advice.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Desktop OS: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "os": "unknown", "os_confirmed": true },
+        feedback: 'No problem at all! We\'ll give you general advice that works everywhere.'
       }
     ]
   },
@@ -336,6 +384,14 @@ export const onboardingQuestions: Question[] = [
         statement: 'Primary Browser: Needs guidance',
         statusCategory: 'to-do',
         facts: { "browser_confirmed": false, "tech_comfort": "novice" }
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Primary Browser: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "browser": "unknown", "browser_confirmed": true },
+        feedback: 'No problem! We\'ll provide general browser security advice.'
       }
     ]
   },
@@ -374,6 +430,14 @@ export const onboardingQuestions: Question[] = [
         statement: 'Primary Browser: Needs guidance',
         statusCategory: 'to-do',
         facts: { "browser_confirmed": false, "tech_comfort": "novice" }
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Primary Browser: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "browser": "unknown", "browser_confirmed": true },
+        feedback: 'No problem! We\'ll provide general browser security advice.'
       }
     ]
   },
@@ -412,6 +476,14 @@ export const onboardingQuestions: Question[] = [
         statement: 'Primary Browser: Needs guidance',
         statusCategory: 'to-do',
         facts: { "browser_confirmed": false, "tech_comfort": "novice" }
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Primary Browser: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "browser": "unknown", "browser_confirmed": true },
+        feedback: 'No problem! We\'ll provide general browser security advice.'
       }
     ]
   },
@@ -450,6 +522,14 @@ export const onboardingQuestions: Question[] = [
         statement: 'Primary Browser: Needs guidance',
         statusCategory: 'to-do',
         facts: { "browser_confirmed": false, "tech_comfort": "novice" }
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Primary Browser: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "browser": "unknown", "browser_confirmed": true },
+        feedback: 'No problem! We\'ll provide general browser security advice.'
       }
     ]
   },
@@ -506,6 +586,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { "browser": "other", "browser_confirmed": true },
         feedback: 'Thanks! We\'ll provide general browser security advice.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Primary Browser: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "browser": "unknown", "browser_confirmed": true },
+        feedback: 'No problem! We\'ll provide general browser security advice.'
       }
     ]
   },
@@ -562,6 +650,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { "browser": "other", "browser_confirmed": true },
         feedback: 'Thanks! We\'ll provide general browser security advice.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Primary Browser: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "browser": "unknown", "browser_confirmed": true },
+        feedback: 'No problem! We\'ll provide general browser security advice.'
       }
     ]
   },
@@ -641,6 +737,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { "has_mobile": true, "mobile_os": "other" },
         feedback: 'Got it! We\'ll include general mobile security advice.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Mobile OS: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "has_mobile": false, "mobile_os": "undisclosed" },
+        feedback: 'No problem! We\'ll skip mobile-specific questions.'
       }
     ]
   },
@@ -689,6 +793,14 @@ export const onboardingQuestions: Question[] = [
         statusCategory: 'shields-up',
         facts: { "has_mobile": false },
         feedback: 'Got it! We\'ll focus on desktop security.'
+      },
+      {
+        id: 'prefer_not',
+        text: '🙈 I\'d rather not say',
+        statement: 'Mobile Devices: Preferred not to share',
+        statusCategory: 'shields-up',
+        facts: { "has_mobile": false, "mobile_os": "undisclosed" },
+        feedback: 'No problem! We\'ll skip mobile-specific questions.'
       }
     ]
   },

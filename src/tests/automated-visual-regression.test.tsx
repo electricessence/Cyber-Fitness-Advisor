@@ -26,8 +26,8 @@ describe('Automated Visual Regression Testing', () => {
       // Trigger resize event
       fireEvent(window, new Event('resize'))
       
-      // Verify layout elements are present with privacy notice
-      expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
+      // Verify welcome screen is shown for new users
+      expect(screen.getByText('Cyber Fitness Advisor')).toBeInTheDocument()
       
       // Check if mobile vs desktop elements are correctly shown/hidden
       if (width < 768) {
@@ -83,11 +83,15 @@ describe('Automated Visual Regression Testing', () => {
     for (const state of states) {
       switch (state) {
         case 'initial':
-          // Verify initial state with privacy notice
-          expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
+          // Verify initial state shows welcome screen
+          expect(screen.getByText('Cyber Fitness Advisor')).toBeInTheDocument()
           break
           
-        case 'first_question_answered':
+        case 'first_question_answered': {
+          // Click Start to get past welcome screen
+          const startButton = screen.queryByText('Start My Checkup')
+          if (startButton) fireEvent.click(startButton)
+          
           // Answer first question if buttons available
           const buttons = screen.queryAllByRole('button')
           if (buttons.length > 0) {
@@ -98,6 +102,7 @@ describe('Automated Visual Regression Testing', () => {
           const store = useAssessmentStore.getState()
           expect(Object.keys(store.answers).length).toBeGreaterThanOrEqual(0)
           break
+        }
           
         case 'multiple_questions_answered':
           // Answer multiple questions or reach end state
@@ -147,8 +152,8 @@ describe('Automated Visual Regression Testing', () => {
     // Try invalid operations that should be handled gracefully
     store.answerQuestion('non_existent_question', 'invalid_answer')
     
-    // Verify UI remains stable with privacy notice
-    expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
+    // Verify UI remains stable with welcome screen
+    expect(screen.getByText('Cyber Fitness Advisor')).toBeInTheDocument()
     
     // Test with malformed data
     try {
@@ -214,8 +219,8 @@ describe('Automated Visual Regression Testing', () => {
         expect(styles.display).not.toBe('none')
       })
       
-      // Verify core functionality remains with privacy notice
-      expect(screen.getByText('🔒 Privacy First')).toBeInTheDocument()
+      // Verify core functionality remains with welcome screen
+      expect(screen.getByText('Cyber Fitness Advisor')).toBeInTheDocument()
       
       // Clean up
       container.remove()

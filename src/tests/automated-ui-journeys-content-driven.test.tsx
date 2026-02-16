@@ -27,6 +27,10 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       
       render(<App />);
       
+      // Click past the welcome screen first
+      const startButton = screen.getByText('Start My Checkup');
+      await user.click(startButton);
+      
       // Test should work with whatever questions are actually configured
       let questionCount = 0;
       
@@ -59,7 +63,12 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
     });
 
     it('should show questions based on actual content structure', async () => {
+      const user = userEvent.setup();
       render(<App />);
+      
+      // Click past the welcome screen
+      const startButton = screen.getByText('Start My Checkup');
+      await user.click(startButton);
       
       // Get questions from content service
       const allQuestionIds = questionContentService.getAllQuestionIds();
@@ -72,8 +81,9 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       // Look for any onboarding question text in the UI - use actual rendered text
       let foundAnyQuestion = false;
       
-      // Check for the Windows question which should be first
-      if (screen.queryByText(/It appears you are using/) || screen.queryByText('🔒 Privacy First')) {
+      // After clicking Start, privacy_notice is auto-answered. Look for the next question.
+      // Check for OS detection question or any other onboarding question
+      if (screen.queryByText(/It appears you are using/) || screen.queryByText(/Is this correct/)) {
         foundAnyQuestion = true;
       }
       
@@ -97,6 +107,10 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
     it('should progress through assessment questions using actual content', async () => {
       const user = userEvent.setup();
       render(<App />);
+      
+      // Click past the welcome screen
+      const startButton = screen.getByText('Start My Checkup');
+      await user.click(startButton);
       
       // Use a simpler approach - just interact with available buttons
       let answeredCount = 0;

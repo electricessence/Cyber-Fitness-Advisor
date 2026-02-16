@@ -9,6 +9,7 @@ import { QuestionDeck } from './components/questions/QuestionDeck';
 import { SecurityStatus } from './components/layout/SecurityStatus';
 import { BadgeSummary } from './components/badges/BadgeSummary';
 import { ConnectedRecommendations } from './components/ConnectedRecommendations';
+import { WelcomeScreen } from './components/WelcomeScreen';
 import { Menu, X, Download, Upload, RefreshCw, Github, Shield, Trophy, Lightbulb } from 'lucide-react';
 // Initialize semantic version for global access
 import './features/assessment/engine/semantics';
@@ -62,6 +63,14 @@ function App() {
   useEffect(() => {
     navigation.setCurrentLevel(userLevel);
   }, [userLevel, navigation]);
+
+  // Determine whether to show welcome screen
+  // Show it when the user hasn't acknowledged the privacy notice yet
+  const hasStarted = 'privacy_notice' in answers;
+
+  const handleStartAssessment = () => {
+    answerQuestion('privacy_notice', 'understood');
+  };
 
   // Close any open modal/panel on Escape key
   useEffect(() => {
@@ -159,6 +168,15 @@ function App() {
     setTimeout(() => window.location.reload(), 100);
   };
   
+  // Show welcome screen for new users
+  if (!hasStarted) {
+    return (
+      <AppLayout>
+        <WelcomeScreen onStart={handleStartAssessment} />
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <>
