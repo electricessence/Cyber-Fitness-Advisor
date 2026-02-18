@@ -224,6 +224,20 @@ Transform cybersecurity from a overwhelming chore into an engaging, rewarding jo
 
 ---
 
+## Ideas & Feature Requests
+
+### Dashboard Mode for Power Users
+**Source**: User feedback (Feb 2026)
+
+After completing onboarding, offer an option to switch from the guided question-by-question flow to a **dashboard-style view** for advanced/"super nerd" users. This would let power users see all available categories, scores, and recommendations at a glance rather than stepping through one question at a time.
+
+- Toggle available after onboarding completes
+- Shows all domains, progress, and actionable items in a grid/panel layout
+- Guided mode remains the default for most users
+- Could leverage `tech_comfort` fact to suggest the switch automatically
+
+---
+
 ## Contributing to the Roadmap
 
 We welcome community input on roadmap priorities! Ways to contribute:

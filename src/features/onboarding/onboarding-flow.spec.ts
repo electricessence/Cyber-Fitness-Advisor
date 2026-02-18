@@ -9,10 +9,16 @@ describe('Complete Onboarding Flow Automation', () => {
     store.resetAssessment();
     
     // Simulate device detection facts as would happen at app startup
+    // Since v1.1 auto-confirms confident detections, inject both detected + confirmed facts
     store.factsActions.injectFact('os_detected', 'windows', { source: 'auto-detection' });
     store.factsActions.injectFact('browser_detected', 'firefox', { source: 'auto-detection' });
     store.factsActions.injectFact('device_type', 'desktop', { source: 'auto-detection' });
     store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
+    // Auto-confirm (mirrors initializeStore behavior)
+    store.factsActions.injectFact('os', 'windows', { source: 'auto-detection' });
+    store.factsActions.injectFact('os_confirmed', true, { source: 'auto-detection' });
+    store.factsActions.injectFact('browser', 'firefox', { source: 'auto-detection' });
+    store.factsActions.injectFact('browser_confirmed', true, { source: 'auto-detection' });
     
     // Set up device profile to simulate complete device detection
     store.setDeviceProfile({
@@ -32,75 +38,40 @@ describe('Complete Onboarding Flow Automation', () => {
     });
   });
 
-  it('should follow correct onboarding sequence with device detection at startup', () => {
-    // STEP 1: First question should be Privacy Notice
+  it('should skip OS/browser confirmation when auto-detected and go straight to assessment', () => {
+    // STEP 1: First onboarding question should be Privacy Notice
     const firstQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
     expect(firstQuestions[0]?.id).toBe('privacy_notice');
     
     // STEP 2: Answer Privacy Notice
     store.answerQuestion('privacy_notice', 'understood');
     
-    // STEP 3: Second question should be OS DETECTION (not selection)
-    const secondQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    expect(secondQuestions[0]?.id).toBe('windows_detection_confirm');
-    expect(secondQuestions[0]?.statement).toContain('Detected: Windows');
+    // STEP 3: With auto-confirm, OS and browser detection confirms are SKIPPED
+    // No more onboarding questions should be pending (detection handled them)
+    const remainingOnboarding = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
+    expect(remainingOnboarding.length).toBe(0);
     
-    // STEP 4: Answer OS Detection
-    store.answerQuestion('windows_detection_confirm', 'yes');
-    
-    // STEP 5: Third question should be Browser DETECTION (not selection)
-    const thirdQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    expect(thirdQuestions[0]?.id).toBe('firefox_detection_confirm');
-    expect(thirdQuestions[0]?.statement).toContain('Detected: Firefox');
+    // STEP 4: First available question should be an assessment question (e.g. password_manager)
+    const assessmentQuestions = store.getAvailableQuestions().filter(q => q.phase !== 'onboarding');
+    expect(assessmentQuestions.length).toBeGreaterThan(0);
   });
 
-  it('should handle different browser detections correctly', () => {
-    const browsers = ['firefox', 'chrome', 'edge', 'safari'];
+  it('should show browser selection when browser detection is unknown', () => {
+    // After resetAssessment(), initializeStore() auto-confirms OS from jsdom
+    // (OS='linux' from jsdom UA). So OS is already confirmed.
+    // We override browser_detected to 'unknown' to simulate failed browser detection.
+    store.resetAssessment();
+    const freshStore = useAssessmentStore.getState();
     
-    browsers.forEach(browser => {
-      // Reset and inject facts for this browser
-      store.resetAssessment();
-      
-      // Get fresh store reference after reset
-      const freshStore = useAssessmentStore.getState();
-      freshStore.factsActions.injectFact('os_detected', 'windows', { source: 'auto-detection' });
-      freshStore.factsActions.injectFact('browser_detected', browser, { source: 'auto-detection' });
-      freshStore.factsActions.injectFact('device_type', 'desktop', { source: 'auto-detection' });
-      freshStore.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
-      
-      // Set up device profile to simulate complete device detection
-      freshStore.setDeviceProfile({
-        currentDevice: {
-          os: 'windows',
-          browser: browser as any,
-          type: 'desktop'
-        },
-        otherDevices: {
-          hasWindows: true,
-          hasMac: false,
-          hasLinux: false,
-          hasIPhone: false,
-          hasAndroid: false,
-          hasIPad: false
-        }
-      });
-      
-      // First should be privacy notice
-      const privacyQuestions = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-      expect(privacyQuestions[0]?.id).toBe('privacy_notice');
-      
-      // Answer privacy notice
-      freshStore.answerQuestion('privacy_notice', 'understood');
-      
-      // Then answer OS detection
-      freshStore.answerQuestion('windows_detection_confirm', 'yes');
-      
-      // Check browser detection question appears
-      const questions = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-      const browserQuestion = questions[0];
-      
-      expect(browserQuestion?.id).toBe(`${browser}_detection_confirm`);
-      expect(browserQuestion?.statement?.toLowerCase()).toContain(browser);
-    });
+    // Override browser detection to 'unknown' (OS stays auto-confirmed from jsdom)
+    freshStore.factsActions.injectFact('browser_detected', 'unknown', { source: 'test-override' });
+    
+    // Answer privacy notice
+    freshStore.answerQuestion('privacy_notice', 'understood');
+    
+    // With OS auto-confirmed + browser 'unknown', browser_selection should appear
+    const onboarding = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');
+    expect(onboarding.length).toBeGreaterThan(0);
+    expect(onboarding[0]?.id).toBe('browser_selection');
   });
 });

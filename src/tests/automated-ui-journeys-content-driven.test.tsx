@@ -12,6 +12,9 @@ import { questionContentService, getOnboardingQuestions, getQuestionText, getQue
  */
 
 describe('🤖 Automated UI User Journeys - Content-Driven', () => {
+  // Navigation / control button labels to exclude from answer button detection
+  const controlLabels = ['Start My Checkup', 'Reset', 'Menu', 'Close', 'Export', 'Import'];
+
   beforeEach(() => {
     // Reset store state before each test
     useAssessmentStore.getState().resetAssessment();
@@ -36,10 +39,21 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       
       // Instead of trying to match content exactly, just interact with available UI
       for (let attempt = 0; attempt < 3; attempt++) {
-        // Look for any answer buttons in the UI
-        const answerButtons = screen.queryAllByRole('button').filter(btn => 
-          btn.textContent && (btn.textContent.includes('Yes') || btn.textContent.includes('No') || btn.textContent.includes('→') || btn.textContent.includes('Continue locally'))
-        );
+        // Wait for a question to render, then find answer buttons
+        // Answer buttons are any button that isn't a navigation/control button
+        await waitFor(() => {
+          const buttons = screen.queryAllByRole('button');
+          expect(buttons.length).toBeGreaterThan(0);
+        }, { timeout: 2000 });
+        
+        const answerButtons = screen.queryAllByRole('button').filter(btn => {
+          const text = btn.textContent?.trim() || '';
+          // Exclude empty buttons, control buttons, and very short buttons (icons)
+          if (text.length < 3) return false;
+          if (controlLabels.some(label => text.includes(label))) return false;
+          // Include buttons with common answer patterns (emoji prefixes, Yes/No, etc.)
+          return true;
+        });
         
         if (answerButtons.length > 0) {
           // Click the first answer button
@@ -78,18 +92,22 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       expect(allQuestionIds.length).toBeGreaterThan(0);
       expect(onboardingQuestions.length).toBeGreaterThan(0);
       
-      // Look for any onboarding question text in the UI - use actual rendered text
+      // Look for any question text in the UI - use actual rendered text
       let foundAnyQuestion = false;
       
       // After clicking Start, privacy_notice is auto-answered. Look for the next question.
-      // Check for OS detection question or any other onboarding question
+      // With auto-confirmation of OS/browser, the first question may be an assessment 
+      // question, a browser_selection (if browser unknown), or an OS detection confirm.
       if (screen.queryByText(/It appears you are using/) || screen.queryByText(/Is this correct/)) {
         foundAnyQuestion = true;
       }
       
-      // Fallback to checking other questions if needed
+      // Check ALL questions from the content service (onboarding + assessment)
+      // The visible question depends on what initializeStore() auto-detected,
+      // so we can't predict which specific question appears in the test environment
       if (!foundAnyQuestion) {
-        for (const question of onboardingQuestions.slice(0, 5)) {
+        const allQuestions = questionContentService.getAllQuestions();
+        for (const question of allQuestions) {
           const questionText = getQuestionText(question.id);
           if (questionText && screen.queryByText(questionText)) {
             foundAnyQuestion = true;
@@ -98,7 +116,7 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
         }
       }
       
-      // Should find at least one onboarding question visible
+      // Should find at least one question visible (onboarding or assessment)
       expect(foundAnyQuestion).toBe(true);
     });
   });
@@ -116,16 +134,19 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       let answeredCount = 0;
       
       for (let attempt = 0; attempt < 2; attempt++) {
-        // Find answer buttons (those with arrows or common answer patterns)
-        const answerButtons = screen.queryAllByRole('button').filter(btn => 
-          btn.textContent && (
-            btn.textContent.includes('→') || 
-            btn.textContent.includes('Yes') || 
-            btn.textContent.includes('No') ||
-            btn.textContent.includes('✅') ||
-            btn.textContent.includes('❌')
-          )
-        );
+        // Wait for question content to render
+        await waitFor(() => {
+          const buttons = screen.queryAllByRole('button');
+          expect(buttons.length).toBeGreaterThan(0);
+        }, { timeout: 2000 });
+        
+        // Find answer buttons — any non-control button with meaningful text
+        const answerButtons = screen.queryAllByRole('button').filter(btn => {
+          const text = btn.textContent?.trim() || '';
+          if (text.length < 3) return false;
+          if (controlLabels.some(label => text.includes(label))) return false;
+          return true;
+        });
         
         if (answerButtons.length > 0) {
           await user.click(answerButtons[0]);

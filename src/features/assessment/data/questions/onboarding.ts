@@ -665,11 +665,11 @@ export const onboardingQuestions: Question[] = [
   // Technology Comfort Assessment
   {
     id: 'tech_comfort',
-    phase: 'onboarding',
-    priority: ONBOARDING_PRIORITIES.TECH_COMFORT,
+    // Moved out of onboarding — useful for personalization but not a blocker
+    priority: 88, // High assessment priority — asked early but after first quick win
     text: 'How would you describe your comfort with technology?',
-    tags: ['onboarding'],
-    journeyIntent: 'onboarding',
+    tags: ['probe'],
+    journeyIntent: 'probe',
     conditions: {
       include: { "os_confirmed": true }
     },
@@ -704,11 +704,11 @@ export const onboardingQuestions: Question[] = [
   // Mobile OS Selection (for users who selected "mobile only" from os_selection)
   {
     id: 'mobile_os_selection',
-    phase: 'onboarding',
-    priority: ONBOARDING_PRIORITIES.MOBILE_CONTEXT + 5, // just above mobile_context
+    // Moved out of onboarding — only needed for mobile-specific deep-dives
+    priority: 46, // Just above mobile security questions
     text: 'Which mobile operating system do you use?',
-    tags: ['onboarding'],
-    journeyIntent: 'onboarding',
+    tags: ['mobile', 'probe'],
+    journeyIntent: 'probe',
     conditions: {
       include: { "os": "mobile_only" },
       exclude: { "mobile_os": "*" }
@@ -752,11 +752,11 @@ export const onboardingQuestions: Question[] = [
   // Mobile Device Context (for desktop users who haven't set mobile_os yet)
   {
     id: 'mobile_context',
-    phase: 'onboarding',
-    priority: ONBOARDING_PRIORITIES.MOBILE_CONTEXT,
+    // Moved out of onboarding — asked before mobile-specific questions
+    priority: 45, // Just above mobile security questions
     text: 'Do you also use a smartphone or tablet?',
-    tags: ['onboarding'],
-    journeyIntent: 'onboarding',
+    tags: ['mobile', 'probe'],
+    journeyIntent: 'probe',
     conditions: {
       include: { "tech_comfort": "*" },
       exclude: { "mobile_os": "*" }
@@ -808,11 +808,11 @@ export const onboardingQuestions: Question[] = [
   // Usage Context
   {
     id: 'usage_context',
-    phase: 'onboarding',
-    priority: ONBOARDING_PRIORITIES.USAGE_CONTEXT,
+    // Moved out of onboarding — personalization context, not a blocker
+    priority: 87, // Early assessment, after tech_comfort
     text: 'What\'s your main concern about digital security?',
-    tags: ['onboarding'],
-    journeyIntent: 'onboarding',
+    tags: ['probe'],
+    journeyIntent: 'probe',
     conditions: {
       include: { "tech_comfort": "*" }
     },

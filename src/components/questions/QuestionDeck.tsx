@@ -203,6 +203,54 @@ export function QuestionDeck() {
   const availableQuestions = getOrderedAvailableQuestions?.() ?? [];
   const totalCards = availableQuestions.length;
 
+  // ── Phase progress ──────────────────────────────────────────────────────────
+  // Phase progress — determines which phase the user is currently in.
+  // Phase 1: Orientation — visible onboarding questions (many are skipped by auto-detection)
+  // Phase 2: Quick Wins  — assessment questions tagged 'quickwin' or 'critical+action'
+  // Phase 3: Building Habits — all remaining assessment questions
+  const phaseProgress = useMemo(() => {
+    const allQuestions = questionBank.domains.flatMap(d => d.levels.flatMap(l => l.questions));
+    const answeredIds = new Set(Object.keys(answers));
+
+    // Only count onboarding questions that are actually visible to the user
+    // (many get auto-skipped by device detection confirming OS/browser)
+    const onboardingAll = allQuestions.filter(q => q.phase === 'onboarding');
+    const onboardingPending = onboardingAll.filter(q => {
+      if (answeredIds.has(q.id)) return false; // already answered = done
+      // Check if the question would be visible given current available questions
+      return availableQuestions.some(aq => aq.id === q.id);
+    });
+    const onboardingVisible = onboardingAll.filter(q =>
+      answeredIds.has(q.id) || availableQuestions.some(aq => aq.id === q.id)
+    );
+    const onboardingDone = onboardingVisible.filter(q => answeredIds.has(q.id)).length;
+    const onboardingTotal = onboardingVisible.length;
+    const onboardingComplete = onboardingPending.length === 0;
+
+    // Quick Wins: tagged 'quickwin' or ('critical' + 'action', not onboarding)
+    const quickWinAll = allQuestions.filter(q =>
+      q.phase !== 'onboarding' &&
+      (q.tags?.includes('quickwin') || (q.tags?.includes('critical') && q.tags?.includes('action')))
+    );
+    const quickWinDone = quickWinAll.filter(q => answeredIds.has(q.id)).length;
+    const quickWinTotal = quickWinAll.length;
+    const quickWinComplete = quickWinDone >= quickWinTotal;
+
+    // Remaining: everything that isn't onboarding or quick-win
+    const quickWinIds = new Set(quickWinAll.map(q => q.id));
+    const remainingAll = allQuestions.filter(q =>
+      q.phase !== 'onboarding' && !quickWinIds.has(q.id)
+    );
+    const remainingDone = remainingAll.filter(q => answeredIds.has(q.id)).length;
+    const remainingTotal = remainingAll.length;
+
+    return {
+      onboardingDone, onboardingTotal, onboardingComplete,
+      quickWinDone, quickWinTotal, quickWinComplete,
+      remainingDone, remainingTotal,
+    };
+  }, [questionBank, answers, availableQuestions]);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
@@ -273,6 +321,37 @@ export function QuestionDeck() {
   const questionVisuals = currentQuestion ? getVisuals(currentQuestion) : CARD_THEMES.default;
   const journeyIntent: JourneyIntent = currentQuestion ? deriveJourneyIntent(currentQuestion) : 'insight';
   const intentMeta = INTENT_META[journeyIntent];
+
+  // Always show a phase bar — determined by overall progress, not the current question
+  // Skip Phase 1 entirely when auto-detection handled all onboarding
+  const phaseBar = useMemo((): { label: string; done: number; total: number; barColor: string } | null => {
+    if (!currentQuestion) return null;
+    if (!phaseProgress.onboardingComplete && phaseProgress.onboardingTotal > 0) {
+      return {
+        label: 'Phase 1 · Orientation',
+        done: phaseProgress.onboardingDone,
+        total: phaseProgress.onboardingTotal,
+        barColor: 'bg-amber-400',
+      };
+    }
+    if (!phaseProgress.quickWinComplete) {
+      return {
+        label: 'Phase 2 · Quick Wins',
+        done: phaseProgress.quickWinDone,
+        total: phaseProgress.quickWinTotal,
+        barColor: 'bg-emerald-400',
+      };
+    }
+    if (phaseProgress.remainingTotal > 0) {
+      return {
+        label: 'Phase 3 · Building Habits',
+        done: phaseProgress.remainingDone,
+        total: phaseProgress.remainingTotal,
+        barColor: 'bg-sky-400',
+      };
+    }
+    return null;
+  }, [currentQuestion, phaseProgress]);
 
   const handleAnswer = (optionId: string) => {
     if (!currentQuestion) return;
@@ -463,97 +542,126 @@ export function QuestionDeck() {
   return (
     <section id="question-deck" aria-label="Security question deck" className="flex flex-col gap-4 h-full">
       <div className="flex-1">
-        <div className={`relative bg-white rounded-3xl shadow-xl p-6 sm:p-8 flex flex-col gap-6 border ${intentMeta.borderClass}`}>
-          <div className="flex items-start gap-3 sm:gap-4">
-            <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${gradient} text-white flex items-center justify-center shadow-md`}>
-              <Icon className="w-6 h-6" />
-            </div>
-            <div className="flex-1 space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full ${intentMeta.chipClass}`}>
-                  {intentMeta.label}
-                </span>
-                <p className={`text-xs font-semibold uppercase tracking-wide ${accent}`}>{label}</p>
-              </div>
-              <div className={`px-4 py-3 ${tint} rounded-xl`}>
-                {currentQuestion.statement && (
-                  <p className="text-base sm:text-lg font-medium text-slate-800 leading-snug">
-                    {currentQuestion.statement}
-                  </p>
-                )}
-                <h3 className={`${currentQuestion.statement ? 'mt-2 ' : ''}font-bold text-sm sm:text-base ${accent}`}>
-                  {currentQuestion.text}
-                </h3>
-                {currentQuestion.timeEstimate && (
-                  <div className="inline-flex items-center gap-1 text-xs text-gray-600 bg-white/70 rounded-full px-2 py-1 mt-3">
-                    <Clock3 className="w-3 h-3" />
-                    {currentQuestion.timeEstimate}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        <div className={`relative bg-white rounded-3xl shadow-xl flex flex-col border ${intentMeta.borderClass} overflow-hidden`}>
 
-          {(currentQuestion.description || currentQuestion.explanation) && (
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={() => setShowDetails((prev) => !prev)}
-                className="inline-flex items-center gap-1 text-sm font-medium text-blue-600"
-              >
-                <Info className="w-4 h-4" />
-                {showDetails ? 'Hide context' : 'Why this matters'}
-              </button>
-              {showDetails && (
-                <p className="mt-2 text-sm text-gray-600 bg-blue-50 rounded-xl p-4">
-                  {currentQuestion.description || currentQuestion.explanation}
-                </p>
-              )}
+          {/* Phase progress bar — thin strip at very top of card, only during defined phases */}
+          {phaseBar && (
+            <div className="px-6 pt-4 pb-0 sm:px-8">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+                  {phaseBar.label}
+                </span>
+                <span className="text-[10px] font-medium text-gray-400 tabular-nums">
+                  {phaseBar.done}/{phaseBar.total}
+                </span>
+              </div>
+              <div className="h-[3px] w-full rounded-full bg-gray-100 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${phaseBar.barColor}`}
+                  style={{ width: `${phaseBar.total > 0 ? Math.round((phaseBar.done / phaseBar.total) * 100) : 0}%` }}
+                  role="progressbar"
+                  aria-valuenow={phaseBar.done}
+                  aria-valuemin={0}
+                  aria-valuemax={phaseBar.total}
+                  aria-label={phaseBar.label}
+                />
+              </div>
             </div>
           )}
 
-          <div className="pt-4 space-y-3">
-            {options.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => handleAnswer(option.id)}
-                className="w-full border-2 border-gray-200 rounded-2xl p-4 text-left hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      {option.icon && <span className="text-xl" aria-hidden="true">{option.icon}</span>}
-                      {option.text}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {option.feedback && (
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        aria-label={expandedOptionId === option.id ? `Hide details for ${option.text}` : `Show details for ${option.text}`}
-                        aria-expanded={expandedOptionId === option.id}
-                        onClick={(e) => toggleOptionInfo(e, option.id)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOptionInfo(e as unknown as React.MouseEvent, option.id); } }}
-                        className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
-                          expandedOptionId === option.id
-                            ? 'bg-blue-100 text-blue-600'
-                            : 'bg-gray-100 text-gray-400 hover:bg-blue-50 hover:text-blue-500'
-                        }`}
-                      >
-                        <Info className="w-3.5 h-3.5" />
-                      </span>
-                    )}
-                    <ArrowRight className="w-5 h-5 text-gray-400" />
-                  </div>
+          {/* Card body */}
+          <div className="p-6 sm:p-8 flex flex-col gap-6">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${gradient} text-white flex items-center justify-center shadow-md`}>
+                <Icon className="w-6 h-6" />
+              </div>
+              <div className="flex-1 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full ${intentMeta.chipClass}`}>
+                    {intentMeta.label}
+                  </span>
+                  <p className={`text-xs font-semibold uppercase tracking-wide ${accent}`}>{label}</p>
                 </div>
-                {option.feedback && expandedOptionId === option.id && (
-                  <p className="text-sm text-gray-500 mt-3 pt-3 border-t border-gray-100 leading-relaxed">
-                    {option.feedback}
+                <div className={`px-4 py-3 ${tint} rounded-xl`}>
+                  {currentQuestion.statement && (
+                    <p className="text-base sm:text-lg font-medium text-slate-800 leading-snug">
+                      {currentQuestion.statement}
+                    </p>
+                  )}
+                  <h3 className={`${currentQuestion.statement ? 'mt-2 ' : ''}font-bold text-sm sm:text-base ${accent}`}>
+                    {currentQuestion.text}
+                  </h3>
+                  {currentQuestion.timeEstimate && (
+                    <div className="inline-flex items-center gap-1 text-xs text-gray-600 bg-white/70 rounded-full px-2 py-1 mt-3">
+                      <Clock3 className="w-3 h-3" />
+                      {currentQuestion.timeEstimate}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {(currentQuestion.description || currentQuestion.explanation) && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDetails((prev) => !prev)}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-blue-600"
+                >
+                  <Info className="w-4 h-4" />
+                  {showDetails ? 'Hide context' : 'Why this matters'}
+                </button>
+                {showDetails && (
+                  <p className="mt-2 text-sm text-gray-600 bg-blue-50 rounded-xl p-4">
+                    {currentQuestion.description || currentQuestion.explanation}
                   </p>
                 )}
-              </button>
-            ))}
+              </div>
+            )}
+
+            <div className="pt-4 space-y-3">
+              {options.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => handleAnswer(option.id)}
+                  className="w-full border-2 border-gray-200 rounded-2xl p-4 text-left hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                        {option.icon && <span className="text-xl" aria-hidden="true">{option.icon}</span>}
+                        {option.text}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {option.feedback && (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          aria-label={expandedOptionId === option.id ? `Hide details for ${option.text}` : `Show details for ${option.text}`}
+                          aria-expanded={expandedOptionId === option.id}
+                          onClick={(e) => toggleOptionInfo(e, option.id)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOptionInfo(e as unknown as React.MouseEvent, option.id); } }}
+                          className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                            expandedOptionId === option.id
+                              ? 'bg-blue-100 text-blue-600'
+                              : 'bg-gray-100 text-gray-400 hover:bg-blue-50 hover:text-blue-500'
+                          }`}
+                        >
+                          <Info className="w-3.5 h-3.5" />
+                        </span>
+                      )}
+                      <ArrowRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </div>
+                  {option.feedback && expandedOptionId === option.id && (
+                    <p className="text-sm text-gray-500 mt-3 pt-3 border-t border-gray-100 leading-relaxed">
+                      {option.feedback}
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
