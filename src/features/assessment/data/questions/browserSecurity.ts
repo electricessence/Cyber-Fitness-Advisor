@@ -56,7 +56,7 @@ export const browserSecurityQuestions: Question[] = [
   {
     id: 'edge_password_manager',
     text: 'Do you use Microsoft Edge\'s built-in password manager?',
-    priority: ASSESSMENT_PRIORITIES.PASSWORD_MANAGER,
+    priority: ASSESSMENT_PRIORITIES.BROWSER_SECURITY, // deferred to browser deep-dive — was at PASSWORD_MANAGER (90), firing before the general password_manager question
     tags: ['browser', 'edge', 'passwords'],
     difficulty: 'beginner',
     effort: '5 minutes',
@@ -142,7 +142,7 @@ export const browserSecurityQuestions: Question[] = [
   {
     id: 'safari_icloud_keychain',
     text: 'Do you use Safari with iCloud Keychain for password management?',
-    priority: ASSESSMENT_PRIORITIES.PASSWORD_MANAGER,
+    priority: ASSESSMENT_PRIORITIES.BROWSER_SECURITY, // deferred to browser deep-dive — was at PASSWORD_MANAGER (90), firing before the general password_manager question
     tags: ['browser', 'safari', 'mac', 'passwords', 'icloud'],
     difficulty: 'beginner',
     effort: '5 minutes',
@@ -185,7 +185,7 @@ export const browserSecurityQuestions: Question[] = [
   {
     id: 'apple_id_2fa',
     text: 'Have you enabled two-factor authentication for your Apple ID?',
-    priority: ASSESSMENT_PRIORITIES.TWO_FACTOR_AUTH,
+    priority: ASSESSMENT_PRIORITIES.BROWSER_SECURITY, // deferred to browser deep-dive — was at TWO_FACTOR_AUTH (85), firing before the general two_factor_auth question
     tags: ['apple', 'mac', 'safari', '2fa', 'authentication'],
     difficulty: 'beginner',
     effort: '5 minutes',
