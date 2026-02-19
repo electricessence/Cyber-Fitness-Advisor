@@ -6,7 +6,7 @@ Cyber Fitness Advisor is a client-side web application built with modern web tec
 
 ## Core Design Principles
 
-### 1. Hunt-to-Help: Stint-Based Value Delivery
+### 1. Hunt-to-Help: Flow-Based Value Delivery
 
 The app's job is NOT to interrogate the user. It is a **race to find how we can help**.
 
@@ -15,28 +15,28 @@ answer reveals a gap, the app pivots into an actionable quick win. The entire
 flow is a funnel from minimum viable info → immediate value → earn trust → go
 deeper.
 
-#### Stints (Short Question Sequences → Outcome)
+#### Flows (Short Question Sequences → Outcome)
 
-A **stint** is just a short sequence of questions that leads to an outcome.
+A **flow** is just a short sequence of questions that leads to an outcome.
 That's it. Not a framework, not a phase system — just 1-3 questions grouped
 because they serve the same goal. The probe asks "is there a gap here?", and
-if yes, the follow-up closes it. If no, the stint is done and we move on.
+if yes, the follow-up closes it. If no, the flow is done and we move on.
 
-Questions are grouped into stints, and each stint is a **hunt**: probe for a
+Questions are grouped into flows, and each flow is a **hunt**: probe for a
 gap, and if found, pivot to the action that closes it.
 
-| # | Stint | Goal | Hunt Pattern | Max Qs |
+| # | Flow | Goal | Hunt Pattern | Max Qs |
 | --- | ------- | ------ | ------------- | -------- |
 | 1 | **Welcome** | User trusts the app | "Your data stays local" → acknowledged | 1 |
 | 2 | **Your Setup** | Know OS + browser | Auto-detect → confirm (2 taps) | 2 |
 | 3 | **Ad Protection** | User has an adblocker | "Do you have one?" → YES: done, move on → NO: "Install uBlock Origin now — 30 seconds" | 2 |
 | 4 | **Password Safety** | User has a password manager, or knows the first step | "Do you use one?" → YES: "What kind?" (quick info) → NO: "What's holding you back?" (identify barrier, suggest next step) | 2 |
 | 5 | **Account Security** | User has 2FA on their most important account, or knows which one to start with | "Do you use 2FA?" → YES: "What method?" → PARTIAL/NO: "Which account would you protect first?" (action) | 2 |
-| 6 | **About You** | Tailor the rest of the journey | Only asked after 3 action stints — earned the right. Tech comfort + main concern + mobile context. | 3 |
+| 6 | **About You** | Tailor the rest of the journey | Only asked after 3 action flows — earned the right. Tech comfort + main concern + mobile context. | 3 |
 | 7 | **Daily Habits** | Surface gaps in routine security | Updates, screen lock, phishing awareness — each is a probe that may reveal a quick fix | 3 |
 | — | *(no stint)* | Ongoing depth | Everything else: browser-specific deep dives, mobile security, advanced 2FA, breach checks, etc. Flows via gates, no progress bar needed | — |
 
-Stints are **data on the question**, not custom UI logic. The `stint` property
+Flows are organized by **priority ranges**, not custom logic on the question**, not custom UI logic. priority ranges
 on a Question tells the UI what label to show and which step the user is on.
 
 #### The Hunt in Practice
@@ -46,7 +46,7 @@ User arrives
   └─ Welcome: "Your data stays local" .................. 1 tap, trust established
   └─ Your Setup: "Windows + Chrome? Correct?" .......... 2 taps, platform known
   └─ Ad Protection: "Do you have an adblocker?"
-       ├─ YES → stint complete, hunt moves on .......... 0 effort
+       ├─ YES → flow complete, hunt moves on .......... 0 effort
        └─ NO → "Install uBlock Origin" ................. 30 sec, FIRST WIN 🎯
   └─ Password Safety: "Do you use a password manager?"
        ├─ YES → "What kind?" (quick categorize) ........ earned the right to ask
@@ -64,7 +64,7 @@ Neither outcome wastes their time.
 
 #### Pacing: Breathe Between Wins
 
-When a user completes a stint's action — they actually installed the adblocker,
+When a user completes a flow's action — they actually installed the adblocker,
 they actually set up a password manager — the next prompt is **not** another
 probe. It's a breather:
 
@@ -77,15 +77,15 @@ This does two things:
 
 If the user already had the thing ("Yes, I have an adblocker"), no pause is
 needed — confirming you're already safe isn't tiring. Pacing kicks in after
-the user **does work**, not after every stint.
+the user **does work**, not after every flow.
 
-The combination of stints (bounded, purposeful) + pacing (breathe after effort)
+The combination of flows (bounded, purposeful) + pacing (breathe after effort)
 is what makes the experience feel like a helpful friend, not a security audit.
 
 #### "Maybe Later" = Move to Todo
 
 Skipping a question is not failure. It means "find me something I *can* do."
-The app should pivot to the next stint, and the skipped action goes to the
+The app should pivot to the next flow, and the skipped action goes to the
 todo/improvement section.
 
 #### Success Metric
@@ -95,7 +95,7 @@ That means maximizing:
 
 - **Adoption** — people start using it
 - **Trust** — they don't drop off during interrogation
-- **Completion** — they finish stints and take actions
+- **Completion** — they finish flows and take actions
 - **Depth** — power users voluntarily go further
 
 A casual user who installs an adblocker and leaves is a success.
@@ -371,3 +371,4 @@ main branch → GitHub Actions → Build → gh-pages branch → GitHub Pages
 4. Update persistence layer for new data
 
 This architecture balances simplicity with extensibility, ensuring the app remains maintainable while providing rich functionality and excellent user experience.
+

@@ -74,9 +74,10 @@ It must feel like a **fitness app for security**:
 
 ### Authoring & Tooling
 
-* Content authored in JSON.
-* JSON Schema defines valid structure.
-* CLI `pnpm author:lint` validates schema, orphan refs, duplicates, cycles, comparator misuse.
+* Content authored in **TypeScript** (`.ts` files in `src/features/assessment/data/questions/`).
+* TypeScript provides type safety, IDE autocomplete, and compile-time validation.
+* Schema defined by `Question` and `AnswerOption` interfaces in `src/features/assessment/engine/schema.ts`.
+* Priority constants in `src/features/assessment/data/questions/priorities.ts` organize flows.
 * Diagnostics panel shows runtime errors.
 * Docs:
 
@@ -89,8 +90,8 @@ It must feel like a **fitness app for security**:
 
 ## Acceptance Criteria
 
-* Strict TypeScript; CI runs lint, typecheck, test, author\:lint, build, Pages deploy.
-* Facts-first engine; hide>show precedence; deterministic patch merges.
+* Strict TypeScript; CI runs lint, typecheck, test, build, Pages deploy.
+* Facts-first engine; hide>show precedence; deterministic condition evaluation.
 * Tiers unlock via facts; onboarding seeds but doesn’t score.
 * Daily task appears, completes, and rolls over.
 * Personas (fixtures of facts) validate flows.

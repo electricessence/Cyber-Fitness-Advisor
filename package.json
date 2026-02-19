@@ -13,7 +13,6 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage --reporter=verbose",
-    "author:lint": "tsx scripts/author-lint.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

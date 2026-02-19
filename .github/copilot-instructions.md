@@ -11,37 +11,37 @@ The Cyber Fitness Advisor is a privacy-first cybersecurity assessment tool built
 - No tracking, analytics, or data collection
 - Make privacy guarantees explicit in UI components
 
-### 2. Hunt-to-Help: Stint-Based Value Delivery
+### 2. Hunt-to-Help: Flow-Based Value Delivery
 **This is the core product philosophy.** The app's job is a race to find how it can help.
 
 - **Every question is a search probe** — "Can I help you here?" — not an interrogation
-- **Stints** are small, purpose-driven missions (2-3 questions max) with a clear goal
+- **Flows** are small, purpose-driven missions (2-3 questions max) with a clear goal
 - **Ordering by value speed**: minimum info → immediate quick win → earn trust → go deeper
-- **"Maybe later" = move to todo**, not failure. Pivot to the next stint.
+- **"Maybe later" = move to todo**, not failure. Pivot to the next flow.
 - **The true metric**: total points accumulated across all users (adoption × trust × completion)
 - **Stints are data on questions**, not custom UI logic — the `stint` property on a Question drives the UI
 
-#### What's a Stint?
-A stint is just a short sequence of questions (1-3) that leads to an outcome. Not a framework, not a phase system — just questions grouped because they serve the same goal. The probe asks "is there a gap here?", and if yes, the follow-up closes it. If no, the stint is done and we move on.
+#### What's a Flow?
+A flow is just a short sequence of questions (1-3) that leads to an outcome. Not a framework, not a phase system — just questions grouped because they serve the same goal. The probe asks "is there a gap here?", and if yes, the follow-up closes it. If no, the flow is done and we move on.
 
-#### Stint Design Rules:
-1. Each stint has a **goal** (e.g., "user has an adblocker installed")
+#### Flow Design Rules:
+1. Each flow has a **goal** (e.g., "user has an adblocker installed")
 2. Start with minimum info needed to unlock the goal
 3. If the probe reveals a gap → pivot to the action card immediately
-4. If no gap → stint completes, move to next
+4. If no gap → flow completes, move to next
 5. Never ask info-gathering questions unless they unlock an action
 6. Personalization questions (tech_comfort, usage_context) come AFTER the first action wins
 
 #### Pacing: Breathe Between Wins
-When a user completes a stint's action (they actually did the thing), the next prompt is a breather — not another probe:
+When a user completes a flow's action (they actually did the thing), the next prompt is a breather — not another probe:
 > "Great work! That was a big win. Would you like to keep going, or take a break?"
 
 - **Celebrate the effort** — acknowledge the user did real work
 - **Give permission to stop** — normalize breaks, reduce assessment fatigue
 - Pacing only kicks in after the user **does work** (e.g., installs something), not after confirming they already had it
-- Stints (bounded, purposeful) + pacing (breathe after effort) = helpful friend, not security audit
+- Flows (bounded, purposeful) + pacing (breathe after effort) = helpful friend, not security audit
 
-#### Stint Sequence (Hunt Pattern):
+#### Flow Sequence (Hunt Pattern):
 1. **Welcome** — "Data stays local" (1 tap, trust)
 2. **Your Setup** — OS + browser confirm (2 taps, enables actions)
 3. **Ad Protection** — probe → YES: done → NO: install now (FIRST WIN)
@@ -204,3 +204,4 @@ interface StoreState {
 - Lazy load non-critical components with `React.lazy()`
 
 Remember: **Maintainable code is more valuable than clever code**. Prioritize clarity and modularity over performance micro-optimizations.
+

@@ -73,8 +73,8 @@ const CARD_THEMES: Record<string, QuestionVisual> = {
 
 const INTENT_META: Record<JourneyIntent, { label: string; description: string; chipClass: string; borderClass: string; textClass: string }> = {
   onboarding: {
-    label: 'Orientation',
-    description: 'These cards confirm basics so we can personalize later steps.',
+    label: 'Setup',
+    description: 'Quick checks to understand your setup so we can help.',
     chipClass: 'bg-amber-100 text-amber-900 border border-amber-200',
     borderClass: 'border-amber-200',
     textClass: 'text-amber-700'
@@ -203,53 +203,12 @@ export function QuestionDeck() {
   const availableQuestions = getOrderedAvailableQuestions?.() ?? [];
   const totalCards = availableQuestions.length;
 
-  // ── Phase progress ──────────────────────────────────────────────────────────
-  // Phase progress — determines which phase the user is currently in.
-  // Phase 1: Orientation — visible onboarding questions (many are skipped by auto-detection)
-  // Phase 2: Quick Wins  — assessment questions tagged 'quickwin' or 'critical+action'
-  // Phase 3: Building Habits — all remaining assessment questions
-  const phaseProgress = useMemo(() => {
-    const allQuestions = questionBank.domains.flatMap(d => d.levels.flatMap(l => l.questions));
-    const answeredIds = new Set(Object.keys(answers));
-
-    // Only count onboarding questions that are actually visible to the user
-    // (many get auto-skipped by device detection confirming OS/browser)
-    const onboardingAll = allQuestions.filter(q => q.phase === 'onboarding');
-    const onboardingPending = onboardingAll.filter(q => {
-      if (answeredIds.has(q.id)) return false; // already answered = done
-      // Check if the question would be visible given current available questions
-      return availableQuestions.some(aq => aq.id === q.id);
-    });
-    const onboardingVisible = onboardingAll.filter(q =>
-      answeredIds.has(q.id) || availableQuestions.some(aq => aq.id === q.id)
-    );
-    const onboardingDone = onboardingVisible.filter(q => answeredIds.has(q.id)).length;
-    const onboardingTotal = onboardingVisible.length;
-    const onboardingComplete = onboardingPending.length === 0;
-
-    // Quick Wins: tagged 'quickwin' or ('critical' + 'action', not onboarding)
-    const quickWinAll = allQuestions.filter(q =>
-      q.phase !== 'onboarding' &&
-      (q.tags?.includes('quickwin') || (q.tags?.includes('critical') && q.tags?.includes('action')))
-    );
-    const quickWinDone = quickWinAll.filter(q => answeredIds.has(q.id)).length;
-    const quickWinTotal = quickWinAll.length;
-    const quickWinComplete = quickWinDone >= quickWinTotal;
-
-    // Remaining: everything that isn't onboarding or quick-win
-    const quickWinIds = new Set(quickWinAll.map(q => q.id));
-    const remainingAll = allQuestions.filter(q =>
-      q.phase !== 'onboarding' && !quickWinIds.has(q.id)
-    );
-    const remainingDone = remainingAll.filter(q => answeredIds.has(q.id)).length;
-    const remainingTotal = remainingAll.length;
-
-    return {
-      onboardingDone, onboardingTotal, onboardingComplete,
-      quickWinDone, quickWinTotal, quickWinComplete,
-      remainingDone, remainingTotal,
-    };
-  }, [questionBank, answers, availableQuestions]);
+  // Simple progress tracking
+  const totalQuestions = useMemo(() => 
+    questionBank.domains.flatMap(d => d.levels.flatMap(l => l.questions)).length,
+    [questionBank]
+  );
+  const answeredCount = Object.keys(answers).length;
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
@@ -322,37 +281,6 @@ export function QuestionDeck() {
   const journeyIntent: JourneyIntent = currentQuestion ? deriveJourneyIntent(currentQuestion) : 'insight';
   const intentMeta = INTENT_META[journeyIntent];
 
-  // Always show a phase bar — determined by overall progress, not the current question
-  // Skip Phase 1 entirely when auto-detection handled all onboarding
-  const phaseBar = useMemo((): { label: string; done: number; total: number; barColor: string } | null => {
-    if (!currentQuestion) return null;
-    if (!phaseProgress.onboardingComplete && phaseProgress.onboardingTotal > 0) {
-      return {
-        label: 'Phase 1 · Orientation',
-        done: phaseProgress.onboardingDone,
-        total: phaseProgress.onboardingTotal,
-        barColor: 'bg-amber-400',
-      };
-    }
-    if (!phaseProgress.quickWinComplete) {
-      return {
-        label: 'Phase 2 · Quick Wins',
-        done: phaseProgress.quickWinDone,
-        total: phaseProgress.quickWinTotal,
-        barColor: 'bg-emerald-400',
-      };
-    }
-    if (phaseProgress.remainingTotal > 0) {
-      return {
-        label: 'Phase 3 · Building Habits',
-        done: phaseProgress.remainingDone,
-        total: phaseProgress.remainingTotal,
-        barColor: 'bg-sky-400',
-      };
-    }
-    return null;
-  }, [currentQuestion, phaseProgress]);
-
   const handleAnswer = (optionId: string) => {
     if (!currentQuestion) return;
     answerQuestion(currentQuestion.id, optionId);
@@ -369,7 +297,6 @@ export function QuestionDeck() {
   }, []);
 
   if (!currentQuestion) {
-    const answeredCount = Object.keys(answers).length;
     const totalSlides = improvementItems.length;
     const clampedIndex = Math.min(slideIndex, Math.max(0, totalSlides - 1));
     const currentSlide = improvementItems[clampedIndex];
@@ -544,26 +471,18 @@ export function QuestionDeck() {
       <div className="flex-1">
         <div className={`relative bg-white rounded-3xl shadow-xl flex flex-col border ${intentMeta.borderClass} overflow-hidden`}>
 
-          {/* Phase progress bar — thin strip at very top of card, only during defined phases */}
-          {phaseBar && (
+          {/* Progress bar — simple visual indicator of overall completion */}
+          {currentQuestion && answeredCount > 0 && (
             <div className="px-6 pt-4 pb-0 sm:px-8">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
-                  {phaseBar.label}
-                </span>
-                <span className="text-[10px] font-medium text-gray-400 tabular-nums">
-                  {phaseBar.done}/{phaseBar.total}
-                </span>
-              </div>
               <div className="h-[3px] w-full rounded-full bg-gray-100 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${phaseBar.barColor}`}
-                  style={{ width: `${phaseBar.total > 0 ? Math.round((phaseBar.done / phaseBar.total) * 100) : 0}%` }}
+                  className="h-full rounded-full transition-all duration-500 bg-amber-400"
+                  style={{ width: `${totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0}%` }}
                   role="progressbar"
-                  aria-valuenow={phaseBar.done}
+                  aria-valuenow={answeredCount}
                   aria-valuemin={0}
-                  aria-valuemax={phaseBar.total}
-                  aria-label={phaseBar.label}
+                  aria-valuemax={totalQuestions}
+                  aria-label="Overall progress"
                 />
               </div>
             </div>

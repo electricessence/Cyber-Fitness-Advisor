@@ -1,13 +1,13 @@
 // Shared Priority Constants
 // Used across all question groups for consistent ordering
 //
-// Stint ordering (Hunt-to-Help philosophy):
-//   Stint 3: Ad Protection (95–92) — FIRST WIN
-//   Stint 4: Password Safety (90–86)
-//   Stint 5: Account Security (85–81)
-//   Stint 6: About You (78–77) — earned after 3 action stints
-//   Stint 7: Daily Habits (75–70)
-//   No stint: everything else (68–38)
+// Flow ordering (Hunt-to-Help philosophy):
+//   Flow 3: Ad Protection (95–92) — FIRST WIN
+//   Flow 4: Password Safety (90–86)
+//   Flow 5: Account Security (85–81)
+//   Flow 6: About You (78–77) — earned after 3 action flows
+//   Flow 7: Daily Habits (75–70)
+//   No flow label: everything else (68–38)
 
 // Onboarding Flow Priorities (10000–9000 range)
 export const ONBOARDING_PRIORITIES = {
