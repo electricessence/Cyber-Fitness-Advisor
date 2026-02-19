@@ -324,57 +324,6 @@ export const mobileSecurityQuestions: Question[] = [
     ]
   },
 
-  {
-    id: 'ios_app_sources',
-    text: 'Do you ever install apps from outside the official App Store?',
-    priority: ASSESSMENT_PRIORITIES.MOBILE_APP_SOURCES,
-    tags: ['mobile', 'ios', 'security'],
-    journeyIntent: 'probe',
-    difficulty: 'beginner',
-    effort: '1 minute',
-    description: 'Apple\'s App Store review process screens apps for malware and policy violations. Apps installed through enterprise certificates or other methods bypass this review, which can introduce security risks.',
-    conditions: {
-      include: { "mobile_os": "ios" }
-    },
-    options: [
-      {
-        id: 'app_store_only',
-        text: '✅ No — App Store only',
-        statement: 'iOS Apps: App Store Only',
-        statusCategory: 'shields-up',
-        facts: { "ios_app_sources": "app_store" },
-        points: 10,
-        feedback: 'Sticking to the App Store means every app you install has been reviewed by Apple for malware and policy compliance. This is the safest approach for most users.'
-      },
-      {
-        id: 'testflight',
-        text: '🧪 Only through TestFlight (beta testing)',
-        statement: 'iOS Apps: App Store + TestFlight',
-        statusCategory: 'shields-up',
-        facts: { "ios_app_sources": "testflight" },
-        points: 8,
-        feedback: 'TestFlight apps still go through Apple\'s review process, just with lighter restrictions for beta software. This is generally safe, especially for apps from developers you trust.'
-      },
-      {
-        id: 'enterprise',
-        text: '⚠️ Yes — enterprise or third-party profiles',
-        statement: 'iOS Apps: Enterprise/Third-party',
-        statusCategory: 'room-for-improvement',
-        facts: { "ios_app_sources": "enterprise" },
-        points: 2,
-        feedback: 'Enterprise certificates bypass App Store review and have been used to distribute malware. Unless required by your employer through a managed device, it\'s worth evaluating whether these profiles are necessary.'
-      },
-      {
-        id: 'unsure',
-        text: '🤔 I\'m not sure',
-        statement: 'iOS Apps: Unknown sources',
-        statusCategory: 'to-do',
-        facts: { "ios_app_sources": "unsure" },
-        points: 0,
-        feedback: 'Check Settings → General → VPN & Device Management. If you see any profiles listed that you don\'t recognize, they may be worth investigating. No profiles listed means you\'re App Store only.'
-      }
-    ]
-  },
 
   // ═══════════════════════════════════════════════════════════════════════
   // Android-Specific — gated on mobile_os: 'android'

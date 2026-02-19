@@ -1270,9 +1270,6 @@ export const iphoneEmma: UserJourney = JourneyBuilder
   .step('iCloud Backup: standard')
     .answerQuestion('ios_icloud_backup', 'yes')
     .then()
-  .step('iOS app sources: App Store only')
-    .answerQuestion('ios_app_sources', 'app_store_only')
-    .then()
 
   .finalOutcome(
     'iPhone Emma completes full iOS mobile flow with good score',
@@ -1289,7 +1286,6 @@ export const iphoneEmma: UserJourney = JourneyBuilder
       // iOS-specific questions answered
       expect(store.answers['ios_find_my']?.value).toBe('yes');
       expect(store.answers['ios_icloud_backup']?.value).toBe('yes');
-      expect(store.answers['ios_app_sources']?.value).toBe('app_store_only');
       // Safari questions also answered (browser detection)
       expect(store.answers['safari_itp']?.value).toBe('default');
       expect(store.answers['apple_id_2fa']?.value).toBe('yes');
