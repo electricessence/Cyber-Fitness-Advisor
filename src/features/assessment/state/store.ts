@@ -687,10 +687,16 @@ export const useAssessmentStore = create<AssessmentState>()(
         const onboarding = prioritySorted.filter(q => phaseRank(q) < 2);
         const assessment = prioritySorted.filter(q => phaseRank(q) >= 2);
 
-        // Split assessment into probes and non-probes (preserving priority order)
+        // Always lead with the highest-priority assessment question regardless
+        // of its journeyIntent.  Priority drives stint ordering; the probe
+        // ceiling only reorders the *rest* to prevent interrogation fatigue.
+        const leadQuestion = assessment.length > 0 ? assessment[0] : null;
+        const remaining = assessment.slice(1);
+
+        // Split remaining assessment into probes and non-probes (preserving priority order)
         const probes: Question[] = [];
         const nonProbes: Question[] = [];
-        for (const q of assessment) {
+        for (const q of remaining) {
           if (q.journeyIntent === 'probe' || q.journeyIntent === 'insight') {
             probes.push(q);
           } else {
@@ -722,7 +728,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           }
         }
 
-        return [...onboarding, ...paced];
+        return [...onboarding, ...(leadQuestion ? [leadQuestion] : []), ...paced];
       },
 
       getOnboardingPendingCount: () => {

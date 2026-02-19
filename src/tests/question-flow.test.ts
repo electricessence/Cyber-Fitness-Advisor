@@ -104,12 +104,11 @@ describe('Question Flow System', () => {
     it('should show highest priority question first in FirstActionFlow', () => {
       const { result } = renderHook(() => useAssessmentStore());
 
-      // Complete onboarding questions to establish basic facts
+      // Complete onboarding questions to enter assessment flow
       act(() => {
         result.current.answerQuestion('privacy_notice', 'understood');
         result.current.answerQuestion('windows_detection_confirm', 'yes');
         result.current.answerQuestion('chrome_detection_confirm', 'yes');
-        result.current.answerQuestion('tech_comfort', 'comfortable');
       });
 
       // Get ordered questions (what FirstActionFlow sees)
@@ -340,9 +339,6 @@ describe('Question Flow System', () => {
         result.current.answerQuestion('privacy_notice', 'understood');
         result.current.answerQuestion('windows_detection_confirm', 'yes');
         result.current.answerQuestion('chrome_detection_confirm', 'yes');
-        result.current.answerQuestion('tech_comfort', 'comfortable');
-        result.current.answerQuestion('mobile_context', 'neither');
-        result.current.answerQuestion('usage_context', 'general');
       });
 
       const questions = result.current.getOrderedAvailableQuestions?.() || [];

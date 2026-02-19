@@ -2,7 +2,7 @@
 // Privacy-first onboarding flow with device detection and user context
 
 import type { Question } from '../../engine/schema';
-import { ONBOARDING_PRIORITIES } from './priorities.js';
+import { ONBOARDING_PRIORITIES, ASSESSMENT_PRIORITIES } from './priorities.js';
 
 export const onboardingQuestions: Question[] = [
   // Privacy Notice - Highest Priority (must be first)
@@ -665,8 +665,8 @@ export const onboardingQuestions: Question[] = [
   // Technology Comfort Assessment
   {
     id: 'tech_comfort',
-    // Moved out of onboarding — useful for personalization but not a blocker
-    priority: 88, // High assessment priority — asked early but after first quick win
+    // Stint 6: About You — personalization earned after 3 action wins
+    priority: ASSESSMENT_PRIORITIES.ABOUT_YOU_TECH_COMFORT,
     text: 'How would you describe your comfort with technology?',
     tags: ['probe'],
     journeyIntent: 'probe',
@@ -808,8 +808,8 @@ export const onboardingQuestions: Question[] = [
   // Usage Context
   {
     id: 'usage_context',
-    // Moved out of onboarding — personalization context, not a blocker
-    priority: 87, // Early assessment, after tech_comfort
+    // Stint 6: About You — personalization earned after 3 action wins
+    priority: ASSESSMENT_PRIORITIES.ABOUT_YOU_USAGE_CONTEXT,
     text: 'What\'s your main concern about digital security?',
     tags: ['probe'],
     journeyIntent: 'probe',
