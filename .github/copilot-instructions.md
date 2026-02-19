@@ -19,7 +19,7 @@ The Cyber Fitness Advisor is a privacy-first cybersecurity assessment tool built
 - **Ordering by value speed**: minimum info → immediate quick win → earn trust → go deeper
 - **"Maybe later" = move to todo**, not failure. Pivot to the next flow.
 - **The true metric**: total points accumulated across all users (adoption × trust × completion)
-- **Stints are data on questions**, not custom UI logic — the `stint` property on a Question drives the UI
+- **Flows are driven by question data**, not custom UI logic — `priority`, `journeyIntent`, and `tags` on a Question drive flow grouping and labels
 
 #### What's a Flow?
 A flow is just a short sequence of questions (1-3) that leads to an outcome. Not a framework, not a phase system — just questions grouped because they serve the same goal. The probe asks "is there a gap here?", and if yes, the follow-up closes it. If no, the flow is done and we move on.

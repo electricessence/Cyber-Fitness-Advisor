@@ -34,10 +34,9 @@ gap, and if found, pivot to the action that closes it.
 | 5 | **Account Security** | User has 2FA on their most important account, or knows which one to start with | "Do you use 2FA?" → YES: "What method?" → PARTIAL/NO: "Which account would you protect first?" (action) | 2 |
 | 6 | **About You** | Tailor the rest of the journey | Only asked after 3 action flows — earned the right. Tech comfort + main concern + mobile context. | 3 |
 | 7 | **Daily Habits** | Surface gaps in routine security | Updates, screen lock, phishing awareness — each is a probe that may reveal a quick fix | 3 |
-| — | *(no stint)* | Ongoing depth | Everything else: browser-specific deep dives, mobile security, advanced 2FA, breach checks, etc. Flows via gates, no progress bar needed | — |
+| — | *(no flow)* | Ongoing depth | Everything else: browser-specific deep dives, mobile security, advanced 2FA, breach checks, etc. Flows via gates, no progress bar needed | — |
 
-Flows are organized by **priority ranges**, not custom logic on the question**, not custom UI logic. priority ranges
-on a Question tells the UI what label to show and which step the user is on.
+Flows are organized by **priority ranges**, not custom UI logic. A priority range on a question tells the UI what label to show and which step the user is on.
 
 #### The Hunt in Practice
 
@@ -59,7 +58,7 @@ User arrives
   └─ Everything else: gate-driven, no interrogation .... power users go deep
 ```
 
-Each stint either **delivers a win** or **confirms the user is already good**.
+Each flow either **delivers a win** or **confirms the user is already good**.
 Neither outcome wastes their time.
 
 #### Pacing: Breathe Between Wins

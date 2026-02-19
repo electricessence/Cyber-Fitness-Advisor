@@ -24,6 +24,9 @@ export const ONBOARDING_PRIORITIES = {
   OS_DETECTION: 80,
   OS_SELECTION: 79,
   OS_NOVICE_HELP: 78.5,
+  // Mobile OS/context — just above mobile security zone, after deeper assessment
+  MOBILE_OS_SELECTION: 46,
+  MOBILE_CONTEXT: 45,
 } as const;
 
 // Assessment Priorities (98–38 range)

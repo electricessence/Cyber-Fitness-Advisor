@@ -159,7 +159,7 @@ interface AssessmentState extends FactsStoreState {
   getVisibleQuestionIds: () => string[];
 
   // Unified model derived
-  getOrderedAvailableQuestions?: () => Question[];
+  getOrderedAvailableQuestions: () => Question[];
   
   // Task Management
   getTodaysTasks: () => Question[];
@@ -661,49 +661,43 @@ export const useAssessmentStore = create<AssessmentState>()(
           return a.id.localeCompare(b.id);
         });
 
-        // Probe ceiling: after MAX_CONSECUTIVE_PROBES probe-intent questions,
+        // Probe ceiling: after MAX_CONSECUTIVE_PROBES consecutive probe-intent questions,
         // pull the next non-probe question forward to break up the interrogation.
+        // Scans the priority-sorted list in order — only the minimum reorder needed
+        // (one non-probe pulled forward) so priority ordering is otherwise preserved.
         const MAX_CONSECUTIVE_PROBES = 3;
 
         // Always lead with the highest-priority question regardless
         // of its journeyIntent.  Priority drives flow ordering; the probe
         // ceiling only reorders the *rest* to prevent interrogation fatigue.
         const leadQuestion = prioritySorted.length > 0 ? prioritySorted[0] : null;
-        const remaining = prioritySorted.slice(1);
+        const pending = prioritySorted.slice(1); // mutable working copy, already priority-sorted
 
-        // Split remaining assessment into probes and non-probes (preserving priority order)
-        const probes: Question[] = [];
-        const nonProbes: Question[] = [];
-        for (const q of remaining) {
-          if (q.journeyIntent === 'probe' || q.journeyIntent === 'insight') {
-            probes.push(q);
-          } else {
-            nonProbes.push(q);
-          }
-        }
-
-        // Interleave: take up to MAX probes, then insert a non-probe, repeat
         const paced: Question[] = [];
-        let pi = 0; // probe index
-        let ni = 0; // non-probe index
+        let streak = 0;
 
-        while (pi < probes.length || ni < nonProbes.length) {
-          // Emit up to MAX_CONSECUTIVE_PROBES probes
-          let emitted = 0;
-          while (pi < probes.length && emitted < MAX_CONSECUTIVE_PROBES) {
-            paced.push(probes[pi++]);
-            emitted++;
-          }
+        while (pending.length > 0) {
+          const next = pending[0];
+          const isProbe = next.journeyIntent === 'probe' || next.journeyIntent === 'insight';
 
-          // Insert a non-probe as a break (if available)
-          if (ni < nonProbes.length) {
-            paced.push(nonProbes[ni++]);
-          } else if (pi < probes.length) {
-            // No more non-probes left — emit remaining probes
-            while (pi < probes.length) {
-              paced.push(probes[pi++]);
+          if (isProbe && streak >= MAX_CONSECUTIVE_PROBES) {
+            // Find the next non-probe further down the sorted list
+            const nonProbeIdx = pending.findIndex(
+              q => q.journeyIntent !== 'probe' && q.journeyIntent !== 'insight'
+            );
+            if (nonProbeIdx !== -1) {
+              // Pull it forward as a single pacing break, then reset the streak
+              paced.push(...pending.splice(nonProbeIdx, 1));
+              streak = 0;
+              continue;
             }
+            // No non-probe available — emit all remaining probes as-is
+            paced.push(...pending.splice(0));
+            break;
           }
+
+          paced.push(pending.shift()!);
+          streak = isProbe ? streak + 1 : 0;
         }
 
         return [...(leadQuestion ? [leadQuestion] : []), ...paced];

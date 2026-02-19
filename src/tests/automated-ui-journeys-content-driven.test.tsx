@@ -13,7 +13,10 @@ import { questionContentService, getQuestionText, getQuestionOptions } from '../
 
 describe('🤖 Automated UI User Journeys - Content-Driven', () => {
   // Navigation / control button labels to exclude from answer button detection
-  const controlLabels = ['Start My Checkup', 'Reset', 'Menu', 'Close', 'Export', 'Import'];
+  const controlLabels = [
+    'Start My Checkup', 'Reset', 'Menu', 'Close', 'Export', 'Import',
+    'Why this matters', 'Hide context', 'Learn more', 'Hide details',
+  ];
 
   beforeEach(() => {
     // Reset store state before each test

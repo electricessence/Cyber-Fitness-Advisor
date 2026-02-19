@@ -10,7 +10,7 @@
 - **Branch**: `feature/phase-progress-bar` (3 commits ahead of main `8e3a858`)
 - **Tests**: 270/270 passing, clean
 - **68 questions** across 9 TypeScript content files
-- Priority system restructured for flow ordering (ad-blocker first at 95)
+- Priority system restructured for flow ordering (ad-blocker first at 98)
 
 ## Key Decisions Made
 

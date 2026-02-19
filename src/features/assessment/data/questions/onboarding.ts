@@ -692,7 +692,7 @@ export const onboardingQuestions: Question[] = [
   {
     id: 'mobile_os_selection',
     // Moved out of onboarding — only needed for mobile-specific deep-dives
-    priority: 46, // Just above mobile security questions
+    priority: ONBOARDING_PRIORITIES.MOBILE_OS_SELECTION, // Just above mobile security questions
     text: 'Which mobile operating system do you use?',
     tags: ['mobile', 'probe'],
     journeyIntent: 'probe',
@@ -740,7 +740,7 @@ export const onboardingQuestions: Question[] = [
   {
     id: 'mobile_context',
     // Moved out of onboarding — asked before mobile-specific questions
-    priority: 45, // Just above mobile security questions
+    priority: ONBOARDING_PRIORITIES.MOBILE_CONTEXT, // Just above mobile security questions
     text: 'Do you also use a smartphone or tablet?',
     tags: ['mobile', 'probe'],
     journeyIntent: 'probe',
