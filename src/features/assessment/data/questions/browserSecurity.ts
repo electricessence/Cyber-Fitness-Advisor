@@ -329,7 +329,8 @@ export const browserSecurityQuestions: Question[] = [
     effort: '10 minutes',
     journeyIntent: 'probe',
     conditions: {
-      include: { "browser": "chrome" }
+      include: { "browser": "chrome" },
+      exclude: { "browser_switched": true }
     },
     options: [
       {

@@ -657,7 +657,8 @@ export const onboardingQuestions: Question[] = [
     tags: ['probe'],
     journeyIntent: 'probe',
     conditions: {
-      include: { "os_confirmed": true }
+      include: { "os_confirmed": true },
+      exclude: { "tech_comfort": "*" } // Don't re-ask if already set via onboarding shortcuts
     },
     options: [
       {

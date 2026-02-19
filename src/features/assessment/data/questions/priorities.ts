@@ -70,7 +70,7 @@ export const ASSESSMENT_PRIORITIES = {
   MOBILE_PUBLIC_WIFI: 41,
   MOBILE_PLATFORM: 40,             // Find My (iOS/Android — mutually exclusive)
   MOBILE_BACKUP_PROTECT: 39,       // iCloud backup / Play Protect (mutually exclusive)
-  MOBILE_APP_SOURCES: 38           // App Store / sideloading (mutually exclusive)
+  MOBILE_APP_SOURCES: 38           // Android sideloading (iOS version removed — sideloading is impossible on iOS)
 } as const;
 
 // Suite-specific priorities can be added here as needed
