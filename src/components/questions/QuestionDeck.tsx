@@ -202,11 +202,6 @@ export function QuestionDeck() {
   const availableQuestions = getOrderedAvailableQuestions?.() ?? [];
   const totalCards = availableQuestions.length;
 
-  // Simple progress tracking
-  const totalQuestions = useMemo(() => 
-    questionBank.domains.flatMap(d => d.levels.flatMap(l => l.questions)).length,
-    [questionBank]
-  );
   const answeredCount = Object.keys(answers).length;
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -469,23 +464,6 @@ export function QuestionDeck() {
     <section id="question-deck" aria-label="Security question deck" className="flex flex-col gap-4 h-full">
       <div className="flex-1">
         <div className={`relative bg-white rounded-3xl shadow-xl flex flex-col border ${intentMeta.borderClass} overflow-hidden`}>
-
-          {/* Progress bar — simple visual indicator of overall completion */}
-          {currentQuestion && answeredCount > 0 && (
-            <div className="px-6 pt-4 pb-0 sm:px-8">
-              <div className="h-[3px] w-full rounded-full bg-gray-100 overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500 bg-amber-400"
-                  style={{ width: `${totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0}%` }}
-                  role="progressbar"
-                  aria-valuenow={answeredCount}
-                  aria-valuemin={0}
-                  aria-valuemax={totalQuestions}
-                  aria-label="Overall progress"
-                />
-              </div>
-            </div>
-          )}
 
           {/* Card body */}
           <div className="p-6 sm:p-8 flex flex-col gap-6">
