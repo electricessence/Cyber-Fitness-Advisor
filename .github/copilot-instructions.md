@@ -49,7 +49,7 @@ When a user completes a flow's action (they actually did the thing), the next pr
 5. **Account Security** — probe → YES: what method? → NO: which account first? (THIRD WIN)
 6. **About You** — earned the right to personalize (tech comfort, concerns, mobile)
 7. **Daily Habits** — routine probes (updates, screen lock, phishing)
-8. *(no stint)* — everything else via gates, power users go deep
+8. *(no flow)* — everything else via gates, power users go deep
 
 ### 3. Test File Organization Policy
 - **`.spec.ts` files**: True spec files that are paired with their source file and live in the same directory

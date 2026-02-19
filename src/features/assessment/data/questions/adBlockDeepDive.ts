@@ -311,7 +311,7 @@ export const adBlockDeepDiveQuestions: Question[] = [
   {
     id: 'adblock_mobile_ios',
     text: 'On iOS, ad blocking works differently. Firefox Focus is a free, open-source app that acts as a Safari content blocker — blocking ads and trackers in Safari itself. You can also use Firefox Focus as a standalone private browser.',
-    priority: 37, // Mobile-only — must appear after OS detection (80) confirms mobile_os
+    priority: ASSESSMENT_PRIORITIES.AD_BLOCK_MOBILE_IOS, // Mobile-only — must appear after OS detection (80) confirms mobile_os
     tags: ['mobile', 'ios', 'privacy', 'action'],
     journeyIntent: 'action-guided',
     difficulty: 'beginner',
@@ -345,7 +345,7 @@ export const adBlockDeepDiveQuestions: Question[] = [
   {
     id: 'adblock_mobile_android',
     text: 'On Android, Firefox is available as a full mobile browser with extension support — including uBlock Origin. This gives you the same desktop-grade ad blocking on your phone.',
-    priority: 36, // Mobile-only — must appear after OS detection (80) confirms mobile_os
+    priority: ASSESSMENT_PRIORITIES.AD_BLOCK_MOBILE_ANDROID, // Mobile-only — must appear after OS detection (80) confirms mobile_os
     tags: ['mobile', 'android', 'privacy', 'action'],
     journeyIntent: 'action-guided',
     difficulty: 'beginner',

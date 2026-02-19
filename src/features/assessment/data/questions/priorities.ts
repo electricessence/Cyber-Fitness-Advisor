@@ -36,6 +36,8 @@ export const ASSESSMENT_PRIORITIES = {
   AD_BLOCK_DESKTOP: 94,            // Browser-specific uBO/content-blocker install prompts
   AD_BLOCK_SECONDARY: 93,          // SponsorBlock bonus, Chrome PM warning, mobile flows
   AD_BLOCK_FOLLOWUP: 92,           // Browser-switch progress check-in
+  AD_BLOCK_MOBILE_IOS: 37,         // Mobile ad-block (iOS) — after mobile_os confirmed at 80
+  AD_BLOCK_MOBILE_ANDROID: 36,     // Mobile ad-block (Android) — after mobile_os confirmed at 80
   // Flow 4: Password Safety
   PASSWORD_MANAGER: 90,
   PM_TYPE: 89,
