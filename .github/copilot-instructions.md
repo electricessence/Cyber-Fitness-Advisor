@@ -11,12 +11,52 @@ The Cyber Fitness Advisor is a privacy-first cybersecurity assessment tool built
 - No tracking, analytics, or data collection
 - Make privacy guarantees explicit in UI components
 
-### 2. Test File Organization Policy
+### 2. Hunt-to-Help: Stint-Based Value Delivery
+**This is the core product philosophy.** The app's job is a race to find how it can help.
+
+- **Every question is a search probe** — "Can I help you here?" — not an interrogation
+- **Stints** are small, purpose-driven missions (2-3 questions max) with a clear goal
+- **Ordering by value speed**: minimum info → immediate quick win → earn trust → go deeper
+- **"Maybe later" = move to todo**, not failure. Pivot to the next stint.
+- **The true metric**: total points accumulated across all users (adoption × trust × completion)
+- **Stints are data on questions**, not custom UI logic — the `stint` property on a Question drives the UI
+
+#### What's a Stint?
+A stint is just a short sequence of questions (1-3) that leads to an outcome. Not a framework, not a phase system — just questions grouped because they serve the same goal. The probe asks "is there a gap here?", and if yes, the follow-up closes it. If no, the stint is done and we move on.
+
+#### Stint Design Rules:
+1. Each stint has a **goal** (e.g., "user has an adblocker installed")
+2. Start with minimum info needed to unlock the goal
+3. If the probe reveals a gap → pivot to the action card immediately
+4. If no gap → stint completes, move to next
+5. Never ask info-gathering questions unless they unlock an action
+6. Personalization questions (tech_comfort, usage_context) come AFTER the first action wins
+
+#### Pacing: Breathe Between Wins
+When a user completes a stint's action (they actually did the thing), the next prompt is a breather — not another probe:
+> "Great work! That was a big win. Would you like to keep going, or take a break?"
+
+- **Celebrate the effort** — acknowledge the user did real work
+- **Give permission to stop** — normalize breaks, reduce assessment fatigue
+- Pacing only kicks in after the user **does work** (e.g., installs something), not after confirming they already had it
+- Stints (bounded, purposeful) + pacing (breathe after effort) = helpful friend, not security audit
+
+#### Stint Sequence (Hunt Pattern):
+1. **Welcome** — "Data stays local" (1 tap, trust)
+2. **Your Setup** — OS + browser confirm (2 taps, enables actions)
+3. **Ad Protection** — probe → YES: done → NO: install now (FIRST WIN)
+4. **Password Safety** — probe → YES: what kind? → NO: what's the barrier? (SECOND WIN)
+5. **Account Security** — probe → YES: what method? → NO: which account first? (THIRD WIN)
+6. **About You** — earned the right to personalize (tech comfort, concerns, mobile)
+7. **Daily Habits** — routine probes (updates, screen lock, phishing)
+8. *(no stint)* — everything else via gates, power users go deep
+
+### 3. Test File Organization Policy
 - **`.spec.ts` files**: True spec files that are paired with their source file and live in the same directory
 - **`.test.ts` files**: Broader integration tests, utilities, or non-paired tests that live in the `tests/` folder
 - **Rule**: If it's not a direct unit test of a specific source file, it belongs in `tests/` as `.test.ts`
 
-### 3. Modular Component Architecture
+### 4. Modular Component Architecture
 **Lesson Learned**: As SPAs grow from "simple concepts" to "serious applications," modular architecture becomes essential from the start.
 
 #### Key Guidelines:
@@ -26,19 +66,19 @@ The Cyber Fitness Advisor is a privacy-first cybersecurity assessment tool built
 - **Use TypeScript interfaces consistently** - Define clear contracts for all component props and state shapes
 - **Group related components together** - Organize by feature or responsibility rather than arbitrary structure
 
-### 3. State Management with Zustand
+### 5. State Management with Zustand
 - Use Zustand for global application state
 - Implement localStorage persistence for user data
 - Keep state updates immutable and predictable
 - Add logging for debugging state changes
 
-### 4. Testing Strategy
+### 6. Testing Strategy
 - Maintain test coverage focused on **critical business logic**
 - Test state management thoroughly (store functions, data persistence)
 - Use integration tests for user workflows
 - Don't over-test simple UI components - focus on behavior
 
-### 5. Performance & UX Considerations
+### 7. Performance & UX Considerations
 - **Progressive Enhancement**: App works without JavaScript for basic functionality
 - **Responsive Design**: Mobile-first approach with clear desktop enhancements
 - **Loading States**: Provide feedback during async operations

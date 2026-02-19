@@ -1162,20 +1162,10 @@ export const initializeStore = () => {
   // Set a general flag that any detection has happened
   store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
   
-  // Auto-confirm OS and browser when detection is confident (not 'unknown').
-  // This skips the confirmation questions so users get to actionable content faster.
-  if (device.os !== 'unknown') {
-    store.setFact('os', device.os);
-    store.setFact('os_confirmed', true);
-    store.factsActions.injectFact('os', device.os, { source: 'auto-detection' });
-    store.factsActions.injectFact('os_confirmed', true, { source: 'auto-detection' });
-  }
-  if (device.browser !== 'unknown') {
-    store.setFact('browser', device.browser);
-    store.setFact('browser_confirmed', true);
-    store.factsActions.injectFact('browser', device.browser, { source: 'auto-detection' });
-    store.factsActions.injectFact('browser_confirmed', true, { source: 'auto-detection' });
-  }
+  // NOTE: We intentionally do NOT auto-confirm OS/browser here.
+  // The user should see the detection confirmation questions (e.g. "Detected: Windows — is this correct?")
+  // so they know what the app detected and can correct it if wrong.
+  // This preserves the privacy-first transparency principle with a minimal 2-question onboarding.
   
   // Facts and questions are now initialized
   
