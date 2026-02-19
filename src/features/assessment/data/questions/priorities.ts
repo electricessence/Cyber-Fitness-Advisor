@@ -1,50 +1,58 @@
 // Shared Priority Constants
 // Used across all question groups for consistent ordering
 //
-// Flow ordering (Hunt-to-Help philosophy):
-//   Flow 3: Ad Protection (95–92) — FIRST WIN
-//   Flow 4: Password Safety (90–86)
-//   Flow 5: Account Security (85–81)
-//   Flow 6: About You (78–77) — earned after 3 action flows
-//   Flow 7: Daily Habits (75–70)
-//   No flow label: everything else (68–38)
+// Hunt-to-Help ordering — race to first action win:
+//   10000  Privacy Notice (must be first)
+//      98  Ad Protection probe (no OS/browser needed)
+//   97–95  Browser Detection (between probe and deep-dives)
+//   94–92  Ad Protection deep-dives (browser-specific install guides)
+//   90–86  Password Safety
+//   85–81  Account Security
+//   80–79  OS Detection (deferred — just before About You)
+//   78–77  About You — personalization earned after 3 action flows
+//   75–70  Daily Habits
+//   68–38  Everything else (deeper assessment + mobile)
 
-// Onboarding Flow Priorities (10000–9000 range)
+// Onboarding Priorities — interleaved with assessment by need
 export const ONBOARDING_PRIORITIES = {
   PRIVACY_NOTICE: 10000,
-  OS_DETECTION: 9550,
-  OS_SELECTION: 9500,
-  BROWSER_DETECTION: 9450,
-  BROWSER_SELECTION: 9400
+  // Browser detection — after ad_blocker probe, before deep-dives
+  BROWSER_DETECTION: 97,
+  BROWSER_SELECTION: 96,
+  BROWSER_SELECTION_FALLBACK: 95,
+  // OS detection — deferred until just before About You
+  OS_DETECTION: 80,
+  OS_SELECTION: 79,
+  OS_NOVICE_HELP: 78.5,
 } as const;
 
-// Assessment Priorities (95–38 range)
+// Assessment Priorities (98–38 range)
 export const ASSESSMENT_PRIORITIES = {
-  // Stint 3: Ad Protection — first action win, easiest + fastest
-  AD_BLOCKER: 95,
+  // Flow 3: Ad Protection — first action win, easiest + fastest
+  AD_BLOCKER: 98,
   AD_BLOCK_DESKTOP: 94,            // Browser-specific uBO/content-blocker install prompts
   AD_BLOCK_SECONDARY: 93,          // SponsorBlock bonus, Chrome PM warning, mobile flows
   AD_BLOCK_FOLLOWUP: 92,           // Browser-switch progress check-in
-  // Stint 4: Password Safety
+  // Flow 4: Password Safety
   PASSWORD_MANAGER: 90,
   PM_TYPE: 89,
   PM_MASTER_PASSWORD: 88,
   PM_CURRENT_METHOD: 87,
   PM_BARRIER: 86,
-  // Stint 5: Account Security
+  // Flow 5: Account Security
   TWO_FACTOR_AUTH: 85,
   TFA_METHOD: 84,
   TFA_BACKUP_CODES: 83,
   TFA_PRIORITY_ACCOUNTS: 82,
   TFA_BARRIER: 81,
-  // Stint 6: About You — personalization after earning trust
+  // Flow 6: About You — personalization after earning trust
   ABOUT_YOU_TECH_COMFORT: 78,
   ABOUT_YOU_USAGE_CONTEXT: 77,
-  // Stint 7: Daily Habits
+  // Flow 7: Daily Habits
   SOFTWARE_UPDATES: 75,
   PHISHING_AWARENESS: 72,
   SCREEN_LOCK: 70,
-  // No stint: deeper assessment
+  // No flow label: deeper assessment
   VIRUS_SCANNING: 68,
   BREACH_CHECK: 66,
   BACKUP_FREQUENCY: 65,

@@ -158,10 +158,8 @@ interface AssessmentState extends FactsStoreState {
   // Condition-driven question visibility
   getVisibleQuestionIds: () => string[];
 
-  // Unified model derived (feature-flagged)
+  // Unified model derived
   getOrderedAvailableQuestions?: () => Question[];
-  getOnboardingPendingCount?: () => number;
-  isOnboardingComplete?: () => boolean;
   
   // Task Management
   getTodaysTasks: () => Question[];
@@ -647,51 +645,31 @@ export const useAssessmentStore = create<AssessmentState>()(
         return availableQuestions;
       },
 
-      // Unified model ordering (priority-first with phase fallback + probe ceiling)
+      // Priority-first ordering with probe ceiling
+      // No phase buckets — priority alone determines order.
+      // The probe ceiling interleaves non-probe questions to prevent
+      // interrogation fatigue.
       getOrderedAvailableQuestions: () => {
         const raw = get().getAvailableQuestions();
-        const onboardingPending = (get().getOnboardingPendingCount?.() ?? 0) > 0;
-
-        const phaseRank = (question: Question) => {
-          if (question.phase === 'onboarding' && onboardingPending) return 0;
-          if (question.phase === 'onboarding') return 1;
-          return 2;
-        };
 
         const prioritySorted = [...raw].sort((a, b) => {
-          const phaseComparison = phaseRank(a) - phaseRank(b);
-          if (phaseComparison !== 0) {
-            return phaseComparison;
-          }
-
-          // Priority still dictates order within the same phase bucket
           const aPriority = a.priority || 0;
           const bPriority = b.priority || 0;
           if (bPriority !== aPriority) {
             return bPriority - aPriority;
           }
-
-          const ao = a.phaseOrder ?? 9999;
-          const bo = b.phaseOrder ?? 9999;
-          if (ao !== bo) return ao - bo;
-
           return a.id.localeCompare(b.id);
         });
 
         // Probe ceiling: after MAX_CONSECUTIVE_PROBES probe-intent questions,
         // pull the next non-probe question forward to break up the interrogation.
-        // Onboarding questions are exempt — they form a fixed orientation flow.
         const MAX_CONSECUTIVE_PROBES = 3;
 
-        // Separate onboarding (exempt) from assessment (subject to ceiling)
-        const onboarding = prioritySorted.filter(q => phaseRank(q) < 2);
-        const assessment = prioritySorted.filter(q => phaseRank(q) >= 2);
-
-        // Always lead with the highest-priority assessment question regardless
-        // of its journeyIntent.  Priority drives stint ordering; the probe
+        // Always lead with the highest-priority question regardless
+        // of its journeyIntent.  Priority drives flow ordering; the probe
         // ceiling only reorders the *rest* to prevent interrogation fatigue.
-        const leadQuestion = assessment.length > 0 ? assessment[0] : null;
-        const remaining = assessment.slice(1);
+        const leadQuestion = prioritySorted.length > 0 ? prioritySorted[0] : null;
+        const remaining = prioritySorted.slice(1);
 
         // Split remaining assessment into probes and non-probes (preserving priority order)
         const probes: Question[] = [];
@@ -728,22 +706,7 @@ export const useAssessmentStore = create<AssessmentState>()(
           }
         }
 
-        return [...onboarding, ...(leadQuestion ? [leadQuestion] : []), ...paced];
-      },
-
-      getOnboardingPendingCount: () => {
-        const state = get();
-        const answeredIds = new Set(Object.keys(state.answers));
-        const allQuestions = state.questionBank.domains.flatMap(domain => 
-          domain.levels.flatMap(level => level.questions)
-        );
-        const onboardingQuestions = allQuestions.filter(question => question.phase === 'onboarding');
-        return onboardingQuestions.filter(question => !answeredIds.has(question.id)).length;
-      },
-
-      isOnboardingComplete: () => {
-        const pending = get().getOnboardingPendingCount?.() ?? 0;
-        return pending === 0;
+        return [...(leadQuestion ? [leadQuestion] : []), ...paced];
       },
       
       getRecommendations: () => {

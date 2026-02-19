@@ -1,4 +1,3 @@
-import { OnboardingBanner } from '../OnboardingBanner';
 import { QuestionDeck } from '../questions/QuestionDeck';
 
 interface MainContentProps {
@@ -8,7 +7,6 @@ interface MainContentProps {
 export function MainContent(_props: MainContentProps) {
   return (
     <div className="lg:col-span-3">
-      <OnboardingBanner />
       <div className="mt-6">
         <QuestionDeck />
       </div>

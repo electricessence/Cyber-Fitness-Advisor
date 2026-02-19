@@ -8,7 +8,6 @@ import { onboardingQuestions, coreAssessmentQuestions, browserSecurityQuestions,
 const advancedSecurityQuestions: Question[] = [
   {
     id: 'advanced_2fa',
-    phase: 'assessment',
     priority: 90, // Just above core assessment range (40-85)
     statement: 'Hardware 2FA Keys Used',
     text: 'Do you use hardware security keys (like YubiKey) for 2FA?',

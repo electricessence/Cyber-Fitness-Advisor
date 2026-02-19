@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 import { useAssessmentStore } from '../features/assessment/state/store';
-import { questionContentService, getOnboardingQuestions, getQuestionText, getQuestionOptions } from '../features/assessment/data/contentService';
+import { questionContentService, getQuestionText, getQuestionOptions } from '../features/assessment/data/contentService';
 
 /**
  * COMPLETELY AUTOMATED UI JOURNEY TESTS - CONTENT-DRIVEN
@@ -24,9 +24,9 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
     it('should complete onboarding flow using actual content', async () => {
       const user = userEvent.setup();
       
-      // Get actual onboarding questions from content service
-      const onboardingQuestions = getOnboardingQuestions();
-      expect(onboardingQuestions.length).toBeGreaterThan(0);
+      // Get all questions from content service
+      const allQuestions = questionContentService.getAllQuestions();
+      expect(allQuestions.length).toBeGreaterThan(0);
       
       render(<App />);
       
@@ -86,11 +86,9 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       
       // Get questions from content service
       const allQuestionIds = questionContentService.getAllQuestionIds();
-      const onboardingQuestions = getOnboardingQuestions();
       
       // Should have questions available
       expect(allQuestionIds.length).toBeGreaterThan(0);
-      expect(onboardingQuestions.length).toBeGreaterThan(0);
       
       // Look for any question text in the UI - use actual rendered text
       let foundAnyQuestion = false;
@@ -257,11 +255,13 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
       expect(Object.keys(initialState.answers).length).toBe(0);
       expect(initialState.overallScore).toBe(0);
       
-      // Answer one question using actual content
-      const firstOnboardingQuestion = getOnboardingQuestions()[0];
-      if (firstOnboardingQuestion) {
-        const questionText = getQuestionText(firstOnboardingQuestion.id);
-        const questionOptions = getQuestionOptions(firstOnboardingQuestion.id);
+      // Answer one question using actual content (highest priority first)
+      const sortedQuestions = questionContentService.getAllQuestions()
+        .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+      const firstQuestion = sortedQuestions[0];
+      if (firstQuestion) {
+        const questionText = getQuestionText(firstQuestion.id);
+        const questionOptions = getQuestionOptions(firstQuestion.id);
         
         if (questionText && questionOptions) {
           const questionElement = screen.queryByText(questionText);
@@ -275,7 +275,7 @@ describe('🤖 Automated UI User Journeys - Content-Driven', () => {
               await waitFor(() => {
                 const newState = useAssessmentStore.getState();
                 expect(Object.keys(newState.answers).length).toBe(1);
-                expect(newState.answers[firstOnboardingQuestion.id]).toBeDefined();
+                expect(newState.answers[firstQuestion.id]).toBeDefined();
               });
             }
           }

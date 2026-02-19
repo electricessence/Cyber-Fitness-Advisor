@@ -22,28 +22,6 @@ export class QuestionContentService {
   }
 
   /**
-   * Get all questions by phase
-   */
-  getQuestionsByPhase(phase: 'onboarding' | 'assessment'): Question[] {
-    return this.getAllQuestions().filter(q => q.phase === phase);
-  }
-
-  /**
-   * Get onboarding questions in order
-   */
-  getOnboardingQuestions(): Question[] {
-    return this.getQuestionsByPhase('onboarding')
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0)); // Higher priority first
-  }
-
-  /**
-   * Get assessment questions
-   */
-  getAssessmentQuestions(): Question[] {
-    return this.getQuestionsByPhase('assessment');
-  }
-
-  /**
    * Get question by ID
    */
   getQuestionById(id: string): Question | undefined {
@@ -137,8 +115,6 @@ export class QuestionContentService {
 export const questionContentService = QuestionContentService.getInstance();
 
 // Export convenient functions for common use cases
-export const getOnboardingQuestions = () => questionContentService.getOnboardingQuestions();
-export const getAssessmentQuestions = () => questionContentService.getAssessmentQuestions();
 export const getQuestionById = (id: string) => questionContentService.getQuestionById(id);
 export const getQuestionText = (id: string) => questionContentService.getQuestionText(id);
 export const getQuestionOptions = (id: string) => questionContentService.getQuestionOptions(id);

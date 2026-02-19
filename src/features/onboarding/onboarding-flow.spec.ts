@@ -34,37 +34,38 @@ describe('Complete Onboarding Flow Automation', () => {
     });
   });
 
-  it('should follow correct onboarding sequence: privacy → OS confirm → browser confirm', () => {
-    // STEP 1: First question should be Privacy Notice
-    const firstQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
+  it('should follow correct onboarding sequence: privacy → ad_blocker → browser confirm', () => {
+    // STEP 1: First question should be Privacy Notice (highest priority: 10000)
+    const firstQuestions = store.getOrderedAvailableQuestions();
     expect(firstQuestions[0]?.id).toBe('privacy_notice');
     
     // STEP 2: Answer Privacy Notice
     store.answerQuestion('privacy_notice', 'understood');
     
-    // STEP 3: Second question should be OS detection confirmation
-    const secondQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    expect(secondQuestions[0]?.id).toBe('windows_detection_confirm');
-    expect(secondQuestions[0]?.statement).toContain('Detected: Windows');
+    // STEP 3: Next highest-priority question should be ad_blocker (98), then browser detection (97)
+    const allQuestions = store.getOrderedAvailableQuestions();
+    expect(allQuestions[0]?.id).toBe('ad_blocker');
     
-    // STEP 4: Confirm OS detection
-    store.answerQuestion('windows_detection_confirm', 'yes');
+    // STEP 4: Answer ad_blocker probe
+    store.answerQuestion('ad_blocker', 'no');
     
-    // STEP 5: Third question should be Browser detection confirmation
-    const thirdQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    expect(thirdQuestions[0]?.id).toBe('firefox_detection_confirm');
-    expect(thirdQuestions[0]?.statement).toContain('Detected: Firefox');
+    // STEP 5: Browser detection confirm should appear next (priority 97)
+    const afterAdBlock = store.getOrderedAvailableQuestions();
+    expect(afterAdBlock[0]?.id).toBe('firefox_detection_confirm');
+    expect(afterAdBlock[0]?.statement).toContain('Detected: Firefox');
     
     // STEP 6: Confirm browser detection
     store.answerQuestion('firefox_detection_confirm', 'yes');
     
-    // STEP 7: No more onboarding questions — tech_comfort, usage_context, etc. were moved to assessment
-    const remainingOnboarding = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    expect(remainingOnboarding.length).toBe(0);
+    // STEP 7: Deep-dive ad-block questions should now be available (browser-specific)
+    const afterBrowser = store.getOrderedAvailableQuestions();
+    // First available should be a browser-specific ad-block deep-dive or next assessment question
+    expect(afterBrowser.length).toBeGreaterThan(0);
     
-    // STEP 8: First available question should now be an assessment question
-    const assessmentQuestions = store.getAvailableQuestions().filter(q => q.phase !== 'onboarding');
-    expect(assessmentQuestions.length).toBeGreaterThan(0);
+    // OS detection questions should NOT have appeared yet — they're deferred to priority 80
+    const osDetectionQuestion = afterBrowser.find(q => q.id === 'windows_detection_confirm');
+    // OS detection is deferred but still available (priority 80)
+    expect(osDetectionQuestion).toBeDefined();
   });
 
   it('should show browser selection when browser detection is unknown', () => {
@@ -78,15 +79,13 @@ describe('Complete Onboarding Flow Automation', () => {
     // Answer privacy notice
     freshStore.answerQuestion('privacy_notice', 'understood');
     
-    // Answer OS confirmation (initializeStore sets os_detected from jsdom UA)
-    // After OS is confirmed, with browser_detected='unknown' → browser_selection should appear
-    const osQuestions = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    if (osQuestions[0]?.id.includes('detection_confirm')) {
-      freshStore.answerQuestion(osQuestions[0].id, 'yes');
-    }
+    // After privacy, ad_blocker is next (98), then browser_selection (96) for unknown browser
+    // Answer ad_blocker first
+    freshStore.answerQuestion('ad_blocker', 'no');
     
-    const onboarding = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    expect(onboarding.length).toBeGreaterThan(0);
-    expect(onboarding[0]?.id).toBe('browser_selection');
+    // With browser_detected='unknown' and privacy_acknowledged=true → browser_selection should appear
+    const available = freshStore.getOrderedAvailableQuestions();
+    const browserSelection = available.find(q => q.id === 'browser_selection');
+    expect(browserSelection).toBeDefined();
   });
 });

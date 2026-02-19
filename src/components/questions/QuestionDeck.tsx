@@ -144,7 +144,6 @@ function getVisuals(question: Question): QuestionVisual {
 
 function deriveJourneyIntent(question: Question): JourneyIntent {
   if (question.journeyIntent) return question.journeyIntent;
-  if (question.phase === 'onboarding') return 'onboarding';
   const tags = new Set(question.tags ?? []);
 
   if (tags.has('checklist')) return 'checklist';
