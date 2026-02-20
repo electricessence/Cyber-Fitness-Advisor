@@ -68,9 +68,6 @@ export interface Question {
     browserInfo?: any; // Flexible browser information for conditions
   };
   
-  // Phase management
-  phase?: 'onboarding' | 'assessment';
-  
   // Legacy properties for backward compatibility
   type?: string; // Question type for component logic
   explanation?: string; // Educational information about the question
@@ -86,7 +83,6 @@ export interface Question {
   prerequisites?: string[] | { answered?: string[]; anyAnswered?: string[]; }; // Prerequisites for this question
   runtimeVisibleFn?: (state: any) => boolean; // Runtime visibility function
   category?: string; // Question category
-  phaseOrder?: number; // Phase ordering
 }
 
 export interface Level {

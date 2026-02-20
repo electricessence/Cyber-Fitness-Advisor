@@ -104,12 +104,11 @@ describe('Question Flow System', () => {
     it('should show highest priority question first in FirstActionFlow', () => {
       const { result } = renderHook(() => useAssessmentStore());
 
-      // Complete onboarding questions to establish basic facts
+      // Complete privacy + first probe + browser confirm to enter deep assessment
       act(() => {
         result.current.answerQuestion('privacy_notice', 'understood');
-        result.current.answerQuestion('windows_detection_confirm', 'yes');
+        result.current.answerQuestion('ad_blocker', 'yes');
         result.current.answerQuestion('chrome_detection_confirm', 'yes');
-        result.current.answerQuestion('tech_comfort', 'comfortable');
       });
 
       // Get ordered questions (what FirstActionFlow sees)
@@ -298,12 +297,11 @@ describe('Question Flow System', () => {
       });
 
       const questions = result.current.getOrderedAvailableQuestions?.() || [];
-      const assessmentQuestions = questions.filter(q => q.phase !== 'onboarding');
 
       // Find the position of the last non-probe
       let lastNonProbeIdx = -1;
-      for (let i = assessmentQuestions.length - 1; i >= 0; i--) {
-        const intent = assessmentQuestions[i].journeyIntent;
+      for (let i = questions.length - 1; i >= 0; i--) {
+        const intent = questions[i].journeyIntent;
         if (intent !== 'probe' && intent !== 'insight') {
           lastNonProbeIdx = i;
           break;
@@ -315,7 +313,7 @@ describe('Question Flow System', () => {
       let maxStreak = 0;
       let streak = 0;
       for (let i = 0; i <= lastNonProbeIdx; i++) {
-        const q = assessmentQuestions[i];
+        const q = questions[i];
         if (q.journeyIntent === 'probe' || q.journeyIntent === 'insight') {
           streak++;
           maxStreak = Math.max(maxStreak, streak);
@@ -326,7 +324,7 @@ describe('Question Flow System', () => {
 
       expect(maxStreak).toBeLessThanOrEqual(3);
       // Also verify an action break appears within the first 4 questions
-      const firstFour = assessmentQuestions.slice(0, 4);
+      const firstFour = questions.slice(0, 4);
       const hasEarlyAction = firstFour.some(q => 
         q.journeyIntent !== 'probe' && q.journeyIntent !== 'insight'
       );
@@ -340,18 +338,14 @@ describe('Question Flow System', () => {
         result.current.answerQuestion('privacy_notice', 'understood');
         result.current.answerQuestion('windows_detection_confirm', 'yes');
         result.current.answerQuestion('chrome_detection_confirm', 'yes');
-        result.current.answerQuestion('tech_comfort', 'comfortable');
-        result.current.answerQuestion('mobile_context', 'neither');
-        result.current.answerQuestion('usage_context', 'general');
       });
 
       const questions = result.current.getOrderedAvailableQuestions?.() || [];
-      const assessmentQuestions = questions.filter(q => q.phase !== 'onboarding');
 
-      expect(assessmentQuestions.length).toBeGreaterThan(0);
-      // First assessment question should still be the highest-priority one
-      const firstPriority = assessmentQuestions[0].priority || 0;
-      const maxPriority = Math.max(...assessmentQuestions.map(q => q.priority || 0));
+      expect(questions.length).toBeGreaterThan(0);
+      // First question should still be the highest-priority one
+      const firstPriority = questions[0].priority || 0;
+      const maxPriority = Math.max(...questions.map(q => q.priority || 0));
       expect(firstPriority).toBe(maxPriority);
     });
   });

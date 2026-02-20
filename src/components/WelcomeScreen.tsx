@@ -27,8 +27,8 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
             <Clock className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
             <div>
-              <p className="text-sm font-medium text-white">About 5 minutes</p>
-              <p className="text-sm text-slate-400">15–20 cards, tailored to your devices and habits</p>
+              <p className="text-sm font-medium text-white">Go at your own pace</p>
+              <p className="text-sm text-slate-400">One card at a time, tailored to your devices and habits — stop and resume anytime</p>
             </div>
           </div>
 

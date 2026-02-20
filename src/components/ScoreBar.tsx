@@ -158,14 +158,10 @@ export function ScoreBar({
       )}
 
       <div className="relative flex flex-col items-center text-center space-y-3">
-        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Percent protected</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Protection score</p>
         <div className="text-5xl font-black text-slate-900 leading-tight">
           {currentLabel}
-          <span className="text-lg font-semibold text-slate-400 align-super ml-1">%</span>
         </div>
-        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">
-          Score confidence · {confidencePercent}%
-        </p>
         <div className="space-y-1">
           <p className="text-sm font-semibold text-slate-900">{stageMeta.current.name}</p>
           <p className="text-sm text-slate-600 max-w-xs mx-auto">{stageMeta.current.copy}</p>

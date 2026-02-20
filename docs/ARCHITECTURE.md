@@ -6,25 +6,117 @@ Cyber Fitness Advisor is a client-side web application built with modern web tec
 
 ## Core Design Principles
 
-### 1. Quick Wins First Philosophy
-- **25% score bonus** for questions marked as `quickWin: true`
-- **Progressive difficulty** - complex questions unlock after basics are mastered
-- **Impact-based recommendations** prioritize high-value, low-effort actions
+### 1. Hunt-to-Help: Flow-Based Value Delivery
+
+The app's job is NOT to interrogate the user. It is a **race to find how we can help**.
+
+Every question is a search probe — "Can I help you here?" — and the moment the
+answer reveals a gap, the app pivots into an actionable quick win. The entire
+flow is a funnel from minimum viable info → immediate value → earn trust → go
+deeper.
+
+#### Flows (Short Question Sequences → Outcome)
+
+A **flow** is just a short sequence of questions that leads to an outcome.
+That's it. Not a framework, not a phase system — just 1-3 questions grouped
+because they serve the same goal. The probe asks "is there a gap here?", and
+if yes, the follow-up closes it. If no, the flow is done and we move on.
+
+Questions are grouped into flows, and each flow is a **hunt**: probe for a
+gap, and if found, pivot to the action that closes it.
+
+| # | Flow | Goal | Hunt Pattern | Max Qs |
+| --- | ------- | ------ | ------------- | -------- |
+| 1 | **Welcome** | User trusts the app | "Your data stays local" → acknowledged | 1 |
+| 2 | **Your Setup** | Know OS + browser | Auto-detect → confirm (2 taps) | 2 |
+| 3 | **Ad Protection** | User has an adblocker | "Do you have one?" → YES: done, move on → NO: "Install uBlock Origin now — 30 seconds" | 2 |
+| 4 | **Password Safety** | User has a password manager, or knows the first step | "Do you use one?" → YES: "What kind?" (quick info) → NO: "What's holding you back?" (identify barrier, suggest next step) | 2 |
+| 5 | **Account Security** | User has 2FA on their most important account, or knows which one to start with | "Do you use 2FA?" → YES: "What method?" → PARTIAL/NO: "Which account would you protect first?" (action) | 2 |
+| 6 | **About You** | Tailor the rest of the journey | Only asked after 3 action flows — earned the right. Tech comfort + main concern + mobile context. | 3 |
+| 7 | **Daily Habits** | Surface gaps in routine security | Updates, screen lock, phishing awareness — each is a probe that may reveal a quick fix | 3 |
+| — | *(no flow)* | Ongoing depth | Everything else: browser-specific deep dives, mobile security, advanced 2FA, breach checks, etc. Flows via gates, no progress bar needed | — |
+
+Flows are organized by **priority ranges**, not custom UI logic. A priority range on a question tells the UI what label to show and which step the user is on.
+
+#### The Hunt in Practice
+
+```text
+User arrives
+  └─ Welcome: "Your data stays local" .................. 1 tap, trust established
+  └─ Your Setup: "Windows + Chrome? Correct?" .......... 2 taps, platform known
+  └─ Ad Protection: "Do you have an adblocker?"
+       ├─ YES → flow complete, hunt moves on .......... 0 effort
+       └─ NO → "Install uBlock Origin" ................. 30 sec, FIRST WIN 🎯
+  └─ Password Safety: "Do you use a password manager?"
+       ├─ YES → "What kind?" (quick categorize) ........ earned the right to ask
+       └─ NO → "What's the barrier?" → suggest action .. SECOND WIN opportunity
+  └─ Account Security: "Do you use 2FA?"
+       ├─ YES → "What method?" ......................... quick check
+       └─ NO → "Which account first?" .................. THIRD WIN opportunity
+  └─ About You: "How comfortable with tech?" ........... they're invested now
+  └─ Daily Habits: updates, screen lock, phishing ...... ongoing awareness
+  └─ Everything else: gate-driven, no interrogation .... power users go deep
+```
+
+Each flow either **delivers a win** or **confirms the user is already good**.
+Neither outcome wastes their time.
+
+#### Pacing: Breathe Between Wins
+
+When a user completes a flow's action — they actually installed the adblocker,
+they actually set up a password manager — the next prompt is **not** another
+probe. It's a breather:
+
+> "Great work! That was a big win. Would you like to keep going, or take a break?"
+
+This does two things:
+
+1. **Celebrates the effort** — the user just did a real thing, acknowledge it
+2. **Gives permission to stop** — normalizes breaks, reduces assessment fatigue
+
+If the user already had the thing ("Yes, I have an adblocker"), no pause is
+needed — confirming you're already safe isn't tiring. Pacing kicks in after
+the user **does work**, not after every flow.
+
+The combination of flows (bounded, purposeful) + pacing (breathe after effort)
+is what makes the experience feel like a helpful friend, not a security audit.
+
+#### "Maybe Later" = Move to Todo
+
+Skipping a question is not failure. It means "find me something I *can* do."
+The app should pivot to the next flow, and the skipped action goes to the
+todo/improvement section.
+
+#### Success Metric
+
+The true metric is **total points accumulated across all users combined**.
+That means maximizing:
+
+- **Adoption** — people start using it
+- **Trust** — they don't drop off during interrogation
+- **Completion** — they finish flows and take actions
+- **Depth** — power users voluntarily go further
+
+A casual user who installs an adblocker and leaves is a success.
+A power user who completes every deep-dive is also a success.
+The system serves both because it delivers value *before* demanding investment.
 
 ### 2. Zero-Backend Architecture
+
 - All logic runs client-side in the browser
 - Data persisted to browser's LocalStorage
 - No server dependencies, perfect for GitHub Pages
 - Export/import for data portability
 
 ### 3. Real-Time Gamification
+
 - Live score calculations with animated feedback
 - Level progression system with celebration triggers
 - Badge achievements for milestone completions
 
 ## Technical Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                        Browser                              │
 ├─────────────────────────────────────────────────────────────┤
@@ -54,20 +146,23 @@ Cyber Fitness Advisor is a client-side web application built with modern web tec
 ## Data Flow
 
 ### 1. Question Answering Flow
-```
+
+```text
 User Answer → Store Action → Scoring Engine → State Update → UI Re-render
                     ↓
               LocalStorage Persist → Celebration Check → UI Feedback
 ```
 
 ### 2. Score Calculation Flow
-```
+
+```text
 Raw Answers → Normalization → Weight Application → Quick Win Bonus → 
 Domain Scores → Overall Score → Level Calculation → Progress Metrics
 ```
 
 ### 3. Recommendation Flow
-```
+
+```text
 Current State → Unanswered Questions → Impact Analysis → 
 Priority Sorting → Top 3 Recommendations → UI Display
 ```
@@ -75,40 +170,50 @@ Priority Sorting → Top 3 Recommendations → UI Display
 ## Component Architecture
 
 ### ScoreBar Component
+
 **Purpose**: Real-time progress visualization with animations
+
 - Animated score counter with easing
 - Level progression indicators
 - Quick wins completion tracking
 - Next level progress visualization
 
 **State Dependencies**:
+
 - `overallScore` - current total score
 - `currentLevel` - user's current level
 - `nextLevelProgress` - progress to next level
 - `quickWinsCompleted` - count of completed quick wins
 
-### QuestionCard Component  
+### QuestionCard Component
+
 **Purpose**: Interactive question presentation with contextual help
+
 - Supports Y/N and 1-5 scale question types
 - Visual indicators for quick wins and time estimates
 - Contextual explanations and action hints
 - Immediate feedback on answer selection
 
 **Props**:
+
 - `question` - question data including text, type, weight
 - `answer` - current user answer (if any)
 - `onAnswer` - callback for answer changes
 - `domainTitle` - context for question categorization
 
 ### Recommendations Component
+
 **Purpose**: Smart next steps based on impact analysis
+
 - Prioritizes unanswered high-impact questions
 - Shows potential point values and time estimates
 - Provides actionable guidance for each recommendation
 - Enables quick navigation to recommended questions
 
 ### Celebration Component
+
 **Purpose**: Progress rewards and motivation
+
 - Triggers on significant score increases (5+ points)
 - Special animations for level-ups
 - Auto-dismissing with manual override
@@ -117,6 +222,7 @@ Priority Sorting → Top 3 Recommendations → UI Display
 ## State Management
 
 ### Zustand Store Design
+
 ```typescript
 interface AssessmentState {
   // Core Data
@@ -142,6 +248,7 @@ interface AssessmentState {
 ```
 
 ### Persistence Strategy
+
 - **Selective Persistence**: Only answers and badges are persisted
 - **Recomputation on Load**: Scores and metrics recalculated from persisted answers
 - **Version Tolerance**: Schema changes don't break existing user data
@@ -150,6 +257,7 @@ interface AssessmentState {
 ## Scoring Engine
 
 ### Normalization Algorithm
+
 ```typescript
 function normalizeAnswer(question: Question, value: boolean | number): number {
   if (question.type === 'YN') {
@@ -162,12 +270,14 @@ function normalizeAnswer(question: Question, value: boolean | number): number {
 ```
 
 ### Weight System
+
 - **Weights 1-10**: Based on security impact assessment
 - **Quick Win Multiplier**: 1.25x bonus for high-impact, easy actions
 - **Domain Balance**: All domains weighted equally in MVP
 
 ### Level Thresholds (Tuned for Early Wins)
-```
+
+```text
 Level 0: 0-15 points   (Getting Started)
 Level 1: 15-35 points  (Basic Protection) 
 Level 2: 35-60 points  (Good Security Habits)
@@ -178,12 +288,14 @@ Level 4: 80+ points    (Cyber Ninja)
 ## Security & Privacy
 
 ### Zero Data Collection
+
 - No analytics or tracking code
 - No external API calls
 - No user identification or profiling
 - All processing happens locally
 
 ### Data Security
+
 - Browser-based encryption via HTTPS
 - LocalStorage data stays on user's device
 - Export files are JSON (human readable)
@@ -192,18 +304,21 @@ Level 4: 80+ points    (Cyber Ninja)
 ## Performance Considerations
 
 ### Bundle Size Optimization
+
 - **Vite tree-shaking** removes unused code
 - **Component lazy loading** for optimal startup
 - **Zustand** (2KB) vs Redux (60KB+) for state management
 - **Lucide icons** loaded on-demand
 
 ### Runtime Performance
+
 - **Pure functions** for scoring calculations enable easy memoization
 - **Incremental updates** only recalculate changed scores
 - **Debounced animations** prevent excessive re-renders
 - **LocalStorage batching** reduces I/O overhead
 
 ### Accessibility
+
 - **ARIA labels** on all interactive elements
 - **Keyboard navigation** support throughout
 - **Color contrast** meets WCAG AA standards
@@ -212,11 +327,13 @@ Level 4: 80+ points    (Cyber Ninja)
 ## Deployment Architecture
 
 ### GitHub Pages Strategy
-```
+
+```text
 main branch → GitHub Actions → Build → gh-pages branch → GitHub Pages
 ```
 
 ### Build Process
+
 1. **Dependency Installation**: pnpm install
 2. **TypeScript Compilation**: Type checking and compilation
 3. **Vite Build**: Bundle optimization and asset processing
@@ -224,6 +341,7 @@ main branch → GitHub Actions → Build → gh-pages branch → GitHub Pages
 5. **Deployment**: Push to gh-pages branch
 
 ### Configuration
+
 - **Base Path**: `/Cyber-Fitness-Advisor/` for GitHub Pages
 - **Asset Optimization**: Minification, compression, source maps
 - **Browser Compatibility**: ES2020+ with Vite polyfills
@@ -231,21 +349,25 @@ main branch → GitHub Actions → Build → gh-pages branch → GitHub Pages
 ## Extension Points
 
 ### Adding New Question Types
+
 1. Extend `QuestionType` union in schema.ts
 2. Update normalization logic in scoring.ts
 3. Add UI handling in QuestionCard component
 4. Update validation and type guards
 
 ### Adding New Domains
+
 1. Add domain definition to questions.json
 2. Update domain navigation in App.tsx
 3. Add domain-specific icons and theming
 4. Create domain-specific recommendations
 
 ### Adding New Gamification Elements
+
 1. Define badge conditions in scoring.ts
 2. Update celebration triggers in store.ts
 3. Add UI components for new reward types
 4. Update persistence layer for new data
 
 This architecture balances simplicity with extensibility, ensuring the app remains maintainable while providing rich functionality and excellent user experience.
+

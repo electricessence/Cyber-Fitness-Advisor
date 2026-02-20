@@ -25,14 +25,14 @@ describe('Store Independence - Data Layer Only', () => {
     expect(store.questionBank.domains).toBeDefined();
     expect(store.questionBank.domains.length).toBeGreaterThan(0);
     
-    // Should find onboarding questions
+    // Should find high-priority questions (e.g., privacy_notice)
     const allQuestions = store.questionBank.domains.flatMap(d => 
       d.levels.flatMap(l => l.questions)
     );
-    const onboardingQuestions = allQuestions.filter(q => q.phase === 'onboarding');
+    const highPriorityQuestions = allQuestions.filter(q => (q.priority || 0) >= 95);
     
-    expect(onboardingQuestions.length).toBeGreaterThan(0);
-    expect(onboardingQuestions.some(q => q.id === 'privacy_notice')).toBe(true);
+    expect(highPriorityQuestions.length).toBeGreaterThan(0);
+    expect(allQuestions.some(q => q.id === 'privacy_notice')).toBe(true);
   });
 
   it('should show privacy notice for fresh user (no facts)', () => {
@@ -42,7 +42,7 @@ describe('Store Independence - Data Layer Only', () => {
     // Privacy notice should be available (no privacy_acknowledged fact exists)
     const privacyNotice = availableQuestions.find(q => q.id === 'privacy_notice');
     expect(privacyNotice).toBeDefined();
-    expect(privacyNotice?.phase).toBe('onboarding');
+    expect(privacyNotice?.priority).toBe(10000);
   });
 
   it('should hide privacy notice after acknowledgment (fact-based filtering)', () => {

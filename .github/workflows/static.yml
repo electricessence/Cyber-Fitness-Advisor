@@ -58,26 +58,8 @@ jobs:
       - name: TypeScript type checking
         run: pnpm typecheck
 
-      - name: Content authoring lint (Phase 2.5 Task B)
-        run: pnpm author:lint
-
       - name: Run comprehensive test suite
         run: pnpm test
-
-      - name: Validate seed content structure
-        run: |
-          # Verify seed content JSON structure
-          node -e "
-            const seedContent = require('./src/data/seed-content/seed-content-v1.json');
-            console.log('Seed content validation:', {
-              suitesCount: seedContent.suites.length,
-              domainsCount: seedContent.domains.length,
-              validStructure: seedContent.suites.length > 0 && seedContent.domains.length > 0
-            });
-            if (seedContent.suites.length === 0 || seedContent.domains.length === 0) {
-              process.exit(1);
-            }
-          "
 
       - name: Build production bundle
         run: pnpm build

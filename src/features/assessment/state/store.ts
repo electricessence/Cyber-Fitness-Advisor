@@ -158,10 +158,8 @@ interface AssessmentState extends FactsStoreState {
   // Condition-driven question visibility
   getVisibleQuestionIds: () => string[];
 
-  // Unified model derived (feature-flagged)
-  getOrderedAvailableQuestions?: () => Question[];
-  getOnboardingPendingCount?: () => number;
-  isOnboardingComplete?: () => boolean;
+  // Unified model derived
+  getOrderedAvailableQuestions: () => Question[];
   
   // Task Management
   getTodaysTasks: () => Question[];
@@ -647,97 +645,62 @@ export const useAssessmentStore = create<AssessmentState>()(
         return availableQuestions;
       },
 
-      // Unified model ordering (priority-first with phase fallback + probe ceiling)
+      // Priority-first ordering with probe ceiling
+      // No phase buckets — priority alone determines order.
+      // The probe ceiling interleaves non-probe questions to prevent
+      // interrogation fatigue.
       getOrderedAvailableQuestions: () => {
         const raw = get().getAvailableQuestions();
-        const onboardingPending = (get().getOnboardingPendingCount?.() ?? 0) > 0;
-
-        const phaseRank = (question: Question) => {
-          if (question.phase === 'onboarding' && onboardingPending) return 0;
-          if (question.phase === 'onboarding') return 1;
-          return 2;
-        };
 
         const prioritySorted = [...raw].sort((a, b) => {
-          const phaseComparison = phaseRank(a) - phaseRank(b);
-          if (phaseComparison !== 0) {
-            return phaseComparison;
-          }
-
-          // Priority still dictates order within the same phase bucket
           const aPriority = a.priority || 0;
           const bPriority = b.priority || 0;
           if (bPriority !== aPriority) {
             return bPriority - aPriority;
           }
-
-          const ao = a.phaseOrder ?? 9999;
-          const bo = b.phaseOrder ?? 9999;
-          if (ao !== bo) return ao - bo;
-
           return a.id.localeCompare(b.id);
         });
 
-        // Probe ceiling: after MAX_CONSECUTIVE_PROBES probe-intent questions,
+        // Probe ceiling: after MAX_CONSECUTIVE_PROBES consecutive probe-intent questions,
         // pull the next non-probe question forward to break up the interrogation.
-        // Onboarding questions are exempt — they form a fixed orientation flow.
+        // Scans the priority-sorted list in order — only the minimum reorder needed
+        // (one non-probe pulled forward) so priority ordering is otherwise preserved.
         const MAX_CONSECUTIVE_PROBES = 3;
 
-        // Separate onboarding (exempt) from assessment (subject to ceiling)
-        const onboarding = prioritySorted.filter(q => phaseRank(q) < 2);
-        const assessment = prioritySorted.filter(q => phaseRank(q) >= 2);
+        // Always lead with the highest-priority question regardless
+        // of its journeyIntent.  Priority drives flow ordering; the probe
+        // ceiling only reorders the *rest* to prevent interrogation fatigue.
+        const leadQuestion = prioritySorted.length > 0 ? prioritySorted[0] : null;
+        const pending = prioritySorted.slice(1); // mutable working copy, already priority-sorted
 
-        // Split assessment into probes and non-probes (preserving priority order)
-        const probes: Question[] = [];
-        const nonProbes: Question[] = [];
-        for (const q of assessment) {
-          if (q.journeyIntent === 'probe' || q.journeyIntent === 'insight') {
-            probes.push(q);
-          } else {
-            nonProbes.push(q);
-          }
-        }
-
-        // Interleave: take up to MAX probes, then insert a non-probe, repeat
         const paced: Question[] = [];
-        let pi = 0; // probe index
-        let ni = 0; // non-probe index
+        let streak = 0;
 
-        while (pi < probes.length || ni < nonProbes.length) {
-          // Emit up to MAX_CONSECUTIVE_PROBES probes
-          let emitted = 0;
-          while (pi < probes.length && emitted < MAX_CONSECUTIVE_PROBES) {
-            paced.push(probes[pi++]);
-            emitted++;
-          }
+        while (pending.length > 0) {
+          const next = pending[0];
+          const isProbe = next.journeyIntent === 'probe' || next.journeyIntent === 'insight';
 
-          // Insert a non-probe as a break (if available)
-          if (ni < nonProbes.length) {
-            paced.push(nonProbes[ni++]);
-          } else if (pi < probes.length) {
-            // No more non-probes left — emit remaining probes
-            while (pi < probes.length) {
-              paced.push(probes[pi++]);
+          if (isProbe && streak >= MAX_CONSECUTIVE_PROBES) {
+            // Find the next non-probe further down the sorted list
+            const nonProbeIdx = pending.findIndex(
+              q => q.journeyIntent !== 'probe' && q.journeyIntent !== 'insight'
+            );
+            if (nonProbeIdx !== -1) {
+              // Pull it forward as a single pacing break, then reset the streak
+              paced.push(...pending.splice(nonProbeIdx, 1));
+              streak = 0;
+              continue;
             }
+            // No non-probe available — emit all remaining probes as-is
+            paced.push(...pending.splice(0));
+            break;
           }
+
+          paced.push(pending.shift()!);
+          streak = isProbe ? streak + 1 : 0;
         }
 
-        return [...onboarding, ...paced];
-      },
-
-      getOnboardingPendingCount: () => {
-        const state = get();
-        const answeredIds = new Set(Object.keys(state.answers));
-        const allQuestions = state.questionBank.domains.flatMap(domain => 
-          domain.levels.flatMap(level => level.questions)
-        );
-        const onboardingQuestions = allQuestions.filter(question => question.phase === 'onboarding');
-        return onboardingQuestions.filter(question => !answeredIds.has(question.id)).length;
-      },
-
-      isOnboardingComplete: () => {
-        const pending = get().getOnboardingPendingCount?.() ?? 0;
-        return pending === 0;
+        return [...(leadQuestion ? [leadQuestion] : []), ...paced];
       },
       
       getRecommendations: () => {
@@ -1161,6 +1124,11 @@ export const initializeStore = () => {
   
   // Set a general flag that any detection has happened
   store.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
+  
+  // NOTE: We intentionally do NOT auto-confirm OS/browser here.
+  // The user should see the detection confirmation questions (e.g. "Detected: Windows — is this correct?")
+  // so they know what the app detected and can correct it if wrong.
+  // This preserves the privacy-first transparency principle with a minimal 2-question onboarding.
   
   // Facts and questions are now initialized
   

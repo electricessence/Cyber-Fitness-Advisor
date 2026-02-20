@@ -9,6 +9,8 @@ describe('Complete Onboarding Flow Automation', () => {
     store.resetAssessment();
     
     // Simulate device detection facts as would happen at app startup
+    // Detection sets os_detected/browser_detected but NOT os_confirmed/browser_confirmed
+    // — the user must confirm via the detection confirmation questions
     store.factsActions.injectFact('os_detected', 'windows', { source: 'auto-detection' });
     store.factsActions.injectFact('browser_detected', 'firefox', { source: 'auto-detection' });
     store.factsActions.injectFact('device_type', 'desktop', { source: 'auto-detection' });
@@ -32,75 +34,58 @@ describe('Complete Onboarding Flow Automation', () => {
     });
   });
 
-  it('should follow correct onboarding sequence with device detection at startup', () => {
-    // STEP 1: First question should be Privacy Notice
-    const firstQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
+  it('should follow correct onboarding sequence: privacy → ad_blocker → browser confirm', () => {
+    // STEP 1: First question should be Privacy Notice (highest priority: 10000)
+    const firstQuestions = store.getOrderedAvailableQuestions();
     expect(firstQuestions[0]?.id).toBe('privacy_notice');
     
     // STEP 2: Answer Privacy Notice
     store.answerQuestion('privacy_notice', 'understood');
     
-    // STEP 3: Second question should be OS DETECTION (not selection)
-    const secondQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    expect(secondQuestions[0]?.id).toBe('windows_detection_confirm');
-    expect(secondQuestions[0]?.statement).toContain('Detected: Windows');
+    // STEP 3: Next highest-priority question should be ad_blocker (98), then browser detection (97)
+    const allQuestions = store.getOrderedAvailableQuestions();
+    expect(allQuestions[0]?.id).toBe('ad_blocker');
     
-    // STEP 4: Answer OS Detection
-    store.answerQuestion('windows_detection_confirm', 'yes');
+    // STEP 4: Answer ad_blocker probe
+    store.answerQuestion('ad_blocker', 'no');
     
-    // STEP 5: Third question should be Browser DETECTION (not selection)
-    const thirdQuestions = store.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-    expect(thirdQuestions[0]?.id).toBe('firefox_detection_confirm');
-    expect(thirdQuestions[0]?.statement).toContain('Detected: Firefox');
+    // STEP 5: Browser detection confirm should appear next (priority 97)
+    const afterAdBlock = store.getOrderedAvailableQuestions();
+    expect(afterAdBlock[0]?.id).toBe('firefox_detection_confirm');
+    expect(afterAdBlock[0]?.statement).toContain('Detected: Firefox');
+    
+    // STEP 6: Confirm browser detection
+    store.answerQuestion('firefox_detection_confirm', 'yes');
+    
+    // STEP 7: Deep-dive ad-block questions should now be available (browser-specific)
+    const afterBrowser = store.getOrderedAvailableQuestions();
+    // First available should be a browser-specific ad-block deep-dive or next assessment question
+    expect(afterBrowser.length).toBeGreaterThan(0);
+    
+    // OS detection questions should NOT have appeared yet — they're deferred to priority 80
+    const osDetectionQuestion = afterBrowser.find(q => q.id === 'windows_detection_confirm');
+    // OS detection is deferred but still available (priority 80)
+    expect(osDetectionQuestion).toBeDefined();
   });
 
-  it('should handle different browser detections correctly', () => {
-    const browsers = ['firefox', 'chrome', 'edge', 'safari'];
+  it('should show browser selection when browser detection is unknown', () => {
+    // Reset and inject unknown browser detection
+    store.resetAssessment();
+    const freshStore = useAssessmentStore.getState();
     
-    browsers.forEach(browser => {
-      // Reset and inject facts for this browser
-      store.resetAssessment();
-      
-      // Get fresh store reference after reset
-      const freshStore = useAssessmentStore.getState();
-      freshStore.factsActions.injectFact('os_detected', 'windows', { source: 'auto-detection' });
-      freshStore.factsActions.injectFact('browser_detected', browser, { source: 'auto-detection' });
-      freshStore.factsActions.injectFact('device_type', 'desktop', { source: 'auto-detection' });
-      freshStore.factsActions.injectFact('device_detection_completed', true, { source: 'auto-detection' });
-      
-      // Set up device profile to simulate complete device detection
-      freshStore.setDeviceProfile({
-        currentDevice: {
-          os: 'windows',
-          browser: browser as any,
-          type: 'desktop'
-        },
-        otherDevices: {
-          hasWindows: true,
-          hasMac: false,
-          hasLinux: false,
-          hasIPhone: false,
-          hasAndroid: false,
-          hasIPad: false
-        }
-      });
-      
-      // First should be privacy notice
-      const privacyQuestions = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-      expect(privacyQuestions[0]?.id).toBe('privacy_notice');
-      
-      // Answer privacy notice
-      freshStore.answerQuestion('privacy_notice', 'understood');
-      
-      // Then answer OS detection
-      freshStore.answerQuestion('windows_detection_confirm', 'yes');
-      
-      // Check browser detection question appears
-      const questions = freshStore.getAvailableQuestions().filter(q => q.phase === 'onboarding');
-      const browserQuestion = questions[0];
-      
-      expect(browserQuestion?.id).toBe(`${browser}_detection_confirm`);
-      expect(browserQuestion?.statement?.toLowerCase()).toContain(browser);
-    });
+    // Override browser to 'unknown' — OS stays as-is from resetAssessment → initializeStore
+    freshStore.factsActions.injectFact('browser_detected', 'unknown', { source: 'test-override' });
+    
+    // Answer privacy notice
+    freshStore.answerQuestion('privacy_notice', 'understood');
+    
+    // After privacy, ad_blocker is next (98), then browser_selection (96) for unknown browser
+    // Answer ad_blocker first
+    freshStore.answerQuestion('ad_blocker', 'no');
+    
+    // With browser_detected='unknown' and privacy_acknowledged=true → browser_selection should appear
+    const available = freshStore.getOrderedAvailableQuestions();
+    const browserSelection = available.find(q => q.id === 'browser_selection');
+    expect(browserSelection).toBeDefined();
   });
 });

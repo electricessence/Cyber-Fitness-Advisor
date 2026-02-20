@@ -73,8 +73,8 @@ const CARD_THEMES: Record<string, QuestionVisual> = {
 
 const INTENT_META: Record<JourneyIntent, { label: string; description: string; chipClass: string; borderClass: string; textClass: string }> = {
   onboarding: {
-    label: 'Orientation',
-    description: 'These cards confirm basics so we can personalize later steps.',
+    label: 'Setup',
+    description: 'Quick checks to understand your setup so we can help.',
     chipClass: 'bg-amber-100 text-amber-900 border border-amber-200',
     borderClass: 'border-amber-200',
     textClass: 'text-amber-700'
@@ -144,7 +144,6 @@ function getVisuals(question: Question): QuestionVisual {
 
 function deriveJourneyIntent(question: Question): JourneyIntent {
   if (question.journeyIntent) return question.journeyIntent;
-  if (question.phase === 'onboarding') return 'onboarding';
   const tags = new Set(question.tags ?? []);
 
   if (tags.has('checklist')) return 'checklist';
@@ -202,6 +201,8 @@ export function QuestionDeck() {
 
   const availableQuestions = getOrderedAvailableQuestions?.() ?? [];
   const totalCards = availableQuestions.length;
+
+  const answeredCount = Object.keys(answers).length;
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
@@ -290,7 +291,6 @@ export function QuestionDeck() {
   }, []);
 
   if (!currentQuestion) {
-    const answeredCount = Object.keys(answers).length;
     const totalSlides = improvementItems.length;
     const clampedIndex = Math.min(slideIndex, Math.max(0, totalSlides - 1));
     const currentSlide = improvementItems[clampedIndex];
@@ -463,97 +463,101 @@ export function QuestionDeck() {
   return (
     <section id="question-deck" aria-label="Security question deck" className="flex flex-col gap-4 h-full">
       <div className="flex-1">
-        <div className={`relative bg-white rounded-3xl shadow-xl p-6 sm:p-8 flex flex-col gap-6 border ${intentMeta.borderClass}`}>
-          <div className="flex items-start gap-3 sm:gap-4">
-            <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${gradient} text-white flex items-center justify-center shadow-md`}>
-              <Icon className="w-6 h-6" />
-            </div>
-            <div className="flex-1 space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full ${intentMeta.chipClass}`}>
-                  {intentMeta.label}
-                </span>
-                <p className={`text-xs font-semibold uppercase tracking-wide ${accent}`}>{label}</p>
+        <div className={`relative bg-white rounded-3xl shadow-xl flex flex-col border ${intentMeta.borderClass} overflow-hidden`}>
+
+          {/* Card body */}
+          <div className="p-6 sm:p-8 flex flex-col gap-6">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${gradient} text-white flex items-center justify-center shadow-md`}>
+                <Icon className="w-6 h-6" />
               </div>
-              <div className={`px-4 py-3 ${tint} rounded-xl`}>
-                {currentQuestion.statement && (
-                  <p className="text-base sm:text-lg font-medium text-slate-800 leading-snug">
-                    {currentQuestion.statement}
+              <div className="flex-1 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full ${intentMeta.chipClass}`}>
+                    {intentMeta.label}
+                  </span>
+                  <p className={`text-xs font-semibold uppercase tracking-wide ${accent}`}>{label}</p>
+                </div>
+                <div className={`px-4 py-3 ${tint} rounded-xl`}>
+                  {currentQuestion.statement && (
+                    <p className="text-base sm:text-lg font-medium text-slate-800 leading-snug">
+                      {currentQuestion.statement}
+                    </p>
+                  )}
+                  <h3 className={`${currentQuestion.statement ? 'mt-2 ' : ''}font-bold text-sm sm:text-base ${accent}`}>
+                    {currentQuestion.text}
+                  </h3>
+                  {currentQuestion.timeEstimate && (
+                    <div className="inline-flex items-center gap-1 text-xs text-gray-600 bg-white/70 rounded-full px-2 py-1 mt-3">
+                      <Clock3 className="w-3 h-3" />
+                      {currentQuestion.timeEstimate}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {(currentQuestion.description || currentQuestion.explanation) && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDetails((prev) => !prev)}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-blue-600"
+                >
+                  <Info className="w-4 h-4" />
+                  {showDetails ? 'Hide context' : 'Why this matters'}
+                </button>
+                {showDetails && (
+                  <p className="mt-2 text-sm text-gray-600 bg-blue-50 rounded-xl p-4">
+                    {currentQuestion.description || currentQuestion.explanation}
                   </p>
                 )}
-                <h3 className={`${currentQuestion.statement ? 'mt-2 ' : ''}font-bold text-sm sm:text-base ${accent}`}>
-                  {currentQuestion.text}
-                </h3>
-                {currentQuestion.timeEstimate && (
-                  <div className="inline-flex items-center gap-1 text-xs text-gray-600 bg-white/70 rounded-full px-2 py-1 mt-3">
-                    <Clock3 className="w-3 h-3" />
-                    {currentQuestion.timeEstimate}
-                  </div>
-                )}
               </div>
-            </div>
-          </div>
+            )}
 
-          {(currentQuestion.description || currentQuestion.explanation) && (
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={() => setShowDetails((prev) => !prev)}
-                className="inline-flex items-center gap-1 text-sm font-medium text-blue-600"
-              >
-                <Info className="w-4 h-4" />
-                {showDetails ? 'Hide context' : 'Why this matters'}
-              </button>
-              {showDetails && (
-                <p className="mt-2 text-sm text-gray-600 bg-blue-50 rounded-xl p-4">
-                  {currentQuestion.description || currentQuestion.explanation}
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="pt-4 space-y-3">
-            {options.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => handleAnswer(option.id)}
-                className="w-full border-2 border-gray-200 rounded-2xl p-4 text-left hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      {option.icon && <span className="text-xl" aria-hidden="true">{option.icon}</span>}
-                      {option.text}
+            <div className="pt-4 space-y-3">
+              {options.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => handleAnswer(option.id)}
+                  className="w-full border-2 border-gray-200 rounded-2xl p-4 text-left hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                        {option.icon && <span className="text-xl" aria-hidden="true">{option.icon}</span>}
+                        {option.text}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {option.feedback && (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          aria-label={expandedOptionId === option.id ? `Hide details for ${option.text}` : `Show details for ${option.text}`}
+                          aria-expanded={expandedOptionId === option.id}
+                          onClick={(e) => toggleOptionInfo(e, option.id)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOptionInfo(e as unknown as React.MouseEvent, option.id); } }}
+                          className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                            expandedOptionId === option.id
+                              ? 'bg-blue-100 text-blue-600'
+                              : 'bg-gray-100 text-gray-400 hover:bg-blue-50 hover:text-blue-500'
+                          }`}
+                        >
+                          <Info className="w-3.5 h-3.5" />
+                        </span>
+                      )}
+                      <ArrowRight className="w-5 h-5 text-gray-400" />
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {option.feedback && (
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        aria-label={expandedOptionId === option.id ? `Hide details for ${option.text}` : `Show details for ${option.text}`}
-                        aria-expanded={expandedOptionId === option.id}
-                        onClick={(e) => toggleOptionInfo(e, option.id)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOptionInfo(e as unknown as React.MouseEvent, option.id); } }}
-                        className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
-                          expandedOptionId === option.id
-                            ? 'bg-blue-100 text-blue-600'
-                            : 'bg-gray-100 text-gray-400 hover:bg-blue-50 hover:text-blue-500'
-                        }`}
-                      >
-                        <Info className="w-3.5 h-3.5" />
-                      </span>
-                    )}
-                    <ArrowRight className="w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-                {option.feedback && expandedOptionId === option.id && (
-                  <p className="text-sm text-gray-500 mt-3 pt-3 border-t border-gray-100 leading-relaxed">
-                    {option.feedback}
-                  </p>
-                )}
-              </button>
-            ))}
+                  {option.feedback && expandedOptionId === option.id && (
+                    <p className="text-sm text-gray-500 mt-3 pt-3 border-t border-gray-100 leading-relaxed">
+                      {option.feedback}
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

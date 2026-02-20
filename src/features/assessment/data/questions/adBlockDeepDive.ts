@@ -16,9 +16,9 @@ import type { Question } from '../../engine/schema.js';
 import { ASSESSMENT_PRIORITIES } from './priorities.js';
 
 // Named priority slots from ASSESSMENT_PRIORITIES — no ad-hoc arithmetic
-const AB_DESKTOP = ASSESSMENT_PRIORITIES.AD_BLOCK_DESKTOP;       // 61
-const AB_SECONDARY = ASSESSMENT_PRIORITIES.AD_BLOCK_SECONDARY;   // 59
-const AB_FOLLOWUP = ASSESSMENT_PRIORITIES.AD_BLOCK_FOLLOWUP;     // 57
+const AB_DESKTOP = ASSESSMENT_PRIORITIES.AD_BLOCK_DESKTOP;       // 94
+const AB_SECONDARY = ASSESSMENT_PRIORITIES.AD_BLOCK_SECONDARY;   // 93
+const AB_FOLLOWUP = ASSESSMENT_PRIORITIES.AD_BLOCK_FOLLOWUP;     // 92
 
 export const adBlockDeepDiveQuestions: Question[] = [
 
@@ -222,7 +222,8 @@ export const adBlockDeepDiveQuestions: Question[] = [
     effort: 'Quick read + optional research',
     description: 'As of early 2026, Google documents that in standard mode the encryption key is stored in your Google Account. Google offers an opt-in "on-device encryption" mode where only you hold the key, but the EFF and Privacy Guides both note this is not enabled by default (sources: EFF 2025-03-06; Privacy Guides 2025-09-12). This is worth researching yourself — search "Google Password Manager on-device encryption" to see the current state.',
     conditions: {
-      include: { browser: 'chrome', pm_type: 'browser' }
+      include: { browser: 'chrome', pm_type: 'browser' },
+      exclude: { browser_switched: true }
     },
     options: [
       {
@@ -310,7 +311,7 @@ export const adBlockDeepDiveQuestions: Question[] = [
   {
     id: 'adblock_mobile_ios',
     text: 'On iOS, ad blocking works differently. Firefox Focus is a free, open-source app that acts as a Safari content blocker — blocking ads and trackers in Safari itself. You can also use Firefox Focus as a standalone private browser.',
-    priority: AB_SECONDARY,
+    priority: ASSESSMENT_PRIORITIES.AD_BLOCK_MOBILE_IOS, // Mobile-only — must appear after OS detection (80) confirms mobile_os
     tags: ['mobile', 'ios', 'privacy', 'action'],
     journeyIntent: 'action-guided',
     difficulty: 'beginner',
@@ -344,7 +345,7 @@ export const adBlockDeepDiveQuestions: Question[] = [
   {
     id: 'adblock_mobile_android',
     text: 'On Android, Firefox is available as a full mobile browser with extension support — including uBlock Origin. This gives you the same desktop-grade ad blocking on your phone.',
-    priority: AB_SECONDARY,
+    priority: ASSESSMENT_PRIORITIES.AD_BLOCK_MOBILE_ANDROID, // Mobile-only — must appear after OS detection (80) confirms mobile_os
     tags: ['mobile', 'android', 'privacy', 'action'],
     journeyIntent: 'action-guided',
     difficulty: 'beginner',

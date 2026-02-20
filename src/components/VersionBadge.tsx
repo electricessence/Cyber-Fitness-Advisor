@@ -1,5 +1,5 @@
 // Import version from package.json at build time
-const version = "1.0.0"; // This will be updated by our versioning workflow
+const version = "1.1.0"; // This will be updated by our versioning workflow
 
 interface VersionBadgeProps {
   className?: string;
