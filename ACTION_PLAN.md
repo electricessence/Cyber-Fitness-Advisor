@@ -111,13 +111,14 @@ security audit.
 ### Question Priority Ranges (Flow Ordering)
 
 ```text
-Onboarding:          10000-9400  (privacy notice, OS/browser confirms)
-Flow 1 - Ad Blocker:    95-92   (probe, browser-specific install, followup)
-Flow 2 - Passwords:     90-86   (probe, type, master pw, barrier)
-Flow 3 - Account Sec:   85-81   (probe, method, backup codes, barrier)
-About You:              78-77   (tech_comfort, usage_context — earned after 3 wins)
-Daily Habits:           75-70   (software_updates, phishing, screen_lock)
-Deep Assessment:        68-38   (everything else)
+Flow 1 - Welcome:    10000      (privacy notice — 1 tap, trust)
+Flow 2 - Your Setup:  97-79    (browser + OS detection/confirmation)
+Flow 3 - Ad Blocker:  98-92    (probe, browser-specific install, followup)
+Flow 4 - Passwords:   90-86    (probe, type, master pw, barrier)
+Flow 5 - Account Sec: 85-81    (probe, method, backup codes, barrier)
+Flow 6 - About You:   78-77    (tech_comfort, usage_context — earned after 3 wins)
+Flow 7 - Daily Habits:75-70    (software_updates, phishing, screen_lock)
+(no flow) Deep Assessment: 68-38  (everything else)
 ```
 
 ### Content Files
