@@ -652,12 +652,14 @@ export const onboardingQuestions: Question[] = [
   {
     id: 'tech_comfort',
     // Flow 6: About You — personalization earned after 3 action wins
+    // Gated on privacy_acknowledged (not os_confirmed) — tech_comfort naturally appears
+    // after OS detection (priority 80) since its own priority (78) is lower.
     priority: ASSESSMENT_PRIORITIES.ABOUT_YOU_TECH_COMFORT,
     text: 'How would you describe your comfort with technology?',
     tags: ['probe'],
     journeyIntent: 'probe',
     conditions: {
-      include: { "os_confirmed": true },
+      include: { "privacy_acknowledged": true },
       exclude: { "tech_comfort": "*" } // Don't re-ask if already set via onboarding shortcuts
     },
     options: [
