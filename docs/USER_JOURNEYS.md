@@ -1,5 +1,10 @@
 # User Journeys - Cyber Fitness Advisor
 
+> Looking for the **implemented** content map (question IDs, ordering policy, branch logic)?
+> Start with **docs/CONTENT_FLOW_TREE.md**.
+>
+> This file is useful for scenario thinking and UX intent, but parts may be more descriptive/aspirational than the current question bank.
+
 ## Overview
 This document outlines expected user journeys to validate the conditional logic, facts system, and overall user experience.
 
